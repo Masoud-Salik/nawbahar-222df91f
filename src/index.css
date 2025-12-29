@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,110 +6,106 @@
 
 @layer base {
   :root {
-    /* Fetrat Media - Premium Afghan Media Platform */
-    /* Deep navy & warm gold palette */
+    /* Fetrat Media - Minimalist White with Persian Green */
     
-    --background: 220 20% 97%;
-    --foreground: 220 30% 12%;
+    --background: 0 0% 99%;
+    --foreground: 210 15% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 30% 12%;
+    --card-foreground: 210 15% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 12%;
+    --popover-foreground: 210 15% 12%;
 
-    /* Deep navy primary */
-    --primary: 220 60% 22%;
-    --primary-foreground: 45 80% 95%;
+    /* Deep Turquoise / Persian Green */
+    --primary: 174 72% 32%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Warm cream secondary */
-    --secondary: 40 30% 94%;
-    --secondary-foreground: 220 30% 18%;
+    /* Subtle cream/off-white secondary */
+    --secondary: 45 20% 96%;
+    --secondary-foreground: 210 15% 18%;
 
-    --muted: 220 15% 92%;
-    --muted-foreground: 220 15% 45%;
+    --muted: 210 10% 95%;
+    --muted-foreground: 210 10% 45%;
 
-    /* Gold accent */
-    --accent: 38 75% 55%;
-    --accent-foreground: 220 60% 12%;
+    /* Persian Green accent */
+    --accent: 174 72% 32%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 88%;
-    --input: 220 20% 88%;
-    --ring: 38 75% 55%;
+    --border: 210 15% 90%;
+    --input: 210 15% 90%;
+    --ring: 174 72% 32%;
 
     --radius: 0.75rem;
 
-    /* Custom tokens */
-    --gold: 38 75% 55%;
-    --gold-light: 42 80% 70%;
-    --gold-dark: 35 70% 40%;
-    --navy: 220 60% 22%;
-    --navy-light: 220 45% 35%;
-    --cream: 45 40% 96%;
-    --ink: 220 30% 12%;
+    /* Custom Persian Green tokens */
+    --persian-green: 174 72% 32%;
+    --persian-green-light: 174 60% 45%;
+    --persian-green-dark: 174 80% 22%;
+    --cream: 45 25% 97%;
+    --ink: 210 15% 12%;
 
-    /* Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(38 75% 55%), hsl(42 80% 70%));
-    --gradient-navy: linear-gradient(180deg, hsl(220 60% 22%), hsl(220 50% 15%));
-    --gradient-subtle: linear-gradient(180deg, hsl(220 20% 97%), hsl(220 15% 94%));
-    
     /* Shadows */
-    --shadow-sm: 0 1px 3px hsl(220 30% 12% / 0.04);
-    --shadow-md: 0 4px 12px hsl(220 30% 12% / 0.08);
-    --shadow-lg: 0 8px 30px hsl(220 30% 12% / 0.12);
-    --shadow-glow: 0 0 40px hsl(38 75% 55% / 0.15);
+    --shadow-sm: 0 1px 2px hsl(210 15% 12% / 0.03);
+    --shadow-md: 0 4px 12px hsl(210 15% 12% / 0.06);
+    --shadow-lg: 0 8px 24px hsl(210 15% 12% / 0.1);
 
     /* Sidebar */
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 220 30% 26%;
-    --sidebar-primary: 220 60% 22%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 40 30% 94%;
-    --sidebar-accent-foreground: 220 30% 18%;
-    --sidebar-border: 220 20% 88%;
-    --sidebar-ring: 38 75% 55%;
+    --sidebar-foreground: 210 15% 26%;
+    --sidebar-primary: 174 72% 32%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 20% 96%;
+    --sidebar-accent-foreground: 210 15% 18%;
+    --sidebar-border: 210 15% 90%;
+    --sidebar-ring: 174 72% 32%;
   }
 
   .dark {
-    --background: 220 30% 8%;
-    --foreground: 40 20% 95%;
+    --background: 210 20% 8%;
+    --foreground: 45 15% 95%;
 
-    --card: 220 25% 12%;
-    --card-foreground: 40 20% 95%;
+    --card: 210 18% 11%;
+    --card-foreground: 45 15% 95%;
 
-    --popover: 220 25% 12%;
-    --popover-foreground: 40 20% 95%;
+    --popover: 210 18% 11%;
+    --popover-foreground: 45 15% 95%;
 
-    --primary: 38 75% 55%;
-    --primary-foreground: 220 30% 8%;
+    /* Persian Green stays vibrant in dark */
+    --primary: 174 65% 42%;
+    --primary-foreground: 210 20% 8%;
 
-    --secondary: 220 25% 18%;
-    --secondary-foreground: 40 20% 90%;
+    --secondary: 210 15% 16%;
+    --secondary-foreground: 45 15% 90%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 15% 60%;
+    --muted: 210 15% 18%;
+    --muted-foreground: 210 10% 55%;
 
-    --accent: 38 75% 55%;
-    --accent-foreground: 220 30% 8%;
+    --accent: 174 65% 42%;
+    --accent-foreground: 210 20% 8%;
 
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
-    --ring: 38 75% 55%;
+    --border: 210 15% 18%;
+    --input: 210 15% 18%;
+    --ring: 174 65% 42%;
 
-    --sidebar-background: 220 25% 10%;
-    --sidebar-foreground: 40 20% 90%;
-    --sidebar-primary: 38 75% 55%;
-    --sidebar-primary-foreground: 220 30% 8%;
-    --sidebar-accent: 220 20% 16%;
-    --sidebar-accent-foreground: 40 20% 90%;
-    --sidebar-border: 220 20% 18%;
-    --sidebar-ring: 38 75% 55%;
+    --persian-green: 174 65% 42%;
+    --persian-green-light: 174 55% 55%;
+    --persian-green-dark: 174 70% 30%;
+
+    --sidebar-background: 210 18% 10%;
+    --sidebar-foreground: 45 15% 90%;
+    --sidebar-primary: 174 65% 42%;
+    --sidebar-primary-foreground: 210 20% 8%;
+    --sidebar-accent: 210 15% 16%;
+    --sidebar-accent-foreground: 45 15% 90%;
+    --sidebar-border: 210 15% 18%;
+    --sidebar-ring: 174 65% 42%;
   }
 }
 
@@ -120,18 +116,24 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Source Sans 3', system-ui, sans-serif;
+    font-family: 'Vazirmatn', system-ui, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', Georgia, serif;
-    @apply font-medium tracking-tight;
+    font-family: 'Vazirmatn', system-ui, sans-serif;
+    @apply font-semibold tracking-tight;
   }
 }
 
+/* Text size settings */
+html.text-sm body { font-size: 14px; }
+html.text-base body { font-size: 16px; }
+html.text-lg body { font-size: 18px; }
+html.text-xl body { font-size: 20px; }
+
 @layer components {
   .article-content {
-    font-family: 'Source Sans 3', system-ui, sans-serif;
+    font-family: 'Vazirmatn', system-ui, sans-serif;
     @apply text-lg leading-relaxed;
   }
 
@@ -140,42 +142,55 @@
   }
 
   .article-content h2 {
-    font-family: 'Playfair Display', Georgia, serif;
     @apply text-2xl font-semibold mt-10 mb-4;
   }
 
   .article-content blockquote {
-    @apply border-l-4 border-accent pl-6 italic my-6 text-muted-foreground;
+    @apply border-l-4 border-primary pl-6 italic my-6 text-muted-foreground;
   }
 
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+    @apply bg-card/90 backdrop-blur-xl border border-border/50;
     box-shadow: var(--shadow-md);
   }
 
-  .btn-gold {
-    background: var(--gradient-gold);
-    @apply text-primary-foreground font-medium shadow-md hover:shadow-lg transition-all duration-300;
+  /* Icon-only nav item */
+  .nav-icon {
+    @apply flex items-center justify-center p-3 text-muted-foreground transition-all duration-200;
   }
 
-  .nav-item {
-    @apply flex flex-col items-center justify-center gap-1 py-2 px-4 text-muted-foreground transition-all duration-200;
+  .nav-icon.active {
+    @apply text-primary;
   }
 
-  .nav-item.active {
-    @apply text-accent;
-  }
-
-  .nav-item:hover {
+  .nav-icon:hover:not(.active) {
     @apply text-foreground;
   }
 
+  /* Center write button */
+  .nav-write {
+    @apply relative flex items-center justify-center w-14 h-14 -mt-5 rounded-2xl bg-primary text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105;
+  }
+
   .tag-pill {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-secondary text-secondary-foreground;
+    @apply inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-secondary text-secondary-foreground transition-colors;
+  }
+
+  .tag-pill:hover {
+    @apply bg-primary/10 text-primary;
   }
 
   .verified-badge {
-    @apply inline-flex items-center gap-1 text-accent text-sm font-medium;
+    @apply inline-flex items-center gap-1 text-primary text-sm font-medium;
+  }
+
+  /* Paisley-style heart (stylized) */
+  .heart-paisley {
+    @apply transition-all duration-200;
+  }
+
+  .heart-paisley.active {
+    @apply text-rose-500;
   }
 }
 

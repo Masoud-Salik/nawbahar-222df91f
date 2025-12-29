@@ -12,7 +12,7 @@ export function ArticleFeed({ articles }: ArticleFeedProps) {
         <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
           <span className="text-2xl">📝</span>
         </div>
-        <h3 className="font-serif text-lg font-medium text-foreground mb-2">
+        <h3 className="text-lg font-semibold text-foreground mb-2">
           No articles yet
         </h3>
         <p className="text-sm text-muted-foreground max-w-xs">
@@ -22,26 +22,16 @@ export function ArticleFeed({ articles }: ArticleFeedProps) {
     );
   }
 
-  const [featured, ...rest] = articles;
-
   return (
-    <div className="space-y-4">
-      {featured && (
-        <div className="px-4 pt-4">
-          <ArticleCard article={featured} variant="featured" />
+    <div className="px-4 py-4 space-y-4">
+      {articles.map((article, index) => (
+        <div
+          key={article.id}
+          style={{ animationDelay: `${index * 80}ms` }}
+        >
+          <ArticleCard article={article} />
         </div>
-      )}
-      
-      <div className="px-4 space-y-3">
-        {rest.map((article, index) => (
-          <div 
-            key={article.id}
-            style={{ animationDelay: `${index * 100}ms` }}
-          >
-            <ArticleCard article={article} />
-          </div>
-        ))}
-      </div>
+      ))}
     </div>
   );
 }
