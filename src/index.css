@@ -176,9 +176,10 @@ html.text-xl body { font-size: 20px; }
     @apply text-foreground;
   }
 
-  /* Center write button - slimmer */
+  /* Center write button - floating with shadow */
   .nav-write {
-    @apply relative flex items-center justify-center w-12 h-12 -mt-4 rounded-xl bg-primary text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105;
+    @apply relative flex items-center justify-center w-14 h-14 -mt-6 rounded-2xl bg-primary text-primary-foreground shadow-xl transition-all duration-200 hover:scale-110 hover:shadow-2xl;
+    box-shadow: 0 8px 24px hsl(var(--primary) / 0.4);
   }
 
   .tag-pill {

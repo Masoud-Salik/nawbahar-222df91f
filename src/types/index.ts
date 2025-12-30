@@ -76,99 +76,103 @@ export interface Comment {
   replies?: Comment[];
 }
 
-// Mock data for demo purposes
+// Mock data with Persian content
 export const mockArticles: Article[] = [
   {
     id: "1",
-    title: "The Future of Afghan Literature in the Digital Age",
-    content: `The intersection of technology and traditional storytelling presents both challenges and opportunities for Afghan writers. As we navigate this new landscape, we must ask ourselves: how do we preserve our rich oral traditions while embracing digital platforms?
+    title: "آینده هوش مصنوعی در افغانستان",
+    content: `چگونه می‌توانیم از تکنولوژی برای بهبود آموزش در مناطق دوردست استفاده کنیم؟ این پرسشی است که ذهن بسیاری از پژوهشگران و متخصصان فناوری را به خود مشغول کرده است.
 
-The answer lies not in choosing one over the other, but in finding a harmonious balance. Digital platforms offer unprecedented reach, allowing stories from Kabul to resonate in communities across the globe. Yet, the essence of Afghan storytelling—its intimate connection to community, its oral traditions, its rich imagery—must remain at the heart of our work.
+در سال‌های اخیر، هوش مصنوعی پیشرفت‌های چشمگیری داشته است. از ترجمه خودکار زبان‌ها گرفته تا تشخیص تصاویر و پردازش متن، این فناوری در حال تغییر چهره جهان است.
 
-## The Digital Revolution
+## فرصت‌ها و چالش‌ها
 
-Consider how our grandparents shared stories around evening fires. The flickering flames, the gathered family, the anticipation of a well-told tale. These elements created an atmosphere that digital screens cannot replicate. However, digital platforms offer something equally valuable: accessibility.
+افغانستان با جمعیت جوان و علاقه‌مند به یادگیری، پتانسیل بالایی برای بهره‌گیری از این فناوری دارد. اما چالش‌هایی مانند زیرساخت‌های ناکافی و کمبود متخصصان، مسیر را دشوار می‌سازد.
 
-> "In the age of information, our stories become bridges between worlds." — Contemporary Afghan Proverb
+> "آینده متعلق به کسانی است که امروز برای آن آماده می‌شوند." — ضرب‌المثل
 
-Today, a young Afghan in diaspora can read poetry from Herat, essays from Kandahar, and short stories from Mazar-i-Sharif—all within the same hour. This connectivity was unimaginable just decades ago.`,
-    cover_image_url: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800",
+با سرمایه‌گذاری درست در آموزش و فناوری، می‌توانیم آینده‌ای روشن‌تر برای نسل‌های آینده بسازیم.`,
+    cover_image_url: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800",
     author_id: "author1",
-    tags: ["Literature", "Technology", "Culture"],
+    tags: ["تکنولوژی", "هوش مصنوعی", "آموزش"],
     status: "published",
-    editorial_score_science: 12,
+    editorial_score_science: 14,
     editorial_score_ethics: 9,
     editorial_score_writing: 9,
     editorial_score_timing: 8,
-    editorial_score_innovation: 4,
-    total_feed_rank: 42,
-    read_count: 1247,
-    save_count: 89,
-    share_count: 34,
+    editorial_score_innovation: 5,
+    total_feed_rank: 45,
+    read_count: 1847,
+    save_count: 234,
+    share_count: 89,
     created_at: "2024-12-28T10:00:00Z",
     updated_at: "2024-12-28T10:00:00Z",
     author: {
       id: "author1",
-      display_name: "دکتر مریم کریمی",
-      specialty: "پژوهشگر ادبیات",
-      avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
-      reputation_score: 87,
-      interests: ["ادبیات", "فرهنگ", "آموزش"],
+      display_name: "دکتر احمدی",
+      specialty: "پژوهشگر فناوری",
+      avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+      reputation_score: 92,
+      interests: ["فناوری", "هوش مصنوعی", "آموزش"],
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     },
   },
   {
     id: "2",
-    title: "Understanding Economic Resilience in Post-Conflict Regions",
-    content: `Economic recovery in post-conflict regions requires more than international aid—it demands a fundamental understanding of local markets, traditional trade networks, and community-based financial systems.
+    title: "نگاهی به معماری هرات باستان",
+    content: `هرات، شهری با تاریخ چند هزار ساله، گنجینه‌ای از معماری اسلامی و ایرانی است. مسجد جامع هرات، مناره‌ها و قلعه اختیارالدین از شاهکارهای معماری این شهر هستند.
 
-Afghanistan's bazaars have been centers of commerce for millennia. The hawala system, often misunderstood by Western economists, represents one of the world's oldest and most efficient money transfer mechanisms. Understanding these systems is crucial for sustainable development.`,
-    cover_image_url: "https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=800",
+معماری هرات ترکیبی منحصر به فرد از هنر تیموری، صفوی و محلی است. استفاده از کاشی‌های فیروزه‌ای، خط نستعلیق و نقوش هندسی از ویژگی‌های بارز این سبک است.
+
+## میراث فرهنگی
+
+حفاظت از این میراث گران‌بها وظیفه همه ماست. با شناخت بهتر این آثار، می‌توانیم ارزش آن‌ها را به نسل‌های آینده منتقل کنیم.`,
+    cover_image_url: "https://images.unsplash.com/photo-1564769625905-50e93615e769?w=800",
     author_id: "author2",
-    tags: ["Economics", "Development", "Policy"],
+    tags: ["معماری", "تاریخ", "هرات"],
     status: "published",
-    editorial_score_science: 14,
-    editorial_score_ethics: 8,
-    editorial_score_writing: 8,
-    editorial_score_timing: 9,
-    editorial_score_innovation: 3,
-    total_feed_rank: 42,
-    read_count: 892,
-    save_count: 156,
-    share_count: 67,
+    editorial_score_science: 12,
+    editorial_score_ethics: 10,
+    editorial_score_writing: 10,
+    editorial_score_timing: 7,
+    editorial_score_innovation: 4,
+    total_feed_rank: 43,
+    read_count: 1256,
+    save_count: 312,
+    share_count: 145,
     created_at: "2024-12-27T15:30:00Z",
     updated_at: "2024-12-27T15:30:00Z",
     author: {
       id: "author2",
-      display_name: "احمد رحیمی",
-      specialty: "اقتصاددان",
-      avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-      reputation_score: 92,
-      interests: ["اقتصاد", "سیاست", "توسعه"],
+      display_name: "استاد کمال",
+      specialty: "معمار و تاریخ‌نگار",
+      avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+      reputation_score: 88,
+      interests: ["معماری", "تاریخ", "هنر"],
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     },
   },
   {
     id: "3",
-    title: "Traditional Medicine Meets Modern Science",
-    content: `For centuries, Afghan healers have used plants from the Hindu Kush mountains to treat ailments. Today, researchers are validating many of these traditional remedies through rigorous scientific study.
+    title: "طب سنتی و دانش بومی افغانستان",
+    content: `قرن‌هاست که حکیمان افغان از گیاهان کوهستان‌های هندوکش برای درمان بیماری‌ها استفاده می‌کنند. امروز، پژوهشگران در حال بررسی علمی این داروها هستند.
 
-The integration of traditional knowledge with modern research methods represents a new frontier in pharmacology. This approach respects cultural heritage while advancing medical science.`,
+ادغام دانش سنتی با روش‌های علمی مدرن، مرز جدیدی در داروسازی ایجاد کرده است. این رویکرد هم میراث فرهنگی را حفظ می‌کند و هم علم پزشکی را پیش می‌برد.`,
     cover_image_url: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=800",
     author_id: "author3",
-    tags: ["Health", "Science", "Tradition"],
+    tags: ["سلامت", "طب سنتی", "علم"],
     status: "published",
     editorial_score_science: 15,
     editorial_score_ethics: 10,
-    editorial_score_writing: 7,
-    editorial_score_timing: 7,
+    editorial_score_writing: 8,
+    editorial_score_timing: 8,
     editorial_score_innovation: 5,
-    total_feed_rank: 44,
-    read_count: 634,
-    save_count: 201,
-    share_count: 45,
+    total_feed_rank: 46,
+    read_count: 923,
+    save_count: 278,
+    share_count: 67,
     created_at: "2024-12-26T09:15:00Z",
     updated_at: "2024-12-26T09:15:00Z",
     author: {
@@ -184,13 +188,13 @@ The integration of traditional knowledge with modern research methods represents
   },
   {
     id: "4",
-    title: "The Art of Calligraphy: A Living Tradition",
-    content: `In the quiet studios of Kabul and Herat, master calligraphers continue a tradition that spans over a thousand years. Their work is more than decoration—it is meditation, prayer, and cultural preservation combined.
+    title: "هنر خوشنویسی: سنتی زنده",
+    content: `در کارگاه‌های آرام کابل و هرات، استادان خوشنویس سنتی هزار ساله را ادامه می‌دهند. کار آن‌ها فراتر از تزیین است—مراقبه، دعا و حفظ فرهنگ در هر ضربه قلم جریان دارد.
 
-Each stroke carries meaning. The thickness of the line, the angle of the pen, the space between letters—all contribute to a visual poetry that transcends language.`,
+هر خط معنا دارد. ضخامت خط، زاویه قلم، فاصله بین حروف—همه در شعر بصری‌ای که فراتر از زبان است نقش دارند.`,
     cover_image_url: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800",
     author_id: "author4",
-    tags: ["Art", "Culture", "History"],
+    tags: ["هنر", "خوشنویسی", "فرهنگ"],
     status: "published",
     editorial_score_science: 8,
     editorial_score_ethics: 9,
@@ -198,18 +202,50 @@ Each stroke carries meaning. The thickness of the line, the angle of the pen, th
     editorial_score_timing: 7,
     editorial_score_innovation: 4,
     total_feed_rank: 38,
-    read_count: 423,
-    save_count: 178,
-    share_count: 89,
+    read_count: 634,
+    save_count: 198,
+    share_count: 112,
     created_at: "2024-12-25T14:00:00Z",
     updated_at: "2024-12-25T14:00:00Z",
     author: {
       id: "author4",
-      display_name: "استاد کریم",
+      display_name: "استاد رحیمی",
       specialty: "خوشنویس",
-      avatar_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
-      reputation_score: 88,
+      avatar_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+      reputation_score: 78,
       interests: ["هنر", "خوشنویسی", "تاریخ"],
+      created_at: "2024-01-01T00:00:00Z",
+      updated_at: "2024-01-01T00:00:00Z",
+    },
+  },
+  {
+    id: "5",
+    title: "زنان کارآفرین افغان در عصر دیجیتال",
+    content: `داستان‌های موفقیت زنان افغان که با استفاده از فناوری، کسب‌وکارهای نوآورانه ایجاد کرده‌اند. از تجارت الکترونیک تا آموزش آنلاین، این زنان الگوی نسل جدید هستند.
+
+با وجود چالش‌های فراوان، این کارآفرینان با پشتکار و خلاقیت، مسیر خود را به سوی موفقیت هموار کرده‌اند.`,
+    cover_image_url: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800",
+    author_id: "author5",
+    tags: ["کارآفرینی", "زنان", "فناوری"],
+    status: "published",
+    editorial_score_science: 11,
+    editorial_score_ethics: 10,
+    editorial_score_writing: 9,
+    editorial_score_timing: 9,
+    editorial_score_innovation: 5,
+    total_feed_rank: 44,
+    read_count: 1567,
+    save_count: 421,
+    share_count: 234,
+    created_at: "2024-12-24T11:00:00Z",
+    updated_at: "2024-12-24T11:00:00Z",
+    author: {
+      id: "author5",
+      display_name: "مریم حسینی",
+      specialty: "نویسنده و روزنامه‌نگار",
+      avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+      reputation_score: 45,
+      interests: ["کارآفرینی", "جامعه", "زنان"],
       created_at: "2024-01-01T00:00:00Z",
       updated_at: "2024-01-01T00:00:00Z",
     },
