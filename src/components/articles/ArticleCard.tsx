@@ -9,6 +9,13 @@ interface ArticleCardProps {
   article: Article;
 }
 
+// Get reputation ring color based on score
+function getReputationRing(score: number): string {
+  if (score > 80) return "ring-2 ring-yellow-500 ring-offset-2 ring-offset-card";
+  if (score > 50) return "ring-2 ring-blue-500 ring-offset-2 ring-offset-card";
+  return "ring-1 ring-border";
+}
+
 export function ArticleCard({ article }: ArticleCardProps) {
   const [isBookmarked, setIsBookmarked] = useState(article.is_bookmarked || false);
   const [isLiked, setIsLiked] = useState(article.is_liked || false);
@@ -44,32 +51,47 @@ export function ArticleCard({ article }: ArticleCardProps) {
     }
   };
 
+  const reputationScore = article.author?.reputation_score || 0;
+
   return (
     <article className="bg-card rounded-2xl border border-border/60 overflow-hidden animate-fade-in hover:shadow-md transition-all duration-300">
       <Link to={`/article/${article.id}`} className="block">
         {/* Title */}
         <div className="px-4 pt-4 pb-3">
-          <h3 className="text-lg font-semibold text-foreground leading-snug line-clamp-2">
+          <h3 className="text-lg font-semibold text-foreground leading-relaxed line-clamp-2">
             {article.title}
           </h3>
         </div>
 
-        {/* Author */}
+        {/* Author with Reputation Ring */}
         <div className="px-4 pb-3">
-          <div className="flex items-center gap-2">
-            {article.author?.avatar_url && (
-              <img
-                src={article.author.avatar_url}
-                alt={article.author.display_name}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            )}
+          <div className="flex items-center gap-3">
+            <div className={cn("rounded-full", getReputationRing(reputationScore))}>
+              {article.author?.avatar_url ? (
+                <img
+                  src={article.author.avatar_url}
+                  alt={article.author.display_name}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-primary font-semibold">
+                    {article.author?.display_name?.charAt(0)}
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-medium text-foreground truncate">
                   {article.author?.display_name}
                 </span>
-                <BadgeCheck size={14} className="text-primary flex-shrink-0" />
+                {reputationScore > 80 && (
+                  <BadgeCheck size={14} className="text-yellow-500 flex-shrink-0" />
+                )}
+                {reputationScore > 50 && reputationScore <= 80 && (
+                  <BadgeCheck size={14} className="text-blue-500 flex-shrink-0" />
+                )}
               </div>
               <span className="text-xs text-muted-foreground">
                 {article.author?.specialty}
@@ -93,10 +115,24 @@ export function ArticleCard({ article }: ArticleCardProps) {
 
         {/* Excerpt */}
         <div className="px-4 pb-3">
-          <p className="text-sm text-muted-foreground line-clamp-2">
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
             {article.content.substring(0, 150)}...
           </p>
         </div>
+
+        {/* Tags */}
+        {article.tags && article.tags.length > 0 && (
+          <div className="px-4 pb-3 flex flex-wrap gap-2">
+            {article.tags.slice(0, 3).map((tag) => (
+              <span 
+                key={tag} 
+                className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Meta & Actions */}
         <div className="px-4 pb-4 flex items-center justify-between">
@@ -107,7 +143,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* پسند (Like) - Paisley-style Heart */}
+            {/* پسند (Like) */}
             <button
               onClick={handleLike}
               className={cn(
@@ -125,7 +161,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
               {likeCount > 0 && <span>{likeCount}</span>}
             </button>
 
-            {/* ذخیره (Save) - Bookmark Ribbon */}
+            {/* ذخیره (Save) */}
             <button
               onClick={handleBookmark}
               className={cn(
