@@ -1,10 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  * {
+    font-family: 'Vazirmatn', system-ui, sans-serif;
+  }
+
   :root {
     /* Fetrat Media - Minimalist White with Persian Green */
     
@@ -114,14 +118,19 @@
     @apply border-border;
   }
 
+  html {
+    direction: rtl;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Vazirmatn', system-ui, sans-serif;
+    text-align: right;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Vazirmatn', system-ui, sans-serif;
-    @apply font-semibold tracking-tight;
+    @apply font-semibold;
   }
 }
 
@@ -167,9 +176,9 @@ html.text-xl body { font-size: 20px; }
     @apply text-foreground;
   }
 
-  /* Center write button */
+  /* Center write button - slimmer */
   .nav-write {
-    @apply relative flex items-center justify-center w-14 h-14 -mt-5 rounded-2xl bg-primary text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105;
+    @apply relative flex items-center justify-center w-12 h-12 -mt-4 rounded-xl bg-primary text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105;
   }
 
   .tag-pill {

@@ -1,11 +1,14 @@
 {
-  "name": "Fetrat Media",
-  "short_name": "Fetrat",
-  "description": "Elite Afghan text-based social platform",
+  "name": "کلک - رسانه فکری",
+  "short_name": "کلک",
+  "description": "پلتفرم متنی برای جامعه افغان",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f5f6f8",
-  "theme_color": "#1e3a5f",
+  "background_color": "#fcfcfc",
+  "theme_color": "#0f766e",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "fa",
   "icons": [
     {
       "src": "/favicon.ico",

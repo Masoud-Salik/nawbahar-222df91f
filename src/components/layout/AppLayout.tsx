@@ -12,7 +12,7 @@ export function AppLayout({ children, hideHeader, hideNav }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       {!hideHeader && <Header />}
-      <main className={`${!hideNav ? 'pb-20' : ''} max-w-lg mx-auto`}>
+      <main className={`${!hideNav ? 'pb-16' : ''} ${!hideHeader ? 'pt-14' : ''} max-w-[600px] mx-auto`}>
         {children}
       </main>
       {!hideNav && <BottomNav />}

@@ -2,14 +2,14 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const categories = [
-  { id: "all", label: "All" },
-  { id: "politics", label: "Politics" },
-  { id: "culture", label: "Culture" },
-  { id: "science", label: "Science" },
-  { id: "health", label: "Health" },
-  { id: "economics", label: "Economics" },
-  { id: "art", label: "Art" },
-  { id: "history", label: "History" },
+  { id: "all", label: "همه" },
+  { id: "politics", label: "سیاست" },
+  { id: "culture", label: "فرهنگ" },
+  { id: "science", label: "علم" },
+  { id: "society", label: "جامعه" },
+  { id: "economics", label: "اقتصاد" },
+  { id: "art", label: "هنر" },
+  { id: "history", label: "تاریخ" },
 ];
 
 interface CategoryPillsProps {

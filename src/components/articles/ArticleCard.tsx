@@ -1,4 +1,4 @@
-import { Bookmark, Heart, BadgeCheck } from "lucide-react";
+import { Bookmark, Heart, BadgeCheck, Share2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Article } from "@/types";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
   const formatReadTime = (content: string) => {
     const words = content.split(/\s+/).length;
     const minutes = Math.ceil(words / 200);
-    return `${minutes} min`;
+    return `${minutes} دقیقه`;
   };
 
   const handleLike = (e: React.MouseEvent) => {
@@ -31,6 +31,17 @@ export function ArticleCard({ article }: ArticleCardProps) {
     e.preventDefault();
     e.stopPropagation();
     setIsBookmarked(!isBookmarked);
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (navigator.share) {
+      navigator.share({
+        title: article.title,
+        url: `/article/${article.id}`,
+      });
+    }
   };
 
   return (
@@ -96,13 +107,14 @@ export function ArticleCard({ article }: ArticleCardProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Paisley-style Heart */}
+            {/* پسند (Like) - Paisley-style Heart */}
             <button
               onClick={handleLike}
               className={cn(
                 "flex items-center gap-1.5 text-sm transition-all duration-200",
                 isLiked ? "text-rose-500" : "text-muted-foreground hover:text-foreground"
               )}
+              title="پسند"
             >
               <Heart
                 size={20}
@@ -113,18 +125,32 @@ export function ArticleCard({ article }: ArticleCardProps) {
               {likeCount > 0 && <span>{likeCount}</span>}
             </button>
 
-            {/* Bookmark Ribbon */}
+            {/* ذخیره (Save) - Bookmark Ribbon */}
             <button
               onClick={handleBookmark}
               className={cn(
                 "transition-all duration-200",
                 isBookmarked ? "text-primary" : "text-muted-foreground hover:text-foreground"
               )}
+              title="ذخیره"
             >
               <Bookmark
                 size={20}
                 strokeWidth={1.5}
                 fill={isBookmarked ? "currentColor" : "none"}
+                className="transition-transform duration-200 hover:scale-110"
+              />
+            </button>
+
+            {/* اشتراک (Share) */}
+            <button
+              onClick={handleShare}
+              className="text-muted-foreground hover:text-foreground transition-all duration-200"
+              title="اشتراک"
+            >
+              <Share2
+                size={18}
+                strokeWidth={1.5}
                 className="transition-transform duration-200 hover:scale-110"
               />
             </button>
