@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
 
 const categories = [
   { id: "all", label: "همه" },
@@ -18,6 +19,7 @@ interface CategoryPillsProps {
 
 export function CategoryPills({ onCategoryChange }: CategoryPillsProps) {
   const [activeCategory, setActiveCategory] = useState("all");
+  const isHeaderVisible = useScrollDirection();
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -25,7 +27,12 @@ export function CategoryPills({ onCategoryChange }: CategoryPillsProps) {
   };
 
   return (
-    <div className="sticky top-14 z-30 bg-card/98 backdrop-blur-xl border-b border-border">
+    <div 
+      className={cn(
+        "sticky z-30 bg-card/98 backdrop-blur-xl border-b border-border transition-all duration-300",
+        isHeaderVisible ? "top-14" : "top-0"
+      )}
+    >
       <div className="flex overflow-x-auto hide-scrollbar px-4 py-3 gap-2">
         {categories.map((category) => (
           <button

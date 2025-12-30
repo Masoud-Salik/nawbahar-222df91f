@@ -1,17 +1,17 @@
-// Afghan Solar Hijri month names
+// Afghan Solar Hijri month names in Persian/Dari
 export const AFGHAN_MONTHS = [
-  "Hamal",    // Aries - March/April
-  "Sawr",     // Taurus - April/May
-  "Jawza",    // Gemini - May/June
-  "Saratan",  // Cancer - June/July
-  "Asad",     // Leo - July/August
-  "Sonbola",  // Virgo - August/September
-  "Mizan",    // Libra - September/October
-  "Aqrab",    // Scorpio - October/November
-  "Qaws",     // Sagittarius - November/December
-  "Jadi",     // Capricorn - December/January
-  "Dalw",     // Aquarius - January/February
-  "Hoot",     // Pisces - February/March
+  "حمل",      // Hamal - March/April
+  "ثور",      // Sawr - April/May
+  "جوزا",     // Jawza - May/June
+  "سرطان",    // Saratan - June/July
+  "اسد",      // Asad - July/August
+  "سنبله",    // Sonbola - August/September
+  "میزان",    // Mizan - September/October
+  "عقرب",     // Aqrab - October/November
+  "قوس",      // Qaws - November/December
+  "جدی",      // Jadi - December/January
+  "دلو",      // Dalw - January/February
+  "حوت",      // Hoot - February/March
 ] as const;
 
 // Convert Gregorian to Solar Hijri (Shamsi)
