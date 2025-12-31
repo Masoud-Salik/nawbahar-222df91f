@@ -146,19 +146,21 @@ export function ArticleCard({ article }: ArticleCardProps) {
             {/* پسند (Like) */}
             <button
               onClick={handleLike}
-              className={cn(
-                "flex items-center gap-1.5 text-sm transition-all duration-200",
-                isLiked ? "text-rose-500" : "text-muted-foreground hover:text-foreground"
-              )}
+              className="flex items-center gap-1.5 text-sm transition-all duration-200 group"
               title="پسند"
             >
               <Heart
                 size={20}
                 strokeWidth={1.5}
                 fill={isLiked ? "currentColor" : "none"}
-                className="transition-transform duration-200 hover:scale-110"
+                className={cn(
+                  "transition-transform duration-200 group-hover:scale-110",
+                  isLiked ? "text-rose-500" : "text-muted-foreground group-hover:text-foreground"
+                )}
               />
-              {likeCount > 0 && <span>{likeCount}</span>}
+              {likeCount > 0 && (
+                <span className="text-muted-foreground">{likeCount}</span>
+              )}
             </button>
 
             {/* ذخیره (Save) */}
