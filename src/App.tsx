@@ -9,6 +9,8 @@ import Explore from "./pages/Explore";
 import Bookmarks from "./pages/Bookmarks";
 import Profile from "./pages/Profile";
 import Write from "./pages/Write";
+import Auth from "./pages/Auth";
+import ArticleEditor from "./pages/ArticleEditor";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -23,6 +25,8 @@ const App = () => (
           <Route path="/bookmarks" element={<Bookmarks />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/write" element={<Write />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/editor" element={<ArticleEditor />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
