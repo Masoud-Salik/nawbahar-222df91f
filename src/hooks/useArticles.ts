@@ -1,9 +1,26 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Article } from "@/types";
+
+export interface FeedArticle {
+  id: string;
+  title: string;
+  content: string;
+  cover_image_url: string | null;
+  tags: string[];
+  created_at: string;
+  save_count: number;
+  author?: {
+    display_name: string;
+    avatar_url: string | null;
+    specialty: string | null;
+    reputation_score: number;
+  };
+  is_bookmarked?: boolean;
+  is_liked?: boolean;
+}
 
 export function usePublishedArticles() {
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [articles, setArticles] = useState<FeedArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +33,14 @@ export function usePublishedArticles() {
     const { data, error } = await supabase
       .from("articles")
       .select(`
-        *,
+        id,
+        title,
+        content,
+        cover_image_url,
+        tags,
+        created_at,
+        save_count,
+        total_feed_rank,
         profiles:author_id(
           display_name,
           avatar_url,
@@ -32,8 +56,7 @@ export function usePublishedArticles() {
       setError(error.message);
       setArticles([]);
     } else {
-      // Transform data to match Article type
-      const transformed: Article[] = (data || []).map((item) => ({
+      const transformed: FeedArticle[] = (data || []).map((item: any) => ({
         id: item.id,
         title: item.title,
         content: item.content,

@@ -1,8 +1,8 @@
-import { Article } from "@/types";
+import type { FeedArticle } from "@/hooks/useArticles";
 import { ArticleCard } from "./ArticleCard";
 
 interface ArticleFeedProps {
-  articles: Article[];
+  articles: FeedArticle[];
 }
 
 export function ArticleFeed({ articles }: ArticleFeedProps) {

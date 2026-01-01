@@ -3,21 +3,31 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Clock, FileText, CheckCircle, XCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatSolarShort } from "@/lib/solarHijri";
 import { ReviewModal } from "@/components/admin/ReviewModal";
-import type { Database } from "@/integrations/supabase/types";
 
-type Article = Database["public"]["Tables"]["articles"]["Row"] & {
+interface AdminArticle {
+  id: string;
+  title: string;
+  content: string;
+  author_id: string;
+  status: string;
+  created_at: string;
+  total_feed_rank: number | null;
+  editorial_score_science: number | null;
+  editorial_score_ethics: number | null;
+  editorial_score_writing: number | null;
+  editorial_score_timing: number | null;
+  editorial_score_innovation: number | null;
   profiles?: { display_name: string } | null;
-};
+}
 
 const AdminDashboard = () => {
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [articles, setArticles] = useState<AdminArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<AdminArticle | null>(null);
   const [activeTab, setActiveTab] = useState("pending");
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -65,7 +75,18 @@ const AdminDashboard = () => {
     const { data, error } = await supabase
       .from("articles")
       .select(`
-        *,
+        id,
+        title,
+        content,
+        author_id,
+        status,
+        created_at,
+        total_feed_rank,
+        editorial_score_science,
+        editorial_score_ethics,
+        editorial_score_writing,
+        editorial_score_timing,
+        editorial_score_innovation,
         profiles:author_id(display_name)
       `)
       .eq("status", status)
@@ -78,7 +99,22 @@ const AdminDashboard = () => {
         variant: "destructive",
       });
     } else {
-      setArticles(data || []);
+      const transformed: AdminArticle[] = (data || []).map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        content: item.content,
+        author_id: item.author_id,
+        status: item.status,
+        created_at: item.created_at,
+        total_feed_rank: item.total_feed_rank,
+        editorial_score_science: item.editorial_score_science,
+        editorial_score_ethics: item.editorial_score_ethics,
+        editorial_score_writing: item.editorial_score_writing,
+        editorial_score_timing: item.editorial_score_timing,
+        editorial_score_innovation: item.editorial_score_innovation,
+        profiles: item.profiles,
+      }));
+      setArticles(transformed);
     }
     setLoading(false);
   };

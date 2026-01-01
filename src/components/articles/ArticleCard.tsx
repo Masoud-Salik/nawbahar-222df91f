@@ -1,12 +1,12 @@
 import { Bookmark, Heart, BadgeCheck, Share2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Article } from "@/types";
+import type { FeedArticle } from "@/hooks/useArticles";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { formatSolarShort } from "@/lib/solarHijri";
 
 interface ArticleCardProps {
-  article: Article;
+  article: FeedArticle;
 }
 
 // Get reputation ring color based on score

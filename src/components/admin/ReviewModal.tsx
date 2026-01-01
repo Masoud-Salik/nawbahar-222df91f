@@ -6,14 +6,25 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { X, CheckCircle, XCircle, FlaskConical, Scale, Pen, Clock, Lightbulb } from "lucide-react";
 import { formatSolarShort } from "@/lib/solarHijri";
-import type { Database } from "@/integrations/supabase/types";
 
-type Article = Database["public"]["Tables"]["articles"]["Row"] & {
+interface AdminArticle {
+  id: string;
+  title: string;
+  content: string;
+  author_id: string;
+  status: string;
+  created_at: string;
+  total_feed_rank: number | null;
+  editorial_score_science: number | null;
+  editorial_score_ethics: number | null;
+  editorial_score_writing: number | null;
+  editorial_score_timing: number | null;
+  editorial_score_innovation: number | null;
   profiles?: { display_name: string } | null;
-};
+}
 
 interface ReviewModalProps {
-  article: Article;
+  article: AdminArticle;
   onClose: () => void;
   onComplete: () => void;
 }
