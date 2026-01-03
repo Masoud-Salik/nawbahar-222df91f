@@ -33,35 +33,46 @@ export function useComments(articleId: string) {
   const fetchComments = async () => {
     setLoading(true);
     
-    const { data, error } = await supabase
+    // First fetch comments
+    const { data: commentsData, error } = await supabase
       .from("comments")
-      .select(`
-        id,
-        content,
-        created_at,
-        user_id,
-        profiles:user_id(
-          display_name,
-          avatar_url
-        )
-      `)
+      .select("id, content, created_at, user_id")
       .eq("article_id", articleId)
       .order("created_at", { ascending: false });
 
-    if (!error && data) {
-      const transformed: Comment[] = data.map((item: any) => ({
+    if (error || !commentsData) {
+      setLoading(false);
+      return;
+    }
+
+    // Get unique user IDs
+    const userIds = [...new Set(commentsData.map(c => c.user_id))];
+    
+    // Fetch profiles for those users
+    const { data: profilesData } = await supabase
+      .from("profiles")
+      .select("id, display_name, avatar_url")
+      .in("id", userIds);
+
+    const profilesMap = new Map(
+      (profilesData || []).map(p => [p.id, p])
+    );
+
+    const transformed: Comment[] = commentsData.map((item) => {
+      const profile = profilesMap.get(item.user_id);
+      return {
         id: item.id,
         content: item.content,
         created_at: item.created_at,
         user_id: item.user_id,
-        author: item.profiles ? {
-          display_name: item.profiles.display_name,
-          avatar_url: item.profiles.avatar_url,
+        author: profile ? {
+          display_name: profile.display_name,
+          avatar_url: profile.avatar_url,
         } : undefined,
-      }));
-      setComments(transformed);
-    }
+      };
+    });
     
+    setComments(transformed);
     setLoading(false);
   };
 
