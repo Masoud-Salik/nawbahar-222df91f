@@ -61,45 +61,40 @@ const Article = () => {
 
   const fetchArticle = async (articleId: string) => {
     setLoading(true);
-    const { data, error } = await supabase
+    
+    // First fetch the article
+    const { data: articleData, error: articleError } = await supabase
       .from("articles")
-      .select(`
-        id,
-        title,
-        content,
-        cover_image_url,
-        tags,
-        created_at,
-        save_count,
-        profiles:author_id(
-          display_name,
-          avatar_url,
-          specialty,
-          reputation_score
-        )
-      `)
+      .select("id, title, content, cover_image_url, tags, created_at, save_count, author_id")
       .eq("id", articleId)
       .eq("status", "published")
       .maybeSingle();
 
-    if (error || !data) {
+    if (articleError || !articleData) {
       navigate("/");
       return;
     }
 
+    // Then fetch the author profile
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("display_name, avatar_url, specialty, reputation_score")
+      .eq("id", articleData.author_id)
+      .maybeSingle();
+
     const transformed: ArticleData = {
-      id: data.id,
-      title: data.title,
-      content: data.content,
-      cover_image_url: data.cover_image_url,
-      tags: data.tags || [],
-      created_at: data.created_at,
-      save_count: data.save_count || 0,
-      author: data.profiles ? {
-        display_name: (data.profiles as any).display_name,
-        avatar_url: (data.profiles as any).avatar_url,
-        specialty: (data.profiles as any).specialty,
-        reputation_score: (data.profiles as any).reputation_score || 0,
+      id: articleData.id,
+      title: articleData.title,
+      content: articleData.content,
+      cover_image_url: articleData.cover_image_url,
+      tags: articleData.tags || [],
+      created_at: articleData.created_at,
+      save_count: articleData.save_count || 0,
+      author: profileData ? {
+        display_name: profileData.display_name,
+        avatar_url: profileData.avatar_url,
+        specialty: profileData.specialty,
+        reputation_score: profileData.reputation_score || 0,
       } : undefined,
     };
 
