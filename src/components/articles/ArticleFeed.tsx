@@ -3,9 +3,10 @@ import { ArticleCard } from "./ArticleCard";
 
 interface ArticleFeedProps {
   articles: FeedArticle[];
+  onRefresh?: () => void;
 }
 
-export function ArticleFeed({ articles }: ArticleFeedProps) {
+export function ArticleFeed({ articles, onRefresh }: ArticleFeedProps) {
   if (articles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
@@ -29,7 +30,7 @@ export function ArticleFeed({ articles }: ArticleFeedProps) {
           key={article.id}
           style={{ animationDelay: `${index * 80}ms` }}
         >
-          <ArticleCard article={article} />
+          <ArticleCard article={article} onDelete={onRefresh} />
         </div>
       ))}
     </div>

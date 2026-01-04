@@ -29,7 +29,7 @@ export function CategoryPills({ onCategoryChange }: CategoryPillsProps) {
   return (
     <div 
       className={cn(
-        "sticky z-30 bg-card/98 backdrop-blur-xl border-b border-border transition-all duration-300",
+        "sticky z-30 bg-card border-b border-border transition-all duration-300",
         isHeaderVisible ? "top-14" : "top-0"
       )}
     >

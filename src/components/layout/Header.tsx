@@ -12,7 +12,7 @@ export function Header() {
   return (
     <header 
       className={cn(
-        "fixed top-0 left-0 right-0 z-40 bg-card/98 backdrop-blur-xl border-b border-border safe-top transition-transform duration-300",
+        "fixed top-0 left-0 right-0 z-40 bg-card border-b border-border safe-top transition-transform duration-300",
         !isVisible && "-translate-y-full"
       )}
     >

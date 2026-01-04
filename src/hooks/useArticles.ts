@@ -9,6 +9,7 @@ export interface FeedArticle {
   tags: string[];
   created_at: string;
   save_count: number;
+  author_id: string;
   author?: {
     display_name: string;
     avatar_url: string | null;
@@ -66,6 +67,7 @@ export function usePublishedArticles() {
         tags: item.tags || [],
         created_at: item.created_at,
         save_count: item.save_count || 0,
+        author_id: item.author_id,
         author: profile ? {
           display_name: profile.display_name,
           avatar_url: profile.avatar_url,

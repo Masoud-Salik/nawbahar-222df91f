@@ -4,9 +4,12 @@ import type { FeedArticle } from "@/hooks/useArticles";
 import { cn } from "@/lib/utils";
 import { formatSolarShort } from "@/lib/solarHijri";
 import { useArticleInteractions } from "@/hooks/useArticleInteractions";
+import { ArticleMenu } from "./ArticleMenu";
+import { useUserRole } from "@/hooks/useUserRole";
 
 interface ArticleCardProps {
   article: FeedArticle;
+  onDelete?: () => void;
 }
 
 function getReputationRing(score: number): string {
@@ -15,7 +18,8 @@ function getReputationRing(score: number): string {
   return "ring-1 ring-border";
 }
 
-export function ArticleCard({ article }: ArticleCardProps) {
+export function ArticleCard({ article, onDelete }: ArticleCardProps) {
+  const { isAdmin, userId } = useUserRole();
   const {
     isLiked,
     isBookmarked,
@@ -56,10 +60,21 @@ export function ArticleCard({ article }: ArticleCardProps) {
   const reputationScore = article.author?.reputation_score || 0;
 
   return (
-    <article className="bg-card rounded-2xl border border-border/60 overflow-hidden animate-fade-in hover:shadow-md transition-all duration-300">
+    <article className="bg-card rounded-2xl border border-border/60 overflow-hidden animate-fade-in hover:shadow-md transition-all duration-300 relative">
+      {/* Three dots menu */}
+      <div className="absolute top-3 left-3 z-10">
+        <ArticleMenu
+          articleId={article.id}
+          authorId={article.author_id}
+          currentUserId={userId}
+          isAdmin={isAdmin}
+          onDelete={onDelete}
+        />
+      </div>
+
       <Link to={`/article/${article.id}`} className="block">
         {/* Title */}
-        <div className="px-4 pt-4 pb-3">
+        <div className="px-4 pt-4 pb-3 pl-12">
           <h3 className="text-lg font-semibold text-foreground leading-relaxed line-clamp-2">
             {article.title}
           </h3>
