@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Heart, Bookmark, Share2, BadgeCheck } from "lucide-react";
+import { ArrowRight, Heart, Bookmark, Share2, BadgeCheck, Star } from "lucide-react";
 import { formatSolarShort } from "@/lib/solarHijri";
 import { cn } from "@/lib/utils";
 import { useArticleInteractions } from "@/hooks/useArticleInteractions";
 import { useComments } from "@/hooks/useComments";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { CommentSection } from "@/components/articles/CommentSection";
+import { ArticleRatingModal } from "@/components/admin/ArticleRatingModal";
+import { Button } from "@/components/ui/button";
 
 interface ArticleData {
   id: string;
@@ -16,6 +20,12 @@ interface ArticleData {
   tags: string[];
   created_at: string;
   save_count: number;
+  author_id: string;
+  editorial_score_science: number;
+  editorial_score_ethics: number;
+  editorial_score_writing: number;
+  editorial_score_timing: number;
+  editorial_score_innovation: number;
   author?: {
     display_name: string;
     avatar_url: string | null;
@@ -35,6 +45,10 @@ const Article = () => {
   const navigate = useNavigate();
   const [article, setArticle] = useState<ArticleData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  
+  const { user } = useAuth();
+  const { isAdmin } = useUserRole();
 
   const {
     isLiked,
@@ -62,10 +76,10 @@ const Article = () => {
   const fetchArticle = async (articleId: string) => {
     setLoading(true);
     
-    // First fetch the article
+    // First fetch the article with all scores
     const { data: articleData, error: articleError } = await supabase
       .from("articles")
-      .select("id, title, content, cover_image_url, tags, created_at, save_count, author_id")
+      .select("id, title, content, cover_image_url, tags, created_at, save_count, author_id, editorial_score_science, editorial_score_ethics, editorial_score_writing, editorial_score_timing, editorial_score_innovation")
       .eq("id", articleId)
       .eq("status", "published")
       .maybeSingle();
@@ -90,6 +104,12 @@ const Article = () => {
       tags: articleData.tags || [],
       created_at: articleData.created_at,
       save_count: articleData.save_count || 0,
+      author_id: articleData.author_id,
+      editorial_score_science: articleData.editorial_score_science || 0,
+      editorial_score_ethics: articleData.editorial_score_ethics || 0,
+      editorial_score_writing: articleData.editorial_score_writing || 0,
+      editorial_score_timing: articleData.editorial_score_timing || 0,
+      editorial_score_innovation: articleData.editorial_score_innovation || 0,
       author: profileData ? {
         display_name: profileData.display_name,
         avatar_url: profileData.avatar_url,
@@ -142,7 +162,18 @@ const Article = () => {
           >
             <ArrowRight size={24} />
           </button>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Admin Rating Button */}
+            {isAdmin && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setRatingModalOpen(true)}
+                className="text-primary"
+              >
+                <Star size={20} />
+              </Button>
+            )}
             <button
               onClick={toggleLike}
               className="flex items-center gap-1.5 p-2 transition-colors"
@@ -270,6 +301,23 @@ const Article = () => {
           />
         </div>
       </main>
+
+      {/* Admin Rating Modal */}
+      {article && (
+        <ArticleRatingModal
+          articleId={article.id}
+          authorId={article.author_id}
+          open={ratingModalOpen}
+          onClose={() => setRatingModalOpen(false)}
+          currentScores={{
+            science: article.editorial_score_science,
+            ethics: article.editorial_score_ethics,
+            writing: article.editorial_score_writing,
+            timing: article.editorial_score_timing,
+            innovation: article.editorial_score_innovation,
+          }}
+        />
+      )}
     </div>
   );
 };

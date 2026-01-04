@@ -80,6 +80,9 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
         variant: "destructive",
       });
     } else {
+      // Update author's reputation score
+      await updateAuthorReputation(article.author_id);
+      
       toast({
         title: "موفق!",
         description: "مقاله با موفقیت منتشر شد",
@@ -87,6 +90,30 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
       onComplete();
     }
     setLoading(false);
+  };
+
+  const updateAuthorReputation = async (authorId: string) => {
+    // Calculate author's new reputation (avg of science + ethics across all articles)
+    const { data: authorArticles } = await supabase
+      .from("articles")
+      .select("editorial_score_science, editorial_score_ethics")
+      .eq("author_id", authorId)
+      .eq("status", "published");
+
+    if (authorArticles && authorArticles.length > 0) {
+      const avgReputation = authorArticles.reduce((acc, article) => {
+        const science = article.editorial_score_science || 0;
+        const ethics = article.editorial_score_ethics || 0;
+        // Normalize: science is out of 15, ethics out of 10 = 25 total
+        // Convert to 0-100 scale
+        return acc + ((science + ethics) / 25) * 100;
+      }, 0) / authorArticles.length;
+
+      await supabase
+        .from("profiles")
+        .update({ reputation_score: Math.round(avgReputation) })
+        .eq("id", authorId);
+    }
   };
 
   const handleReject = async () => {

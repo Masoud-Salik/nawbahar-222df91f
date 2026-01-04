@@ -105,12 +105,23 @@ const ArticleEditor = () => {
     }
   };
 
+  const MAX_IMAGE_SIZE = 300 * 1024; // 300KB
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setCoverImage(file);
-      setCoverPreview(URL.createObjectURL(file));
+    if (!file) return;
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast({
+        title: "خطا",
+        description: "حجم تصویر بیش از حد مجاز است. لطفاً تصویری کمتر از ۳۰۰ کیلوبایت انتخاب کنید.",
+        variant: "destructive",
+      });
+      return;
     }
+
+    setCoverImage(file);
+    setCoverPreview(URL.createObjectURL(file));
   };
 
   const removeCoverImage = () => {
