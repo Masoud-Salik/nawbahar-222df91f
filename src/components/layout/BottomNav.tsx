@@ -24,14 +24,13 @@ export function BottomNav() {
               key={path}
               to={path}
               className={cn(
-                "flex items-center justify-center p-2.5 transition-colors duration-200",
-                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                "flex items-center justify-center p-2.5 transition-colors duration-150",
+                isActive ? "text-primary" : "text-muted-foreground"
               )}
             >
               <Icon
                 size={22}
-                strokeWidth={isActive ? 2 : 1.5}
-                fill={isActive ? "currentColor" : "none"}
+                strokeWidth={1.5}
               />
             </Link>
           );

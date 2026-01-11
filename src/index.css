@@ -10,106 +10,97 @@
   }
 
   :root {
-    /* Fetrat Media - Minimalist White with Persian Green */
+    /* Calm, Professional - White with Persian Green */
     
-    --background: 0 0% 99%;
-    --foreground: 210 15% 12%;
+    --background: 0 0% 100%;
+    --foreground: 220 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 15% 12%;
+    --card-foreground: 220 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 15% 12%;
+    --popover-foreground: 220 15% 15%;
 
     /* Deep Turquoise / Persian Green */
-    --primary: 174 72% 32%;
+    --primary: 174 65% 35%;
     --primary-foreground: 0 0% 100%;
 
-    /* Subtle cream/off-white secondary */
-    --secondary: 45 20% 96%;
-    --secondary-foreground: 210 15% 18%;
+    /* Subtle off-white secondary */
+    --secondary: 220 10% 97%;
+    --secondary-foreground: 220 15% 20%;
 
-    --muted: 210 10% 95%;
-    --muted-foreground: 210 10% 45%;
+    --muted: 220 10% 96%;
+    --muted-foreground: 220 10% 50%;
 
-    /* Persian Green accent */
-    --accent: 158 64.3725% 51.5686%;
+    /* Accent */
+    --accent: 174 50% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 15% 90%;
-    --input: 210 15% 90%;
-    --ring: 189 94.4954% 42.7451%;
+    --border: 220 10% 92%;
+    --input: 220 10% 92%;
+    --ring: 174 65% 35%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Custom Persian Green tokens */
-    --persian-green: 174 72% 32%;
-    --persian-green-light: 174 60% 45%;
-    --persian-green-dark: 174 80% 22%;
-    --cream: 45 25% 97%;
-    --ink: 210 15% 12%;
-
-    /* Shadows */
-    --shadow-sm: 0 1px 2px hsl(210 15% 12% / 0.03);
-    --shadow-md: 0 4px 12px hsl(210 15% 12% / 0.06);
-    --shadow-lg: 0 8px 24px hsl(210 15% 12% / 0.1);
+    /* Custom tokens */
+    --persian-green: 174 65% 35%;
+    --cream: 45 20% 98%;
+    --ink: 220 15% 15%;
 
     /* Sidebar */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 210 15% 26%;
-    --sidebar-primary: 174 72% 32%;
+    --sidebar-background: 0 0% 99%;
+    --sidebar-foreground: 220 15% 30%;
+    --sidebar-primary: 174 65% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 45 20% 96%;
-    --sidebar-accent-foreground: 210 15% 18%;
-    --sidebar-border: 210 15% 90%;
-    --sidebar-ring: 174 72% 32%;
+    --sidebar-accent: 220 10% 96%;
+    --sidebar-accent-foreground: 220 15% 20%;
+    --sidebar-border: 220 10% 92%;
+    --sidebar-ring: 174 65% 35%;
   }
 
   .dark {
-    --background: 210 20% 8%;
-    --foreground: 45 15% 95%;
+    --background: 220 15% 7%;
+    --foreground: 220 10% 92%;
 
-    --card: 210 18% 11%;
-    --card-foreground: 45 15% 95%;
+    --card: 220 15% 9%;
+    --card-foreground: 220 10% 92%;
 
-    --popover: 210 18% 11%;
-    --popover-foreground: 45 15% 95%;
+    --popover: 220 15% 9%;
+    --popover-foreground: 220 10% 92%;
 
-    /* Persian Green stays vibrant in dark */
-    --primary: 174 65% 42%;
-    --primary-foreground: 210 20% 8%;
+    /* Persian Green stays vibrant */
+    --primary: 174 55% 45%;
+    --primary-foreground: 220 15% 7%;
 
-    --secondary: 210 15% 16%;
-    --secondary-foreground: 45 15% 90%;
+    --secondary: 220 12% 14%;
+    --secondary-foreground: 220 10% 88%;
 
-    --muted: 210 15% 18%;
-    --muted-foreground: 210 10% 55%;
+    --muted: 220 12% 16%;
+    --muted-foreground: 220 8% 55%;
 
-    --accent: 174 65% 42%;
-    --accent-foreground: 210 20% 8%;
+    --accent: 174 55% 45%;
+    --accent-foreground: 220 15% 7%;
 
-    --destructive: 0 62% 45%;
+    --destructive: 0 55% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 15% 18%;
-    --input: 210 15% 18%;
-    --ring: 174 65% 42%;
+    --border: 220 12% 16%;
+    --input: 220 12% 16%;
+    --ring: 174 55% 45%;
 
-    --persian-green: 174 65% 42%;
-    --persian-green-light: 174 55% 55%;
-    --persian-green-dark: 174 70% 30%;
+    --persian-green: 174 55% 45%;
 
-    --sidebar-background: 210 18% 10%;
-    --sidebar-foreground: 45 15% 90%;
-    --sidebar-primary: 174 65% 42%;
-    --sidebar-primary-foreground: 210 20% 8%;
-    --sidebar-accent: 210 15% 16%;
-    --sidebar-accent-foreground: 45 15% 90%;
-    --sidebar-border: 210 15% 18%;
-    --sidebar-ring: 174 65% 42%;
+    --sidebar-background: 220 15% 8%;
+    --sidebar-foreground: 220 10% 88%;
+    --sidebar-primary: 174 55% 45%;
+    --sidebar-primary-foreground: 220 15% 7%;
+    --sidebar-accent: 220 12% 14%;
+    --sidebar-accent-foreground: 220 10% 88%;
+    --sidebar-border: 220 12% 16%;
+    --sidebar-ring: 174 55% 45%;
   }
 }
 
@@ -141,31 +132,31 @@ html.text-lg body { font-size: 18px; }
 html.text-xl body { font-size: 20px; }
 
 @layer components {
+  /* Article reading experience - Enhanced Persian typography */
   .article-content {
     font-family: 'Vazirmatn', system-ui, sans-serif;
-    @apply text-lg leading-relaxed;
+    @apply text-lg;
+    line-height: 2.2;
+    letter-spacing: 0.01em;
   }
 
   .article-content p {
-    @apply mb-6;
+    @apply mb-8;
   }
 
   .article-content h2 {
-    @apply text-2xl font-semibold mt-10 mb-4;
+    @apply text-xl font-semibold mt-12 mb-5;
+    line-height: 1.8;
   }
 
   .article-content blockquote {
-    @apply border-l-4 border-primary pl-6 italic my-6 text-muted-foreground;
-  }
-
-  .glass-card {
-    @apply bg-card/90 backdrop-blur-xl border border-border/50;
-    box-shadow: var(--shadow-md);
+    @apply border-r-2 border-primary pr-5 my-8 text-muted-foreground;
+    line-height: 2;
   }
 
   /* Icon-only nav item */
   .nav-icon {
-    @apply flex items-center justify-center p-3 text-muted-foreground transition-all duration-200;
+    @apply flex items-center justify-center p-3 text-muted-foreground transition-colors duration-150;
   }
 
   .nav-icon.active {
@@ -176,26 +167,12 @@ html.text-xl body { font-size: 20px; }
     @apply text-foreground;
   }
 
-
   .tag-pill {
     @apply inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-secondary text-secondary-foreground transition-colors;
   }
 
   .tag-pill:hover {
     @apply bg-primary/10 text-primary;
-  }
-
-  .verified-badge {
-    @apply inline-flex items-center gap-1 text-primary text-sm font-medium;
-  }
-
-  /* Paisley-style heart (stylized) */
-  .heart-paisley {
-    @apply transition-all duration-200;
-  }
-
-  .heart-paisley.active {
-    @apply text-rose-500;
   }
 }
 
@@ -205,42 +182,12 @@ html.text-xl body { font-size: 20px; }
   }
 
   .animate-fade-in {
-    animation: fadeIn 0.4s ease-out forwards;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.5s ease-out forwards;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.3s ease-out forwards;
+    animation: fadeIn 0.3s ease-out forwards;
   }
 
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-  }
-
-  @keyframes slideUp {
-    from { 
-      opacity: 0; 
-      transform: translateY(20px); 
-    }
-    to { 
-      opacity: 1; 
-      transform: translateY(0); 
-    }
-  }
-
-  @keyframes scaleIn {
-    from { 
-      opacity: 0; 
-      transform: scale(0.95); 
-    }
-    to { 
-      opacity: 1; 
-      transform: scale(1); 
-    }
   }
 
   .line-clamp-2 {
@@ -271,10 +218,10 @@ html.text-xl body { font-size: 20px; }
 /* PWA safe areas */
 @supports (padding: max(0px)) {
   .safe-bottom {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
   
   .safe-top {
-    padding-top: max(0.5rem, env(safe-area-inset-top));
+    padding-top: max(0.25rem, env(safe-area-inset-top));
   }
 }

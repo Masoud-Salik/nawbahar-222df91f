@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Heart, Bookmark, Share2, BadgeCheck, Star, Quote } from "lucide-react";
+import { ArrowRight, Star, CornerUpRight } from "lucide-react";
 import { formatSolarShort } from "@/lib/solarHijri";
-import { cn } from "@/lib/utils";
-import { useArticleInteractions } from "@/hooks/useArticleInteractions";
-import { useComments } from "@/hooks/useComments";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
-import { useCitations } from "@/hooks/useCitations";
+import { useComments } from "@/hooks/useComments";
+import { useReactions } from "@/hooks/useReactions";
+import { useResponseArticles } from "@/hooks/useResponseArticles";
+import { useViewCount } from "@/hooks/useViewCount";
 import { CommentSection } from "@/components/articles/CommentSection";
 import { ArticleRatingModal } from "@/components/admin/ArticleRatingModal";
+import { ArticleActionsMenu } from "@/components/articles/ArticleActionsMenu";
+import { ArticleReactions } from "@/components/articles/ArticleReactions";
+import { ArticleBottomSignals } from "@/components/articles/ArticleBottomSignals";
+import { ResponseArticles } from "@/components/articles/ResponseArticles";
 import { Button } from "@/components/ui/button";
 
 interface ArticleData {
@@ -30,15 +34,7 @@ interface ArticleData {
   author?: {
     display_name: string;
     avatar_url: string | null;
-    specialty: string | null;
-    reputation_score: number;
   };
-}
-
-function getReputationRing(score: number): string {
-  if (score > 80) return "ring-2 ring-yellow-500 ring-offset-2 ring-offset-background";
-  if (score > 50) return "ring-2 ring-blue-500 ring-offset-2 ring-offset-background";
-  return "ring-1 ring-border";
 }
 
 const Article = () => {
@@ -50,15 +46,9 @@ const Article = () => {
   
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
-  const { citations, citationCount, loading: citationsLoading } = useCitations(id || "");
-
-  const {
-    isLiked,
-    isBookmarked,
-    likeCount,
-    toggleLike,
-    toggleBookmark,
-  } = useArticleInteractions(id || "");
+  const { viewCount } = useViewCount(id || "");
+  const { userReaction, likedCount, dislikedCount, setReaction } = useReactions(id || "");
+  const { responses, responseCount, parentArticle } = useResponseArticles(id || "");
 
   const {
     comments,
@@ -75,7 +65,6 @@ const Article = () => {
     }
   }, [id]);
 
-  // Scroll to comments if hash is #comments
   useEffect(() => {
     if (window.location.hash === "#comments" && !loading) {
       const commentsSection = document.getElementById("comments");
@@ -104,7 +93,7 @@ const Article = () => {
 
     const { data: profileData } = await supabase
       .from("profiles")
-      .select("display_name, avatar_url, specialty, reputation_score")
+      .select("display_name, avatar_url")
       .eq("id", articleData.author_id)
       .maybeSingle();
 
@@ -125,28 +114,11 @@ const Article = () => {
       author: profileData ? {
         display_name: profileData.display_name,
         avatar_url: profileData.avatar_url,
-        specialty: profileData.specialty,
-        reputation_score: profileData.reputation_score || 0,
       } : undefined,
     };
 
     setArticle(transformed);
     setLoading(false);
-  };
-
-  const formatReadTime = (content: string) => {
-    const words = content.split(/\s+/).length;
-    const minutes = Math.ceil(words / 200);
-    return `${minutes} دقیقه مطالعه`;
-  };
-
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: article?.title,
-        url: window.location.href,
-      });
-    }
   };
 
   if (loading) {
@@ -161,180 +133,125 @@ const Article = () => {
     return null;
   }
 
-  const reputationScore = article.author?.reputation_score || 0;
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Header - Minimal */}
       <header className="sticky top-0 z-50 bg-background border-b border-border">
-        <div className="flex items-center justify-between px-4 h-14 max-w-screen-md mx-auto">
+        <div className="flex items-center justify-between px-4 h-12 max-w-screen-md mx-auto">
           <button
             onClick={() => navigate(-1)}
             className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
           >
-            <ArrowRight size={24} />
+            <ArrowRight size={22} strokeWidth={1.5} />
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {isAdmin && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setRatingModalOpen(true)}
-                className="text-primary"
+                className="text-muted-foreground h-8 w-8"
               >
-                <Star size={20} />
+                <Star size={18} strokeWidth={1.5} />
               </Button>
             )}
-            <button
-              onClick={toggleLike}
-              className="flex items-center gap-1.5 p-2 transition-colors"
-            >
-              <Heart
-                size={22}
-                fill={isLiked ? "currentColor" : "none"}
-                className={cn(isLiked ? "text-rose-500" : "text-muted-foreground hover:text-foreground")}
-              />
-              {likeCount > 0 && (
-                <span className="text-sm text-muted-foreground">{likeCount}</span>
-              )}
-            </button>
-            <div className="flex items-center gap-1.5 p-2 text-muted-foreground">
-              <Quote size={18} />
-              {citationCount > 0 && (
-                <span className="text-sm">{citationCount}</span>
-              )}
-            </div>
-            <button
-              onClick={toggleBookmark}
-              className="p-2 transition-colors"
-            >
-              <Bookmark
-                size={22}
-                fill={isBookmarked ? "currentColor" : "none"}
-                className={cn(isBookmarked ? "text-primary" : "text-muted-foreground hover:text-foreground")}
-              />
-            </button>
-            <button
-              onClick={handleShare}
-              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Share2 size={20} />
-            </button>
+            <ArticleActionsMenu 
+              articleId={article.id} 
+              authorId={article.author_id}
+              articleTitle={article.title}
+            />
           </div>
         </div>
       </header>
 
       {/* Article Content */}
-      <main className="max-w-screen-md mx-auto px-4 py-6 pb-20">
-        {/* Title */}
-        <h1 className="text-2xl font-bold text-foreground leading-relaxed mb-4">
-          {article.title}
-        </h1>
+      <main className="max-w-screen-md mx-auto px-5 py-8 pb-24">
+        {/* Response indicator */}
+        {parentArticle && (
+          <Link
+            to={`/article/${parentArticle.id}`}
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6 transition-colors"
+          >
+            <CornerUpRight size={16} strokeWidth={1.5} />
+            <span>در پاسخ به:</span>
+            <span className="text-foreground">{parentArticle.title}</span>
+          </Link>
+        )}
 
-        {/* Author */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className={cn("rounded-full", getReputationRing(reputationScore))}>
+        {/* Author - Simple, top section */}
+        <div className="flex items-center gap-3 mb-8">
+          <Link to={`/profile/${article.author_id}`}>
             {article.author?.avatar_url ? (
               <img
                 src={article.author.avatar_url}
                 alt={article.author.display_name}
-                className="w-12 h-12 rounded-full object-cover"
+                className="w-10 h-10 rounded-full object-cover"
               />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-primary font-semibold text-lg">
+              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                <span className="text-muted-foreground font-medium">
                   {article.author?.display_name?.charAt(0)}
                 </span>
               </div>
             )}
-          </div>
+          </Link>
           <div>
-              <Link to={`/profile/${article.author_id}`} className="flex items-center gap-1.5 hover:underline">
-                <span className="font-medium text-foreground">
-                  {article.author?.display_name}
-                </span>
-                {reputationScore > 80 && (
-                  <BadgeCheck size={16} className="text-yellow-500" />
-                )}
-                {reputationScore > 50 && reputationScore <= 80 && (
-                  <BadgeCheck size={16} className="text-blue-500" />
-                )}
-              </Link>
-                {article.author?.display_name}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              {article.author?.specialty && (
-                <>
-                  <span>{article.author.specialty}</span>
-                  <span>•</span>
-                </>
-              )}
-              <span>{formatSolarShort(article.created_at)}</span>
-              <span>•</span>
-              <span>{formatReadTime(article.content)}</span>
-            </div>
+            <Link 
+              to={`/profile/${article.author_id}`} 
+              className="font-medium text-foreground hover:underline"
+            >
+              {article.author?.display_name}
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              {formatSolarShort(article.created_at)}
+            </p>
           </div>
         </div>
 
+        {/* Title */}
+        <h1 className="text-2xl font-bold text-foreground leading-relaxed mb-6">
+          {article.title}
+        </h1>
+
         {/* Cover Image */}
         {article.cover_image_url && (
-          <div className="rounded-2xl overflow-hidden mb-6">
+          <div className="rounded-xl overflow-hidden mb-8">
             <img
               src={article.cover_image_url}
               alt={article.title}
               className="w-full object-cover"
+              loading="lazy"
             />
           </div>
         )}
 
-        {/* Content */}
-        <div className="prose prose-lg dark:prose-invert max-w-none">
-          <div className="text-foreground leading-loose whitespace-pre-wrap">
+        {/* Content - Improved typography */}
+        <article className="article-content">
+          <div className="text-foreground whitespace-pre-wrap">
             {article.content}
           </div>
-        </div>
+        </article>
 
-        {/* Tags */}
-        {article.tags && article.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-8 pt-6 border-t border-border">
-            {article.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-sm px-3 py-1.5 rounded-full bg-primary/10 text-primary"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        )}
+        {/* Reactions */}
+        <ArticleReactions
+          userReaction={userReaction}
+          likedCount={likedCount}
+          dislikedCount={dislikedCount}
+          onReaction={setReaction}
+        />
 
-        {/* References Section */}
-        {citations.length > 0 && (
-          <div className="mt-8 pt-6 border-t border-border">
-            <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
-              <Quote size={20} className="text-primary" />
-              <span>منابع و ارجاعات</span>
-            </h3>
-            <ul className="space-y-3">
-              {citations.map((citation, index) => (
-                <li key={citation.id}>
-                  <Link 
-                    to={`/article/${citation.id}`}
-                    className="flex items-start gap-2 text-sm hover:text-primary transition-colors"
-                  >
-                    <span className="text-muted-foreground">[{index + 1}]</span>
-                    <span className="text-foreground hover:text-primary">
-                      {citation.title}
-                      <span className="text-muted-foreground mr-2">— {citation.author_name}</span>
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {/* Bottom Signals */}
+        <ArticleBottomSignals
+          viewCount={viewCount}
+          commentCount={comments.length}
+          responseCount={responseCount}
+        />
+
+        {/* Response Articles */}
+        <ResponseArticles responses={responses} />
 
         {/* Comments Section */}
-        <div id="comments" className="mt-8 pt-6 border-t border-border">
+        <div id="comments" className="mt-10 pt-8 border-t border-border">
           <CommentSection
             comments={comments}
             loading={commentsLoading}

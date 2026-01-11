@@ -27,6 +27,7 @@ export type Database = {
           editorial_score_writing: number | null
           embedding: string | null
           id: string
+          parent_article_id: string | null
           read_count: number | null
           save_count: number | null
           share_count: number | null
@@ -35,6 +36,7 @@ export type Database = {
           title: string
           total_feed_rank: number | null
           updated_at: string
+          view_count: number | null
         }
         Insert: {
           author_id: string
@@ -48,6 +50,7 @@ export type Database = {
           editorial_score_writing?: number | null
           embedding?: string | null
           id?: string
+          parent_article_id?: string | null
           read_count?: number | null
           save_count?: number | null
           share_count?: number | null
@@ -56,6 +59,7 @@ export type Database = {
           title: string
           total_feed_rank?: number | null
           updated_at?: string
+          view_count?: number | null
         }
         Update: {
           author_id?: string
@@ -69,6 +73,7 @@ export type Database = {
           editorial_score_writing?: number | null
           embedding?: string | null
           id?: string
+          parent_article_id?: string | null
           read_count?: number | null
           save_count?: number | null
           share_count?: number | null
@@ -77,8 +82,17 @@ export type Database = {
           title?: string
           total_feed_rank?: number | null
           updated_at?: string
+          view_count?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "articles_parent_article_id_fkey"
+            columns: ["parent_article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bookmarks: {
         Row: {
@@ -312,6 +326,38 @@ export type Database = {
         }
         Relationships: []
       }
+      reactions: {
+        Row: {
+          article_id: string
+          created_at: string
+          id: string
+          reaction_type: string
+          user_id: string
+        }
+        Insert: {
+          article_id: string
+          created_at?: string
+          id?: string
+          reaction_type: string
+          user_id: string
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reactions_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -346,6 +392,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_view_count: {
+        Args: { article_uuid: string }
+        Returns: undefined
       }
     }
     Enums: {

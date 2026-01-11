@@ -12,7 +12,7 @@ export function Header() {
   return (
     <header 
       className={cn(
-        "fixed top-0 left-0 right-0 z-40 bg-card border-b border-border safe-top transition-transform duration-300",
+        "fixed top-0 left-0 right-0 z-40 bg-card border-b border-border safe-top transition-transform duration-200",
         !isVisible && "-translate-y-full"
       )}
     >
@@ -22,7 +22,7 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-8 w-8"
+            className="text-muted-foreground h-8 w-8"
           >
             <Info size={18} strokeWidth={1.5} />
           </Button>
@@ -30,7 +30,7 @@ export function Header() {
 
         {/* Logo - Center */}
         <Link to="/" className="flex items-center">
-          <span className="text-xl font-black tracking-tight text-foreground">
+          <span className="text-xl font-bold text-foreground">
             نوبهار
           </span>
         </Link>
@@ -40,12 +40,12 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-8 w-8"
+            className="text-muted-foreground h-8 w-8"
           >
             <Bell size={18} strokeWidth={1.5} />
           </Button>
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-primary-foreground bg-primary rounded-full px-1">
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] flex items-center justify-center text-[10px] font-medium text-primary-foreground bg-primary rounded-full px-1">
               {unreadCount > 9 ? "۹+" : unreadCount}
             </span>
           )}

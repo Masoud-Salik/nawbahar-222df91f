@@ -10,14 +10,13 @@ export interface FeedArticle {
   created_at: string;
   save_count: number;
   author_id: string;
+  view_count: number;
   author?: {
     display_name: string;
     avatar_url: string | null;
     specialty: string | null;
     reputation_score: number;
   };
-  is_bookmarked?: boolean;
-  is_liked?: boolean;
 }
 
 export function usePublishedArticles() {
@@ -35,7 +34,7 @@ export function usePublishedArticles() {
     // First get articles
     const { data: articlesData, error: articlesError } = await supabase
       .from("articles")
-      .select("id, title, content, cover_image_url, tags, created_at, save_count, total_feed_rank, author_id")
+      .select("id, title, content, cover_image_url, tags, created_at, save_count, view_count, author_id")
       .eq("status", "published")
       .order("created_at", { ascending: false });
 
@@ -67,6 +66,7 @@ export function usePublishedArticles() {
         tags: item.tags || [],
         created_at: item.created_at,
         save_count: item.save_count || 0,
+        view_count: item.view_count || 0,
         author_id: item.author_id,
         author: profile ? {
           display_name: profile.display_name,
