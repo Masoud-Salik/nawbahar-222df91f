@@ -16,6 +16,11 @@ export type Database = {
     Tables: {
       articles: {
         Row: {
+          ai_score_ethics: number | null
+          ai_score_innovation: number | null
+          ai_score_science: number | null
+          ai_score_timing: number | null
+          ai_score_writing: number | null
           author_id: string
           content: string
           cover_image_url: string | null
@@ -26,6 +31,8 @@ export type Database = {
           editorial_score_timing: number | null
           editorial_score_writing: number | null
           embedding: string | null
+          engagement_score: number | null
+          final_weight: number | null
           id: string
           parent_article_id: string | null
           read_count: number | null
@@ -39,6 +46,11 @@ export type Database = {
           view_count: number | null
         }
         Insert: {
+          ai_score_ethics?: number | null
+          ai_score_innovation?: number | null
+          ai_score_science?: number | null
+          ai_score_timing?: number | null
+          ai_score_writing?: number | null
           author_id: string
           content: string
           cover_image_url?: string | null
@@ -49,6 +61,8 @@ export type Database = {
           editorial_score_timing?: number | null
           editorial_score_writing?: number | null
           embedding?: string | null
+          engagement_score?: number | null
+          final_weight?: number | null
           id?: string
           parent_article_id?: string | null
           read_count?: number | null
@@ -62,6 +76,11 @@ export type Database = {
           view_count?: number | null
         }
         Update: {
+          ai_score_ethics?: number | null
+          ai_score_innovation?: number | null
+          ai_score_science?: number | null
+          ai_score_timing?: number | null
+          ai_score_writing?: number | null
           author_id?: string
           content?: string
           cover_image_url?: string | null
@@ -72,6 +91,8 @@ export type Database = {
           editorial_score_timing?: number | null
           editorial_score_writing?: number | null
           embedding?: string | null
+          engagement_score?: number | null
+          final_weight?: number | null
           id?: string
           parent_article_id?: string | null
           read_count?: number | null
@@ -328,6 +349,7 @@ export type Database = {
           real_name: string | null
           reputation_score: number | null
           specialty: string | null
+          trust_score: number | null
           updated_at: string
           whatsapp_number: string | null
         }
@@ -342,6 +364,7 @@ export type Database = {
           real_name?: string | null
           reputation_score?: number | null
           specialty?: string | null
+          trust_score?: number | null
           updated_at?: string
           whatsapp_number?: string | null
         }
@@ -356,6 +379,7 @@ export type Database = {
           real_name?: string | null
           reputation_score?: number | null
           specialty?: string | null
+          trust_score?: number | null
           updated_at?: string
           whatsapp_number?: string | null
         }

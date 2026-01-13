@@ -1,11 +1,10 @@
-import { MoreHorizontal, Bookmark, UserPlus, Share2, Flag } from "lucide-react";
+import { MoreVertical, Bookmark, Share2, Flag } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
@@ -19,12 +18,21 @@ interface ArticleActionsMenuProps {
 export function ArticleActionsMenu({ articleId, authorId, articleTitle }: ArticleActionsMenuProps) {
   const { toast } = useToast();
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
-  }, [articleId, authorId]);
+  }, [articleId]);
+
+  // Close menu on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isOpen) setIsOpen(false);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isOpen]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -32,7 +40,6 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle }: Articl
     setUserId(uid || null);
 
     if (uid) {
-      // Check bookmark status
       const { data: bookmark } = await supabase
         .from("bookmarks")
         .select("id")
@@ -40,17 +47,6 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle }: Articl
         .eq("user_id", uid)
         .maybeSingle();
       setIsBookmarked(!!bookmark);
-
-      // Check follow status
-      if (uid !== authorId) {
-        const { data: follow } = await supabase
-          .from("follows")
-          .select("id")
-          .eq("follower_id", uid)
-          .eq("following_id", authorId)
-          .maybeSingle();
-        setIsFollowing(!!follow);
-      }
     }
   };
 
@@ -69,28 +65,7 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle }: Articl
       setIsBookmarked(true);
       toast({ title: "ذخیره شد" });
     }
-  };
-
-  const handleFollow = async () => {
-    if (!userId) {
-      toast({ title: "برای دنبال کردن باید وارد شوید", variant: "destructive" });
-      return;
-    }
-
-    if (userId === authorId) {
-      toast({ title: "نمی‌توانید خودتان را دنبال کنید" });
-      return;
-    }
-
-    if (isFollowing) {
-      await supabase.from("follows").delete().eq("follower_id", userId).eq("following_id", authorId);
-      setIsFollowing(false);
-      toast({ title: "دنبال نمی‌کنید" });
-    } else {
-      await supabase.from("follows").insert({ follower_id: userId, following_id: authorId });
-      setIsFollowing(true);
-      toast({ title: "دنبال می‌کنید" });
-    }
+    setIsOpen(false);
   };
 
   const handleShare = async () => {
@@ -101,36 +76,32 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle }: Articl
       await navigator.clipboard.writeText(url);
       toast({ title: "لینک کپی شد" });
     }
+    setIsOpen(false);
   };
 
   const handleReport = () => {
     toast({ title: "گزارش ثبت شد", description: "با تشکر از گزارش شما" });
+    setIsOpen(false);
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-          <MoreHorizontal size={18} strokeWidth={1.5} />
-        </Button>
+        <button className="p-1.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none">
+          <MoreVertical size={16} strokeWidth={1.5} />
+        </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuItem onClick={handleSave} className="gap-3">
-          <Bookmark size={16} strokeWidth={1.5} />
-          <span>{isBookmarked ? "حذف از ذخیره‌ها" : "ذخیره مقاله"}</span>
+      <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuItem onClick={handleSave} className="gap-3 text-sm">
+          <Bookmark size={14} strokeWidth={1.5} />
+          <span>{isBookmarked ? "حذف از ذخیره‌ها" : "ذخیره"}</span>
         </DropdownMenuItem>
-        {userId !== authorId && (
-          <DropdownMenuItem onClick={handleFollow} className="gap-3">
-            <UserPlus size={16} strokeWidth={1.5} />
-            <span>{isFollowing ? "لغو دنبال کردن" : "دنبال کردن نویسنده"}</span>
-          </DropdownMenuItem>
-        )}
-        <DropdownMenuItem onClick={handleShare} className="gap-3">
-          <Share2 size={16} strokeWidth={1.5} />
+        <DropdownMenuItem onClick={handleShare} className="gap-3 text-sm">
+          <Share2 size={14} strokeWidth={1.5} />
           <span>اشتراک‌گذاری</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleReport} className="gap-3 text-destructive">
-          <Flag size={16} strokeWidth={1.5} />
+        <DropdownMenuItem onClick={handleReport} className="gap-3 text-sm text-destructive">
+          <Flag size={14} strokeWidth={1.5} />
           <span>گزارش</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

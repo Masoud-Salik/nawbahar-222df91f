@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ChevronUp, Send, Heart, CornerDownRight, Trash2, Flag, MoreHorizontal } from "lucide-react";
-import { formatSolarShort } from "@/lib/solarHijri";
+import { ChevronUp, Send, ThumbsUp, CornerDownRight, Trash2, Flag, MoreVertical } from "lucide-react";
+import { getRelativeTime } from "@/lib/relativeTime";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -57,7 +57,6 @@ export function SlideDownComments({
   const [likedComments, setLikedComments] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
-  // Filter top-level comments and replies
   const topLevelComments = comments.filter(c => !c.parent_id);
   const getReplies = (parentId: string) => comments.filter(c => c.parent_id === parentId);
 
@@ -89,8 +88,10 @@ export function SlideDownComments({
       await supabase.from("comment_likes").delete().eq("comment_id", commentId).eq("user_id", userId);
       setLikedComments(prev => ({ ...prev, [commentId]: false }));
     } else {
-      await supabase.from("comment_likes").insert({ comment_id: commentId, user_id: userId });
-      setLikedComments(prev => ({ ...prev, [commentId]: true }));
+      const { error } = await supabase.from("comment_likes").insert({ comment_id: commentId, user_id: userId });
+      if (!error) {
+        setLikedComments(prev => ({ ...prev, [commentId]: true }));
+      }
     }
   };
 
@@ -124,10 +125,10 @@ export function SlideDownComments({
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <span className="text-sm font-medium text-foreground">
-          نظرات ({comments.length})
+          نظرات {comments.length > 0 && `(${comments.length})`}
         </span>
         <button onClick={onClose} className="text-muted-foreground hover:text-foreground p-1">
-          <ChevronUp size={18} />
+          <ChevronUp size={18} strokeWidth={1.5} />
         </button>
       </div>
 
@@ -170,7 +171,6 @@ export function SlideDownComments({
               
               return (
                 <div key={comment.id} className="px-4 py-3">
-                  {/* Comment */}
                   <div className="flex items-start gap-2">
                     {comment.author?.avatar_url ? (
                       <img
@@ -191,7 +191,7 @@ export function SlideDownComments({
                           {comment.author?.display_name || "کاربر"}
                         </span>
                         <span className="text-[10px] text-muted-foreground">
-                          {formatSolarShort(comment.created_at)}
+                          {getRelativeTime(comment.created_at)}
                         </span>
                       </div>
                       <p className="text-sm text-foreground leading-relaxed mt-1">
@@ -207,7 +207,7 @@ export function SlideDownComments({
                             likedComments[comment.id] ? "text-primary" : "text-muted-foreground hover:text-foreground"
                           )}
                         >
-                          <Heart size={12} fill={likedComments[comment.id] ? "currentColor" : "none"} />
+                          <ThumbsUp size={12} strokeWidth={1.5} fill={likedComments[comment.id] ? "currentColor" : "none"} />
                           <span>پسندیدن</span>
                         </button>
                         
@@ -215,25 +215,25 @@ export function SlideDownComments({
                           onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
                           className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                         >
-                          <CornerDownRight size={12} />
+                          <CornerDownRight size={12} strokeWidth={1.5} />
                           <span>پاسخ</span>
                         </button>
 
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="text-muted-foreground hover:text-foreground p-0.5">
-                              <MoreHorizontal size={14} />
+                            <button className="text-muted-foreground hover:text-foreground p-0.5 focus:outline-none">
+                              <MoreVertical size={14} strokeWidth={1.5} />
                             </button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start" className="min-w-[120px]">
+                          <DropdownMenuContent align="start" className="min-w-[100px]">
                             {userId === comment.user_id && (
-                              <DropdownMenuItem onClick={() => onDeleteComment(comment.id)} className="text-destructive">
-                                <Trash2 size={14} className="ml-2" />
+                              <DropdownMenuItem onClick={() => onDeleteComment(comment.id)} className="text-destructive text-xs">
+                                <Trash2 size={12} className="ml-2" />
                                 حذف
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem onClick={() => handleReportComment(comment.id)}>
-                              <Flag size={14} className="ml-2" />
+                            <DropdownMenuItem onClick={() => handleReportComment(comment.id)} className="text-xs">
+                              <Flag size={12} className="ml-2" />
                               گزارش
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -290,7 +290,7 @@ export function SlideDownComments({
                                         {reply.author?.display_name || "کاربر"}
                                       </span>
                                       <span className="text-[10px] text-muted-foreground">
-                                        {formatSolarShort(reply.created_at)}
+                                        {getRelativeTime(reply.created_at)}
                                       </span>
                                     </div>
                                     <p className="text-xs text-foreground leading-relaxed mt-0.5">

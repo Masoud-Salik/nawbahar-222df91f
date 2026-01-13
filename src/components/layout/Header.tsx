@@ -1,6 +1,5 @@
 import { Info, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { cn } from "@/lib/utils";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -19,13 +18,11 @@ export function Header() {
       <div className="flex items-center justify-between px-4 h-11 max-w-lg mx-auto">
         {/* Info - Left side */}
         <Link to="/about">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="text-muted-foreground h-8 w-8 hover:text-foreground"
+          <button 
+            className="p-1.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
           >
             <Info size={18} strokeWidth={1.5} />
-          </Button>
+          </button>
         </Link>
 
         {/* Logo - Center */}
@@ -37,18 +34,16 @@ export function Header() {
 
         {/* Notifications - Right side */}
         <Link to="/notifications" className="relative">
-          <Button 
-            variant="ghost" 
-            size="icon"
+          <button 
             className={cn(
-              "h-8 w-8 transition-colors",
+              "p-1.5 transition-colors focus:outline-none",
               unreadCount > 0 ? "text-primary" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <Bell size={18} strokeWidth={1.5} />
-          </Button>
+          </button>
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] flex items-center justify-center text-[10px] font-medium text-primary-foreground bg-primary rounded-full px-1">
+            <span className="absolute top-0 right-0 min-w-[14px] h-[14px] flex items-center justify-center text-[9px] font-medium text-primary-foreground bg-primary rounded-full px-1">
               {unreadCount > 9 ? "۹+" : unreadCount}
             </span>
           )}

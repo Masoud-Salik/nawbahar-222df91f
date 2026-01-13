@@ -24,7 +24,7 @@ export function BottomNav() {
               key={path}
               to={path}
               className={cn(
-                "flex flex-col items-center justify-center gap-0.5 px-4 py-2 transition-colors duration-150",
+                "flex flex-col items-center justify-center gap-0.5 px-4 py-2 transition-colors duration-150 focus:outline-none",
                 isActive ? "text-primary" : "text-muted-foreground"
               )}
             >

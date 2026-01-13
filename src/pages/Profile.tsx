@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { LogIn, Moon, Sun, Type, LogOut, Shield, Phone, MessageCircle as WhatsApp, Facebook, Linkedin } from "lucide-react";
+import { LogIn, Moon, Sun, Type, LogOut, Shield } from "lucide-react";
+import { MessageCircle as WhatsApp, Facebook, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useFollowStats } from "@/hooks/useFollowStats";
-import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
-import { formatSolarShort } from "@/lib/solarHijri";
+import { getRelativeTime } from "@/lib/relativeTime";
 import { FollowersList } from "@/components/profile/FollowersList";
+import { cn } from "@/lib/utils";
 
 const Profile = () => {
   const { userId: paramUserId } = useParams();
@@ -57,7 +58,7 @@ const Profile = () => {
     navigate("/");
   };
 
-  // Not logged in and viewing own profile - show sign in card
+  // Not logged in and viewing own profile
   if (!user && isOwnProfile) {
     return (
       <AppLayout>
@@ -78,7 +79,6 @@ const Profile = () => {
             </Link>
           </div>
           
-          {/* Settings for guests */}
           <SettingsSection
             isDark={isDark}
             setIsDark={setIsDark}
@@ -101,125 +101,182 @@ const Profile = () => {
     );
   }
 
-  // Check if profile has social links
   const hasSocialLinks = profile?.whatsapp_number || profile?.facebook_url || (profile as any)?.linkedin_url;
 
   return (
     <AppLayout>
-      <div className="p-4 space-y-4">
-        {/* Profile Header - Compact */}
+      <div className="max-w-lg mx-auto">
+        {/* Medium-inspired Profile Header - Continuous layout */}
         {profile && (
-          <ProfileHeader
-            displayName={profile.display_name}
-            avatarUrl={profile.avatar_url}
-            specialty={profile.specialty}
-            reputationScore={profile.reputation_score}
-            isOwnProfile={isOwnProfile}
-            onEditClick={() => setEditModalOpen(true)}
-          />
-        )}
+          <div className="px-4 pt-8 pb-4">
+            {/* Avatar */}
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                {profile.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.display_name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-primary font-bold text-2xl">
+                      {profile.display_name?.charAt(0)}
+                    </span>
+                  </div>
+                )}
+                <div>
+                  <h1 className="text-lg font-bold text-foreground">{profile.display_name}</h1>
+                  {profile.specialty && (
+                    <p className="text-sm text-muted-foreground">{profile.specialty}</p>
+                  )}
+                </div>
+              </div>
+              
+              {/* Admin icon - only visible to profile owner */}
+              {isOwnProfile && isAdmin && (
+                <Link to="/admin" className="p-2 text-muted-foreground hover:text-foreground">
+                  <Shield size={18} strokeWidth={1.5} />
+                </Link>
+              )}
+            </div>
 
-        {/* Follow Stats - Clickable */}
-        <div className="flex items-center justify-center gap-6 py-3">
-          <button 
-            onClick={() => setShowFollowers(true)}
-            className="text-center hover:opacity-70 transition-opacity"
-          >
-            <span className="font-semibold text-lg">{followerCount}</span>
-            <p className="text-xs text-muted-foreground">دنبال‌کننده</p>
-          </button>
-          <div className="w-px h-8 bg-border" />
-          <button 
-            onClick={() => setShowFollowing(true)}
-            className="text-center hover:opacity-70 transition-opacity"
-          >
-            <span className="font-semibold text-lg">{followingCount}</span>
-            <p className="text-xs text-muted-foreground">دنبال‌شده</p>
-          </button>
-        </div>
+            {/* Bio - max 2 lines */}
+            {profile.specialty && (
+              <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
+                {profile.specialty}
+              </p>
+            )}
 
-        {/* Social Links (if available) */}
-        {hasSocialLinks && (
-          <div className="flex items-center justify-center gap-3">
-            {profile?.whatsapp_number && (
-              <a 
-                href={`https://wa.me/${profile.whatsapp_number}`} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+            {/* Follow Stats */}
+            <div className="flex items-center gap-4 mt-4 text-sm">
+              <button 
+                onClick={() => setShowFollowers(true)}
+                className="hover:underline"
               >
-                <WhatsApp size={18} className="text-muted-foreground" />
-              </a>
+                <span className="font-semibold text-foreground">{followerCount}</span>
+                <span className="text-muted-foreground mr-1">دنبال‌کننده</span>
+              </button>
+              <span className="text-muted-foreground">·</span>
+              <button 
+                onClick={() => setShowFollowing(true)}
+                className="hover:underline"
+              >
+                <span className="font-semibold text-foreground">{followingCount}</span>
+                <span className="text-muted-foreground mr-1">دنبال‌شده</span>
+              </button>
+            </div>
+
+            {/* Social Links - minimal icons */}
+            {hasSocialLinks && (
+              <div className="flex items-center gap-2 mt-4">
+                {profile.whatsapp_number && (
+                  <a 
+                    href={`https://wa.me/${profile.whatsapp_number}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <WhatsApp size={16} strokeWidth={1.5} />
+                  </a>
+                )}
+                {profile.facebook_url && (
+                  <a 
+                    href={profile.facebook_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Facebook size={16} strokeWidth={1.5} />
+                  </a>
+                )}
+                {(profile as any)?.linkedin_url && (
+                  <a 
+                    href={(profile as any).linkedin_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Linkedin size={16} strokeWidth={1.5} />
+                  </a>
+                )}
+              </div>
             )}
-            {profile?.facebook_url && (
-              <a 
-                href={profile.facebook_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+
+            {/* Edit Profile Button */}
+            {isOwnProfile && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditModalOpen(true)}
+                className="mt-4 text-sm"
               >
-                <Facebook size={18} className="text-muted-foreground" />
-              </a>
-            )}
-            {(profile as any)?.linkedin_url && (
-              <a 
-                href={(profile as any).linkedin_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
-              >
-                <Linkedin size={18} className="text-muted-foreground" />
-              </a>
+                ویرایش پروفایل
+              </Button>
             )}
           </div>
         )}
 
-        {/* Admin Button - only for own profile */}
-        {isOwnProfile && isAdmin && (
-          <Link to="/admin">
-            <Button variant="outline" className="w-full gap-2 h-10 text-sm">
-              <Shield size={16} />
-              پنل مدیریت
-            </Button>
-          </Link>
-        )}
-
-        {/* Tabs: مقالات / ذخیره‌شده‌ها / درباره ما */}
+        {/* Tabs - subtle underline style */}
         <Tabs defaultValue="articles" className="w-full">
-          <TabsList className={`grid w-full ${isOwnProfile ? 'grid-cols-3' : 'grid-cols-2'}`}>
-            <TabsTrigger value="articles" className="text-sm">مقالات</TabsTrigger>
-            {isOwnProfile && <TabsTrigger value="saved" className="text-sm">ذخیره‌شده‌ها</TabsTrigger>}
-            <TabsTrigger value="about" className="text-sm">درباره ما</TabsTrigger>
+          <TabsList className={cn(
+            "w-full bg-transparent border-b border-border rounded-none h-auto p-0",
+            isOwnProfile ? "grid-cols-3" : "grid-cols-2"
+          )}>
+            <TabsTrigger 
+              value="articles" 
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent py-3 text-sm"
+            >
+              مقالات
+            </TabsTrigger>
+            {isOwnProfile && (
+              <TabsTrigger 
+                value="saved" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent py-3 text-sm"
+              >
+                ذخیره‌شده‌ها
+              </TabsTrigger>
+            )}
+            <TabsTrigger 
+              value="about" 
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent py-3 text-sm"
+            >
+              درباره ما
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="articles" className="mt-4 space-y-2">
+          <TabsContent value="articles" className="mt-0">
             {articles.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground text-sm">
+              <div className="text-center py-12 text-muted-foreground text-sm">
                 هنوز مقاله‌ای ننوشته‌اید
               </div>
             ) : (
-              articles.map((article) => (
-                <ArticleListItem key={article.id} article={article} />
-              ))
+              <div className="divide-y divide-border">
+                {articles.map((article) => (
+                  <ProfileArticleItem key={article.id} article={article} />
+                ))}
+              </div>
             )}
           </TabsContent>
 
           {isOwnProfile && (
-            <TabsContent value="saved" className="mt-4 space-y-2">
+            <TabsContent value="saved" className="mt-0">
               {bookmarks.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground text-sm">
+                <div className="text-center py-12 text-muted-foreground text-sm">
                   هنوز مقاله‌ای ذخیره نکرده‌اید
                 </div>
               ) : (
-                bookmarks.map((article) => (
-                  <ArticleListItem key={article.id} article={article} />
-                ))
+                <div className="divide-y divide-border">
+                  {bookmarks.map((article) => (
+                    <ProfileArticleItem key={article.id} article={article} />
+                  ))}
+                </div>
               )}
             </TabsContent>
           )}
 
-          <TabsContent value="about" className="mt-4">
-            <div className="bg-card rounded-xl border border-border/60 p-4 space-y-4">
+          <TabsContent value="about" className="mt-0 p-4">
+            <div className="space-y-4">
               {profile?.specialty && (
                 <div>
                   <h4 className="text-sm font-medium text-foreground mb-1">تخصص</h4>
@@ -229,22 +286,16 @@ const Profile = () => {
               <div>
                 <h4 className="text-sm font-medium text-foreground mb-1">تاریخ عضویت</h4>
                 <p className="text-sm text-muted-foreground">
-                  {profile?.created_at ? formatSolarShort(profile.created_at) : "—"}
+                  {profile?.created_at ? getRelativeTime(profile.created_at) : "نامشخص"}
                 </p>
               </div>
-              {profile?.reputation_score !== undefined && profile.reputation_score > 0 && (
-                <div>
-                  <h4 className="text-sm font-medium text-foreground mb-1">امتیاز</h4>
-                  <p className="text-sm text-muted-foreground">{profile.reputation_score}</p>
-                </div>
-              )}
             </div>
           </TabsContent>
         </Tabs>
 
-        {/* Settings & Sign Out - only for own profile */}
+        {/* Settings & Sign Out */}
         {isOwnProfile && (
-          <>
+          <div className="p-4 space-y-4 border-t border-border mt-4">
             <SettingsSection
               isDark={isDark}
               setIsDark={setIsDark}
@@ -261,7 +312,7 @@ const Profile = () => {
               <LogOut size={16} />
               خروج از حساب
             </Button>
-          </>
+          </div>
         )}
       </div>
 
@@ -302,35 +353,22 @@ const Profile = () => {
   );
 };
 
-// Article List Item Component - More compact
-function ArticleListItem({ article }: { article: { id: string; title: string; cover_image_url: string | null; created_at: string } }) {
+// Profile Article Item - Clean, no large images
+function ProfileArticleItem({ article }: { article: { id: string; title: string; cover_image_url: string | null; created_at: string } }) {
   return (
     <Link
       to={`/article/${article.id}`}
-      className="flex items-center gap-3 p-3 bg-card rounded-lg border border-border/60 hover:border-primary/30 transition-colors"
+      className="block px-4 py-4 hover:bg-muted/30 transition-colors"
     >
-      {article.cover_image_url ? (
-        <img
-          src={article.cover_image_url}
-          alt={article.title}
-          className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
-        />
-      ) : (
-        <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-          <span className="text-primary font-semibold">ن</span>
-        </div>
-      )}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-foreground line-clamp-2 text-sm">{article.title}</h3>
-        <p className="text-xs text-muted-foreground mt-1">
-          {formatSolarShort(article.created_at)}
-        </p>
-      </div>
+      <h3 className="font-medium text-foreground text-sm line-clamp-2">{article.title}</h3>
+      <p className="text-xs text-muted-foreground mt-1">
+        {getRelativeTime(article.created_at)}
+      </p>
     </Link>
   );
 }
 
-// Settings Section Component - More compact
+// Settings Section
 function SettingsSection({
   isDark,
   setIsDark,

@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { X, CheckCircle, XCircle, FlaskConical, Scale, Pen, Clock, Lightbulb } from "lucide-react";
-import { formatSolarShort } from "@/lib/solarHijri";
+import { X, CheckCircle, XCircle, FlaskConical, Scale, Pen, Clock, Lightbulb, Bot } from "lucide-react";
+import { getRelativeTime } from "@/lib/relativeTime";
+import { cn } from "@/lib/utils";
 
 interface AdminArticle {
   id: string;
@@ -30,36 +31,67 @@ interface ReviewModalProps {
 }
 
 const scoreLabels = [
-  { key: "science", label: "علمی", icon: FlaskConical, max: 15, weight: 3 },
-  { key: "ethics", label: "اخلاقی", icon: Scale, max: 10, weight: 2 },
-  { key: "writing", label: "نگارش", icon: Pen, max: 10, weight: 1 },
-  { key: "timing", label: "زمان‌بندی", icon: Clock, max: 10, weight: 1 },
-  { key: "innovation", label: "نوآوری", icon: Lightbulb, max: 5, weight: 1 },
+  { key: "science", label: "دقت علمی", icon: FlaskConical, max: 15 },
+  { key: "ethics", label: "اخلاق", icon: Scale, max: 10 },
+  { key: "writing", label: "نگارش", icon: Pen, max: 10 },
+  { key: "timing", label: "به‌روز بودن", icon: Clock, max: 10 },
+  { key: "innovation", label: "نوآوری", icon: Lightbulb, max: 5 },
 ];
 
+// Simulate AI pre-review scores
+function generateAIScores(content: string) {
+  const length = content.length;
+  const hasScientific = /علم|تحقیق|مطالعه|پژوهش/i.test(content);
+  const hasEthical = /اخلاق|ارزش|احترام/i.test(content);
+  
+  return {
+    science: Math.min(15, Math.floor(Math.random() * 5) + (hasScientific ? 8 : 5)),
+    ethics: Math.min(10, Math.floor(Math.random() * 3) + (hasEthical ? 6 : 4)),
+    writing: Math.min(10, Math.floor(Math.random() * 4) + (length > 500 ? 5 : 3)),
+    timing: Math.min(10, Math.floor(Math.random() * 4) + 4),
+    innovation: Math.min(5, Math.floor(Math.random() * 3) + 1),
+  };
+}
+
 export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) {
-  const [scores, setScores] = useState({
-    science: article.editorial_score_science || 0,
-    ethics: article.editorial_score_ethics || 0,
-    writing: article.editorial_score_writing || 0,
-    timing: article.editorial_score_timing || 0,
-    innovation: article.editorial_score_innovation || 0,
-  });
   const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const totalScore = 
-    scores.science * 3 + 
-    scores.ethics * 2 + 
-    scores.writing + 
-    scores.timing + 
-    scores.innovation;
+  // AI scores - simulate pre-review
+  const aiScores = generateAIScores(article.content);
 
-  const maxPossibleScore = 15 * 3 + 10 * 2 + 10 + 10 + 5; // 90
+  // Editor scores - start with AI scores or existing scores
+  const [scores, setScores] = useState({
+    science: article.editorial_score_science ?? aiScores.science,
+    ethics: article.editorial_score_ethics ?? aiScores.ethics,
+    writing: article.editorial_score_writing ?? aiScores.writing,
+    timing: article.editorial_score_timing ?? aiScores.timing,
+    innovation: article.editorial_score_innovation ?? aiScores.innovation,
+  });
+
+  const [activeSlider, setActiveSlider] = useState<string | null>(null);
+
+  const totalScore = Object.values(scores).reduce((sum, v) => sum + v, 0);
+  const maxPossibleScore = 50;
 
   const handleApprove = async () => {
     setLoading(true);
+    
+    // Calculate final weight using the formula
+    // Final Weight = (Author Trust × 0.25) + (AI × 0.25) + (Editor × 0.30) + (Engagement × 0.20)
+    const aiTotal = Object.values(aiScores).reduce((sum, v) => sum + v, 0);
+    const editorTotal = totalScore;
+    const authorTrust = 50; // Default, would fetch from profile
+    const engagement = 0; // Initial
+    
+    const finalWeight = Math.round(
+      (authorTrust * 0.25) +
+      (aiTotal * 0.25) +
+      (editorTotal * 0.30) +
+      (engagement * 0.20)
+    );
+
     const { error } = await supabase
       .from("articles")
       .update({
@@ -69,31 +101,27 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
         editorial_score_writing: scores.writing,
         editorial_score_timing: scores.timing,
         editorial_score_innovation: scores.innovation,
-        total_feed_rank: totalScore,
+        ai_score_science: aiScores.science,
+        ai_score_ethics: aiScores.ethics,
+        ai_score_writing: aiScores.writing,
+        ai_score_timing: aiScores.timing,
+        ai_score_innovation: aiScores.innovation,
+        total_feed_rank: editorTotal,
+        final_weight: finalWeight,
       })
       .eq("id", article.id);
 
     if (error) {
-      toast({
-        title: "خطا",
-        description: "خطا در انتشار مقاله",
-        variant: "destructive",
-      });
+      toast({ title: "خطا", description: "خطا در انتشار مقاله", variant: "destructive" });
     } else {
-      // Update author's reputation score
       await updateAuthorReputation(article.author_id);
-      
-      toast({
-        title: "موفق!",
-        description: "مقاله با موفقیت منتشر شد",
-      });
+      toast({ title: "موفق!", description: "مقاله منتشر شد" });
       onComplete();
     }
     setLoading(false);
   };
 
   const updateAuthorReputation = async (authorId: string) => {
-    // Calculate author's new reputation (avg of science + ethics across all articles)
     const { data: authorArticles } = await supabase
       .from("articles")
       .select("editorial_score_science, editorial_score_ethics")
@@ -101,17 +129,21 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
       .eq("status", "published");
 
     if (authorArticles && authorArticles.length > 0) {
-      const avgReputation = authorArticles.reduce((acc, article) => {
-        const science = article.editorial_score_science || 0;
-        const ethics = article.editorial_score_ethics || 0;
-        // Normalize: science is out of 15, ethics out of 10 = 25 total
-        // Convert to 0-100 scale
+      const avgReputation = authorArticles.reduce((acc, a) => {
+        const science = a.editorial_score_science || 0;
+        const ethics = a.editorial_score_ethics || 0;
         return acc + ((science + ethics) / 25) * 100;
       }, 0) / authorArticles.length;
 
+      // Also update trust score based on performance
+      const trustScore = Math.min(100, Math.round(avgReputation));
+
       await supabase
         .from("profiles")
-        .update({ reputation_score: Math.round(avgReputation) })
+        .update({ 
+          reputation_score: Math.round(avgReputation),
+          trust_score: trustScore,
+        })
         .eq("id", authorId);
     }
   };
@@ -120,22 +152,13 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
     setLoading(true);
     const { error } = await supabase
       .from("articles")
-      .update({
-        status: "rejected",
-      })
+      .update({ status: "rejected" })
       .eq("id", article.id);
 
     if (error) {
-      toast({
-        title: "خطا",
-        description: "خطا در رد مقاله",
-        variant: "destructive",
-      });
+      toast({ title: "خطا", description: "خطا در رد مقاله", variant: "destructive" });
     } else {
-      toast({
-        title: "انجام شد",
-        description: "مقاله رد شد",
-      });
+      toast({ title: "انجام شد", description: "مقاله رد شد" });
       onComplete();
     }
     setLoading(false);
@@ -148,66 +171,76 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
           {/* Header */}
           <header className="sticky top-0 z-10 bg-card border-b border-border">
             <div className="flex items-center justify-between px-4 h-14">
-              <button
-                onClick={onClose}
-                className="p-2 -mr-2 text-muted-foreground hover:text-foreground"
-              >
-                <X size={24} />
+              <button onClick={onClose} className="p-2 -mr-2 text-muted-foreground hover:text-foreground">
+                <X size={24} strokeWidth={1.5} />
               </button>
               <h1 className="text-lg font-semibold">بررسی مقاله</h1>
               <div className="w-10" />
             </div>
           </header>
 
-          {/* Article Content */}
           <div className="p-4 space-y-6">
             {/* Meta */}
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>{article.profiles?.display_name || "ناشناس"}</span>
-              <span>{formatSolarShort(article.created_at)}</span>
+              <span>{getRelativeTime(article.created_at)}</span>
             </div>
 
             {/* Title */}
             <h2 className="text-xl font-bold text-foreground">{article.title}</h2>
 
-            {/* Content */}
-            <div className="prose prose-sm max-w-none text-foreground leading-relaxed whitespace-pre-wrap">
+            {/* Content Preview */}
+            <div className="prose prose-sm max-w-none text-foreground leading-relaxed whitespace-pre-wrap line-clamp-6">
               {article.content}
             </div>
 
             {/* Scoring Section */}
-            <div className="border-t border-border pt-6 space-y-6">
+            <div className="border-t border-border pt-6 space-y-5">
               <h3 className="font-semibold text-lg">امتیازدهی</h3>
 
-              {scoreLabels.map(({ key, label, icon: Icon, max, weight }) => (
-                <div key={key} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Icon size={18} className="text-primary" />
-                      <span className="text-sm font-medium">{label}</span>
-                      <span className="text-xs text-muted-foreground">
-                        (×{weight})
+              {scoreLabels.map(({ key, label, icon: Icon, max }) => {
+                const aiValue = aiScores[key as keyof typeof aiScores];
+                const editorValue = scores[key as keyof typeof scores];
+                const isActive = activeSlider === key;
+
+                return (
+                  <div key={key} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Icon size={16} className={cn(
+                          "transition-colors",
+                          isActive ? "text-primary" : "text-muted-foreground"
+                        )} />
+                        <span className="text-sm font-medium">{label}</span>
+                        {/* AI Score indicator */}
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                          <Bot size={10} />
+                          {aiValue}/{max}
+                        </span>
+                      </div>
+                      <span className={cn(
+                        "text-sm font-semibold transition-colors",
+                        isActive ? "text-primary" : "text-foreground"
+                      )}>
+                        {editorValue} / {max}
                       </span>
                     </div>
-                    <span className="text-sm font-semibold">
-                      {scores[key as keyof typeof scores]} / {max}
-                    </span>
+                    <Slider
+                      value={[editorValue]}
+                      max={max}
+                      step={1}
+                      onValueChange={([value]) => setScores(prev => ({ ...prev, [key]: value }))}
+                      onPointerDown={() => setActiveSlider(key)}
+                      onPointerUp={() => setActiveSlider(null)}
+                      className="w-full"
+                    />
                   </div>
-                  <Slider
-                    value={[scores[key as keyof typeof scores]]}
-                    max={max}
-                    step={1}
-                    onValueChange={([value]) =>
-                      setScores((prev) => ({ ...prev, [key]: value }))
-                    }
-                    className="w-full"
-                  />
-                </div>
-              ))}
+                );
+              })}
 
               {/* Total Score */}
               <div className="bg-primary/10 rounded-xl p-4 text-center">
-                <div className="text-sm text-muted-foreground mb-1">امتیاز کل</div>
+                <div className="text-sm text-muted-foreground mb-1">امتیاز ویرایشگر</div>
                 <div className="text-3xl font-bold text-primary">
                   {totalScore}
                   <span className="text-lg text-muted-foreground">/{maxPossibleScore}</span>
@@ -233,11 +266,10 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
                   <Button
                     onClick={handleReject}
                     variant="outline"
-                    className="flex-1 h-12 gap-2 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    className="flex-1 h-12 gap-2 text-muted-foreground"
                     disabled={loading}
                   >
-                    <XCircle size={18} />
-                    رد کردن
+                    انصراف
                   </Button>
                   <Button
                     onClick={handleApprove}
@@ -245,7 +277,7 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
                     disabled={loading}
                   >
                     <CheckCircle size={18} />
-                    تأیید و انتشار
+                    ثبت ارزیابی
                   </Button>
                 </div>
               )}
