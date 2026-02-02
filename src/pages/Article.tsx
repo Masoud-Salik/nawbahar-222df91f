@@ -9,6 +9,7 @@ import { useComments } from "@/hooks/useComments";
 import { useReactions } from "@/hooks/useReactions";
 import { useResponseArticles } from "@/hooks/useResponseArticles";
 import { useViewCount } from "@/hooks/useViewCount";
+import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import { CommentSection } from "@/components/articles/CommentSection";
 import { ArticleRatingModal } from "@/components/admin/ArticleRatingModal";
 import { ArticleActionsMenu } from "@/components/articles/ArticleActionsMenu";
@@ -49,6 +50,10 @@ const Article = () => {
   const { viewCount } = useViewCount(id || "");
   const { userReaction, likedCount, dislikedCount, setReaction } = useReactions(id || "");
   const { responses, responseCount, parentArticle } = useResponseArticles(id || "");
+  
+  // Track user engagement (scroll depth, time spent)
+  const contentLength = article?.content?.length || 0;
+  useEngagementTracking(id || "", contentLength);
 
   const {
     comments,

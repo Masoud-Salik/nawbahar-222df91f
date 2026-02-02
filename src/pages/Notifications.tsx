@@ -1,19 +1,22 @@
 import { AppLayout } from "@/components/layout/AppLayout";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications, NotificationSettings } from "@/hooks/useNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, MessageCircle, UserPlus, Bell, CheckCheck } from "lucide-react";
+import { Heart, MessageCircle, UserPlus, Bell, CheckCheck, Settings, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { getRelativeTime } from "@/lib/relativeTime";
+import { useState } from "react";
 
 function getNotificationIcon(type: string) {
   switch (type) {
     case "like":
-      return <Heart size={18} className="text-rose-500" fill="currentColor" />;
+      return <Heart size={18} className="text-destructive" fill="currentColor" />;
     case "comment":
       return <MessageCircle size={18} className="text-primary" fill="currentColor" />;
     case "follow":
-      return <UserPlus size={18} className="text-green-500" />;
+      return <UserPlus size={18} className="text-accent-foreground" />;
     default:
       return <Bell size={18} className="text-muted-foreground" />;
   }
@@ -46,25 +49,21 @@ function getNotificationText(type: string, actorName: string, articleTitle?: str
   }
 }
 
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return "همین الان";
-  if (diffMins < 60) return `${diffMins} دقیقه پیش`;
-  if (diffHours < 24) return `${diffHours} ساعت پیش`;
-  if (diffDays < 7) return `${diffDays} روز پیش`;
-  return `${Math.floor(diffDays / 7)} هفته پیش`;
-}
-
 const Notifications = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications();
+  const { 
+    notifications, 
+    unreadCount, 
+    loading, 
+    markAsRead, 
+    markAllAsRead,
+    deleteNotification,
+    settings,
+    updateSettings
+  } = useNotifications();
+  
+  const [showSettings, setShowSettings] = useState(false);
 
   if (!user) {
     return (
@@ -91,18 +90,58 @@ const Notifications = () => {
         {/* Header */}
         <div className="sticky top-11 z-30 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
           <h1 className="text-lg font-semibold">اعلان‌ها</h1>
-          {unreadCount > 0 && (
+          <div className="flex items-center gap-2">
+            {unreadCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={markAllAsRead}
+                className="text-xs gap-1.5 text-primary"
+              >
+                <CheckCheck size={16} />
+                خواندن همه
+              </Button>
+            )}
             <Button
               variant="ghost"
-              size="sm"
-              onClick={markAllAsRead}
-              className="text-xs gap-1.5 text-primary"
+              size="icon"
+              onClick={() => setShowSettings(!showSettings)}
+              className="h-8 w-8"
             >
-              <CheckCheck size={16} />
-              خواندن همه
+              {showSettings ? <X size={18} /> : <Settings size={18} />}
             </Button>
-          )}
+          </div>
         </div>
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className="bg-muted/50 border-b border-border p-4 space-y-4">
+            <h3 className="text-sm font-semibold">تنظیمات اعلان‌ها</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">اعلان نظرات</span>
+                <Switch 
+                  checked={settings.comments}
+                  onCheckedChange={(checked) => updateSettings({ comments: checked })}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">اعلان پسندها</span>
+                <Switch 
+                  checked={settings.likes}
+                  onCheckedChange={(checked) => updateSettings({ likes: checked })}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">اعلان دنبال‌کننده‌ها</span>
+                <Switch 
+                  checked={settings.follows}
+                  onCheckedChange={(checked) => updateSettings({ follows: checked })}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex justify-center py-12">
@@ -118,41 +157,53 @@ const Notifications = () => {
         ) : (
           <div className="divide-y divide-border">
             {notifications.map((notification) => (
-              <Link
+              <div
                 key={notification.id}
-                to={
-                  notification.type === "follow"
-                    ? `/profile/${notification.actor_id}`
-                    : notification.article_id
-                    ? `/article/${notification.article_id}`
-                    : "#"
-                }
-                onClick={() => !notification.is_read && markAsRead(notification.id)}
                 className={cn(
-                  "flex items-start gap-3 p-4 hover:bg-muted/50 transition-colors",
+                  "flex items-start gap-3 p-4 hover:bg-muted/50 transition-colors relative group",
                   !notification.is_read && "bg-primary/5"
                 )}
-                dir="rtl"
               >
-                <div className="mt-0.5">
-                  {getNotificationIcon(notification.type)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm leading-relaxed">
-                    {getNotificationText(
-                      notification.type,
-                      notification.actor?.display_name || "کاربر",
-                      notification.article?.title
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {formatRelativeTime(notification.created_at)}
-                  </p>
-                </div>
+                <Link
+                  to={
+                    notification.type === "follow"
+                      ? `/profile/${notification.actor_id}`
+                      : notification.article_id
+                      ? `/article/${notification.article_id}`
+                      : "#"
+                  }
+                  onClick={() => !notification.is_read && markAsRead(notification.id)}
+                  className="flex items-start gap-3 flex-1 min-w-0"
+                >
+                  <div className="mt-0.5">
+                    {getNotificationIcon(notification.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm leading-relaxed">
+                      {getNotificationText(
+                        notification.type,
+                        notification.actor?.display_name || "کاربر",
+                        notification.article?.title
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {getRelativeTime(notification.created_at)}
+                    </p>
+                  </div>
+                </Link>
+                
+                {/* Delete button */}
+                <button
+                  onClick={() => deleteNotification(notification.id)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 size={14} />
+                </button>
+                
                 {!notification.is_read && (
                   <div className="w-2 h-2 rounded-full bg-primary mt-2 shrink-0" />
                 )}
-              </Link>
+              </div>
             ))}
           </div>
         )}
