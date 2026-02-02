@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Send, ImagePlus, X, CornerUpRight, FileText, Bold, Italic, List, Quote } from "lucide-react";
 import { compressArticleImage } from "@/lib/imageCompression";
+import { sanitizeError, validation } from "@/lib/errorHandler";
 import type { User } from "@supabase/supabase-js";
 
 const DRAFT_KEY = "nobahar_draft";
@@ -95,12 +96,17 @@ const ArticleEditor = () => {
   }, [navigate]);
 
   const handlePublish = async () => {
-    if (!title.trim() || !content.trim()) {
-      toast({
-        title: "خطا",
-        description: "لطفاً عنوان و متن مقاله را وارد کنید",
-        variant: "destructive",
-      });
+    // Validate title
+    const titleError = validation.title.validate(title);
+    if (titleError) {
+      toast({ title: "خطا", description: titleError, variant: "destructive" });
+      return;
+    }
+
+    // Validate content
+    const contentError = validation.content.validate(content);
+    if (contentError) {
+      toast({ title: "خطا", description: contentError, variant: "destructive" });
       return;
     }
 
@@ -158,7 +164,7 @@ const ArticleEditor = () => {
     } catch (error: any) {
       toast({
         title: "خطا",
-        description: error.message || "مشکلی در ثبت مقاله پیش آمد",
+        description: sanitizeError(error),
         variant: "destructive",
       });
     } finally {

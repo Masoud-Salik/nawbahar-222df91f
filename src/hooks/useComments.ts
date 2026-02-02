@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { validation } from "@/lib/errorHandler";
 
 export interface Comment {
   id: string;
@@ -88,10 +89,12 @@ export function useComments(articleId: string) {
       return false;
     }
 
-    if (!content.trim()) {
+    // Validate comment content
+    const commentError = validation.comment.validate(content);
+    if (commentError) {
       toast({
         title: "خطا",
-        description: "متن نظر نمی‌تواند خالی باشد",
+        description: commentError,
         variant: "destructive",
       });
       return false;

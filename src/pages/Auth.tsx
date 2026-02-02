@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { PenTool, Mail, Lock, User } from "lucide-react";
+import { sanitizeError, validation } from "@/lib/errorHandler";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,6 +19,16 @@ const Auth = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate display name for signup
+    if (!isLogin) {
+      const nameError = validation.displayName.validate(displayName);
+      if (nameError) {
+        toast({ title: "خطا", description: nameError, variant: "destructive" });
+        return;
+      }
+    }
+    
     setLoading(true);
 
     try {
@@ -36,18 +47,17 @@ const Auth = () => {
           options: {
             emailRedirectTo: `${window.location.origin}/`,
             data: {
-              display_name: displayName,
+              display_name: displayName.trim(),
             },
           },
         });
         if (error) throw error;
-        toast({ title: "ثبت‌نام موفق!", description: "حساب شما ایجاد شد" });
-        navigate("/");
+        toast({ title: "ثبت‌نام موفق!", description: "لطفاً ایمیل خود را تأیید کنید" });
       }
     } catch (error: any) {
       toast({
         title: "خطا",
-        description: error.message || "مشکلی پیش آمد",
+        description: sanitizeError(error),
         variant: "destructive",
       });
     } finally {
