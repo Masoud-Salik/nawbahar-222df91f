@@ -38,19 +38,37 @@ const scoreLabels = [
   { key: "innovation", label: "نوآوری", icon: Lightbulb, max: 5 },
 ];
 
-// Simulate AI pre-review scores
-function generateAIScores(content: string) {
-  const length = content.length;
-  const hasScientific = /علم|تحقیق|مطالعه|پژوهش/i.test(content);
-  const hasEthical = /اخلاق|ارزش|احترام/i.test(content);
+// AI pre-review scoring based on content analysis
+function generateAIScores(content: string, title: string) {
+  const contentLength = content.length;
+  const wordCount = content.split(/\s+/).length;
   
-  return {
-    science: Math.min(15, Math.floor(Math.random() * 5) + (hasScientific ? 8 : 5)),
-    ethics: Math.min(10, Math.floor(Math.random() * 3) + (hasEthical ? 6 : 4)),
-    writing: Math.min(10, Math.floor(Math.random() * 4) + (length > 500 ? 5 : 3)),
-    timing: Math.min(10, Math.floor(Math.random() * 4) + 4),
-    innovation: Math.min(5, Math.floor(Math.random() * 3) + 1),
-  };
+  // Content quality signals
+  const hasScientificTerms = /علم|تحقیق|مطالعه|پژوهش|بررسی|آمار|داده|نتیجه|روش/i.test(content);
+  const hasEthicalTerms = /اخلاق|ارزش|احترام|مسئولیت|انصاف|عدالت/i.test(content);
+  const hasReferences = /منبع|مرجع|کتاب|مقاله|نقل/i.test(content);
+  const hasParagraphs = (content.match(/\n\n/g) || []).length >= 3;
+  const hasProperTitle = title.length >= 10 && title.length <= 100;
+  
+  // Calculate scores
+  const scienceBase = hasScientificTerms ? 10 : 6;
+  const scienceBonus = hasReferences ? 3 : 0;
+  const science = Math.min(15, scienceBase + scienceBonus + Math.floor(Math.random() * 3));
+  
+  const ethicsBase = hasEthicalTerms ? 7 : 5;
+  const ethics = Math.min(10, ethicsBase + Math.floor(Math.random() * 2));
+  
+  const writingBase = hasParagraphs ? 6 : 4;
+  const writingBonus = wordCount > 300 ? 2 : 0;
+  const writing = Math.min(10, writingBase + writingBonus + Math.floor(Math.random() * 2));
+  
+  const timingBase = 5; // Default - can be improved with date detection
+  const timing = Math.min(10, timingBase + Math.floor(Math.random() * 3));
+  
+  const innovationBase = hasProperTitle && contentLength > 1000 ? 3 : 2;
+  const innovation = Math.min(5, innovationBase + Math.floor(Math.random() * 2));
+  
+  return { science, ethics, writing, timing, innovation };
 }
 
 export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) {
@@ -59,7 +77,7 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
   const { toast } = useToast();
 
   // AI scores - simulate pre-review
-  const aiScores = generateAIScores(article.content);
+  const aiScores = generateAIScores(article.content, article.title);
 
   // Editor scores - start with AI scores or existing scores
   const [scores, setScores] = useState({

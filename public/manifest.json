@@ -1,19 +1,32 @@
 {
-  "name": "کلک - رسانه فکری",
-  "short_name": "کلک",
-  "description": "پلتفرم متنی برای جامعه افغان",
+  "name": "نوبهار",
+  "short_name": "نوبهار",
+  "description": "جامعه نخبگان",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fcfcfc",
+  "background_color": "#ffffff",
   "theme_color": "#0f766e",
   "orientation": "portrait",
   "dir": "rtl",
   "lang": "fa",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "64x64",
-      "type": "image/x-icon"
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "categories": ["news", "social"],
+  "screenshots": []
 }
