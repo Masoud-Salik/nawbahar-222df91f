@@ -1,4 +1,4 @@
-import { Info, Bell } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { cn } from "@/lib/utils";
@@ -11,29 +11,20 @@ export function Header() {
   return (
     <header 
       className={cn(
-        "fixed top-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-sm border-b border-border/50 safe-top transition-transform duration-300",
+        "fixed top-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-b border-border/30 safe-top transition-transform duration-300",
         !isVisible && "-translate-y-full"
       )}
     >
       <div className="flex items-center justify-between px-4 h-12 max-w-lg mx-auto">
-        {/* Info - Left side */}
-        <Link to="/about" className="p-2 -mr-2">
-          <button 
-            className="p-1.5 text-muted-foreground hover:text-foreground transition-colors duration-200 focus:outline-none rounded-full hover:bg-muted"
-            aria-label="درباره ما"
-          >
-            <Info size={18} strokeWidth={1.5} />
-          </button>
-        </Link>
-
-        {/* Logo - Center */}
+        {/* Logo - Right side (RTL) */}
         <Link to="/" className="flex items-center group">
-          <span className="text-xl font-bold text-foreground transition-colors duration-200 group-hover:text-primary">
+          <span className="text-lg font-black tracking-tight text-foreground transition-colors duration-200 group-hover:text-primary">
             نوبهار
           </span>
+          <span className="text-[9px] font-medium text-primary/60 mr-1.5 mt-1">β</span>
         </Link>
 
-        {/* Notifications - Right side */}
+        {/* Notifications - Left side */}
         <Link to="/notifications" className="relative p-2 -ml-2">
           <button 
             className={cn(

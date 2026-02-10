@@ -36,12 +36,12 @@ export function ArticleFeed({ articles, onRefresh }: ArticleFeedProps) {
   }
 
   return (
-    <div className="py-4 space-y-4 px-3">
+    <div className="py-3 space-y-3 px-3">
       {articles.map((article, index) => (
         <div
           key={article.id}
           className="animate-slide-up"
-          style={{ animationDelay: `${Math.min(index * 50, 300)}ms` }}
+          style={{ animationDelay: `${Math.min(index * 40, 200)}ms` }}
         >
           <ArticleCard article={article} onDelete={onRefresh} />
         </div>

@@ -14,7 +14,7 @@ export function AppLayout({ children, hideHeader, hideNav, className }: AppLayou
     <div className="min-h-screen bg-background">
       {!hideHeader && <Header />}
       <main 
-        className={`${!hideNav ? 'pb-16' : ''} ${!hideHeader ? 'pt-12' : ''} max-w-[600px] mx-auto ${className || ''}`}
+        className={`${!hideNav ? 'pb-16' : ''} ${!hideHeader ? 'pt-12' : ''} max-w-[540px] mx-auto ${className || ''}`}
         role="main"
       >
         {children}

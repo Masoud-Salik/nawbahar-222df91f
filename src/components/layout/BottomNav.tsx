@@ -14,7 +14,7 @@ export function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-t border-border/50 safe-bottom no-print">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border/30 safe-bottom no-print">
       <div className="flex items-center justify-around max-w-lg mx-auto h-14">
         {navItems.map(({ icon: Icon, path, label }) => {
           const isActive = location.pathname === path || 
@@ -28,13 +28,13 @@ export function BottomNav() {
                 "flex flex-col items-center justify-center gap-0.5 px-4 py-2 transition-all duration-200 focus:outline-none rounded-lg min-h-[48px]",
                 isActive 
                   ? "text-primary" 
-                  : "text-muted-foreground hover:text-foreground active:scale-95"
+                  : "text-muted-foreground/60 hover:text-foreground active:scale-95"
               )}
               aria-label={label}
               aria-current={isActive ? "page" : undefined}
             >
               <Icon
-                size={20}
+                size={19}
                 strokeWidth={isActive ? 2 : 1.5}
                 className={cn(
                   "transition-transform duration-200",
@@ -42,8 +42,8 @@ export function BottomNav() {
                 )}
               />
               <span className={cn(
-                "text-[10px] transition-opacity duration-200",
-                isActive ? "font-medium" : "font-normal"
+                "text-[9px] transition-opacity duration-200",
+                isActive ? "font-semibold" : "font-normal"
               )}>
                 {label}
               </span>
