@@ -113,8 +113,13 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
     if (error) {
       toast({ title: "خطا", description: "خطا در انتشار مقاله", variant: "destructive" });
     } else {
-      await updateAuthorReputation(article.author_id);
-      toast({ title: "✅ موفق!", description: "مقاله با موفقیت منتشر شد" });
+      const reputationUpdated = await updateAuthorReputation(article.author_id);
+      toast({
+        title: "✅ موفق!",
+        description: reputationUpdated
+          ? "مقاله با موفقیت منتشر شد"
+          : "مقاله منتشر شد؛ اما امتیاز اعتباری نویسنده بروزرسانی نشد",
+      });
       onComplete();
     }
     setLoading(false);
@@ -137,34 +142,51 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
     if (error) {
       toast({ title: "خطا", description: "خطا در ذخیره امتیازات", variant: "destructive" });
     } else {
-      await updateAuthorReputation(article.author_id);
-      toast({ title: "✅ ذخیره شد", description: "امتیازات با موفقیت ثبت شد" });
+      const reputationUpdated = await updateAuthorReputation(article.author_id);
+      toast({
+        title: "✅ ذخیره شد",
+        description: reputationUpdated
+          ? "امتیازات با موفقیت ثبت شد"
+          : "امتیازات ثبت شد؛ اما امتیاز اعتباری نویسنده بروزرسانی نشد",
+      });
       onComplete();
     }
     setLoading(false);
   };
 
   const updateAuthorReputation = async (authorId: string) => {
-    const { data: authorArticles } = await supabase
+    const { data: authorArticles, error: authorArticlesError } = await supabase
       .from("articles")
       .select("editorial_score_science, editorial_score_ethics")
       .eq("author_id", authorId)
       .eq("status", "published");
 
-    if (authorArticles && authorArticles.length > 0) {
-      const avgReputation = authorArticles.reduce((acc, a) => {
-        const science = a.editorial_score_science || 0;
-        const ethics = a.editorial_score_ethics || 0;
-        return acc + ((science + ethics) / 25) * 100;
-      }, 0) / authorArticles.length;
-
-      const trustScore = Math.min(100, Math.round(avgReputation));
-
-      await supabase
-        .from("profiles")
-        .update({ reputation_score: Math.round(avgReputation), trust_score: trustScore })
-        .eq("id", authorId);
+    if (authorArticlesError) {
+      console.error("Error fetching author articles for reputation:", authorArticlesError);
+      return false;
     }
+
+    if (!authorArticles || authorArticles.length === 0) return true;
+
+    const avgReputation = authorArticles.reduce((acc, a) => {
+      const science = a.editorial_score_science || 0;
+      const ethics = a.editorial_score_ethics || 0;
+      return acc + ((science + ethics) / 25) * 100;
+    }, 0) / authorArticles.length;
+
+    const trustScore = Math.min(100, Math.round(avgReputation));
+
+    const { error: updateProfileError } = await supabase
+      .from("profiles")
+      .update({ reputation_score: Math.round(avgReputation), trust_score: trustScore })
+      .eq("id", authorId);
+
+    if (updateProfileError) {
+      console.error("Error updating author reputation:", updateProfileError);
+      return false;
+    }
+
+    return true;
   };
 
   const handleReject = async () => {
