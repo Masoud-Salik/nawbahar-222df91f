@@ -43,12 +43,17 @@ export function gregorianToSolar(date: Date): { year: number; month: number; day
 export function formatSolarDate(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   const solar = gregorianToSolar(d);
-  return `${solar.day} ${AFGHAN_MONTHS[solar.month - 1]} ${solar.year}`;
+  return `${toPersianNum(solar.day)} ${AFGHAN_MONTHS[solar.month - 1]} ${toPersianNum(solar.year)}`;
 }
 
 // Short format: just day and month
 export function formatSolarShort(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   const solar = gregorianToSolar(d);
-  return `${solar.day} ${AFGHAN_MONTHS[solar.month - 1]}`;
+  return `${toPersianNum(solar.day)} ${AFGHAN_MONTHS[solar.month - 1]}`;
+}
+
+const PERSIAN_DIGITS_LOCAL = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+function toPersianNum(num: number): string {
+  return String(num).replace(/\d/g, (d) => PERSIAN_DIGITS_LOCAL[parseInt(d, 10)]);
 }

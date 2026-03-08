@@ -72,7 +72,7 @@ export function ProfileHeader({
       <div className="flex items-center gap-2 mt-3">
         <span className="text-sm text-muted-foreground">امتیاز اعتبار:</span>
         <span className={cn("font-bold", getReputationColor(reputationScore))}>
-          {reputationScore}
+          {toPersianNumber(reputationScore)}
         </span>
       </div>
 

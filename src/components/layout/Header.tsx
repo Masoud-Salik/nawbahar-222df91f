@@ -1,10 +1,12 @@
-import { PenLine } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
-import { cn } from "@/lib/utils";
+import { useNotifications } from "@/hooks/useNotifications";
+import { cn, toPersianNumber } from "@/lib/utils";
 
 export function Header() {
   const isVisible = useScrollDirection();
+  const { unreadCount } = useNotifications();
 
   return (
     <header 
@@ -25,10 +27,15 @@ export function Header() {
           </Link>
 
           <Link 
-            to="/write" 
-            className="text-muted-foreground/45 hover:text-foreground transition-colors"
+            to="/notifications" 
+            className="relative text-muted-foreground/45 hover:text-foreground transition-colors"
           >
-            <PenLine size={20} strokeWidth={1.5} />
+            <Bell size={20} strokeWidth={1.5} />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1.5 min-w-[14px] h-[14px] flex items-center justify-center text-[7px] font-bold text-accent-foreground bg-accent rounded-full px-0.5 ring-2 ring-background">
+                {unreadCount > 9 ? "۹+" : toPersianNumber(unreadCount)}
+              </span>
+            )}
           </Link>
         </div>
       </div>

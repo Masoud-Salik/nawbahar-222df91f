@@ -1,4 +1,5 @@
 import { Eye, MessageCircle, CornerDownLeft } from "lucide-react";
+import { toPersianNumber } from "@/lib/utils";
 
 interface ArticleBottomSignalsProps {
   viewCount: number;
@@ -15,16 +16,16 @@ export function ArticleBottomSignals({
     <div className="flex items-center justify-center gap-6 py-4 text-muted-foreground">
       <div className="flex items-center gap-1.5 text-sm">
         <Eye size={16} strokeWidth={1.5} />
-        <span>{viewCount}</span>
+        <span>{toPersianNumber(viewCount)}</span>
       </div>
       <div className="flex items-center gap-1.5 text-sm">
         <MessageCircle size={16} strokeWidth={1.5} />
-        <span>{commentCount}</span>
+        <span>{toPersianNumber(commentCount)}</span>
       </div>
       {responseCount > 0 && (
         <div className="flex items-center gap-1.5 text-sm">
           <CornerDownLeft size={16} strokeWidth={1.5} />
-          <span>{responseCount}</span>
+          <span>{toPersianNumber(responseCount)}</span>
         </div>
       )}
     </div>
