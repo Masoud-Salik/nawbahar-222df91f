@@ -14,7 +14,7 @@ import { CommentSection } from "@/components/articles/CommentSection";
 import { ArticleRatingModal } from "@/components/admin/ArticleRatingModal";
 import { ArticleActionsMenu } from "@/components/articles/ArticleActionsMenu";
 import { ArticleReactions } from "@/components/articles/ArticleReactions";
-import { ArticleBottomSignals } from "@/components/articles/ArticleBottomSignals";
+
 import { ResponseArticles } from "@/components/articles/ResponseArticles";
 import { RelatedArticles } from "@/components/articles/RelatedArticles";
 import { Button } from "@/components/ui/button";
@@ -257,11 +257,17 @@ const Article = () => {
           </div>
         )}
 
-        {/* Reactions */}
-        <ArticleReactions articleId={article.id} summary={reactionSummary} onReact={toggleReaction} />
-
-        {/* Bottom Signals */}
-        <ArticleBottomSignals viewCount={viewCount} commentCount={comments.length} responseCount={responseCount} />
+        {/* Reactions + Comments */}
+        <ArticleReactions
+          articleId={article.id}
+          summary={reactionSummary}
+          commentCount={comments.length}
+          onReact={toggleReaction}
+          onCommentClick={() => {
+            const el = document.getElementById("comments");
+            if (el) el.scrollIntoView({ behavior: "smooth" });
+          }}
+        />
 
         {/* Response Articles */}
         <ResponseArticles responses={responses} />
