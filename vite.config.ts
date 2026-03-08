@@ -39,6 +39,7 @@ export default defineConfig(({ mode }) => ({
         dir: "rtl",
         lang: "fa-AF",
         prefer_related_applications: false,
+        related_applications: [],
         categories: ["news", "social", "education", "lifestyle"],
         icons: [
           {
