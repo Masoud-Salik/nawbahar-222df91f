@@ -671,6 +671,7 @@ const ArticleEditor = () => {
               </div>
             );
           })()}
+        </div>
 
         {/* Extras Toggle */}
         <button
