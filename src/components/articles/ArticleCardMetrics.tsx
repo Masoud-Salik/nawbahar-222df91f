@@ -1,5 +1,5 @@
 import { MessageCircle, CheckCheck, CornerUpRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, toPersianNumber } from "@/lib/utils";
 import { ReactionPicker } from "./ReactionPicker";
 import { REACTION_EMOJIS, type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
 
@@ -35,9 +35,9 @@ export function ArticleCardMetrics({
     if (userReaction) names.unshift("شما");
     const displayNames = names.slice(0, 2);
     const remaining = totalCount - displayNames.length;
-    if (displayNames.length === 0 && remaining > 0) return `${remaining} واکنش`;
+    if (displayNames.length === 0 && remaining > 0) return `${toPersianNumber(remaining)} واکنش`;
     let text = displayNames.join(" و ");
-    if (remaining > 0) text += ` و ${remaining} نفر دیگر`;
+    if (remaining > 0) text += ` و ${toPersianNumber(remaining)} نفر دیگر`;
     return text;
   };
 
@@ -59,7 +59,7 @@ export function ArticleCardMetrics({
           >
             <MessageCircle size={14} strokeWidth={1.5} />
             <span className="text-[11.5px]">
-              {commentCount > 0 ? `${commentCount} نظر` : "نظر"}
+              {commentCount > 0 ? `${toPersianNumber(commentCount)} نظر` : "نظر"}
             </span>
           </button>
 
@@ -70,7 +70,7 @@ export function ArticleCardMetrics({
               className="flex items-center gap-1 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
             >
               <CornerUpRight size={13} strokeWidth={1.5} />
-              <span className="text-[11.5px]">{responseCount}</span>
+              <span className="text-[11.5px]">{toPersianNumber(responseCount)}</span>
             </button>
           )}
 
@@ -80,11 +80,11 @@ export function ArticleCardMetrics({
           {/* Inline reaction summary: top emojis + names */}
           {totalCount > 0 && (
             <div className="flex items-center gap-1">
-              <div className="flex items-center -space-x-1">
+              <div className="flex items-center -space-x-0.5">
                 {topTypes.slice(0, 2).map((type) => (
                   <span
                     key={type}
-                    className="w-[14px] h-[14px] flex items-center justify-center rounded-full text-[8px] leading-none ring-[1px] ring-background"
+                    className="w-[18px] h-[18px] flex items-center justify-center rounded-full text-[12px] leading-none ring-[1.5px] ring-background"
                     style={{ background: "hsl(var(--muted))" }}
                   >
                     {REACTION_EMOJIS[type]}
