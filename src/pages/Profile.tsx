@@ -346,8 +346,8 @@ const Profile = () => {
 
         {/* === Settings & Sign Out === */}
         {isOwnProfile && user && (
-          <div className="px-5 py-6 mt-4">
-            <Separator className="mb-6" />
+          <div className="px-5 py-4 mt-2">
+            <Separator className="mb-4" />
             <SettingsSection
               isDark={isDark}
               setIsDark={setIsDark}
@@ -355,12 +355,11 @@ const Profile = () => {
               setTextSize={setTextSize}
               textSizes={textSizes}
             />
-
             <button
               onClick={handleSignOut}
-              className="w-full flex items-center justify-center gap-2 mt-6 py-3 text-[13px] font-medium text-destructive hover:bg-destructive/5 rounded-xl transition-colors"
+              className="w-full flex items-center justify-center gap-2 mt-4 py-2.5 text-[12px] font-medium text-destructive hover:bg-destructive/5 rounded-lg transition-colors"
             >
-              <LogOut size={16} strokeWidth={1.5} />
+              <LogOut size={14} strokeWidth={1.5} />
               خروج از حساب
             </button>
           </div>
