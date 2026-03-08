@@ -1,4 +1,4 @@
-import { Eye, MessageCircle, Reply, CheckCheck, Bookmark, ThumbsDown, MoreHorizontal } from "lucide-react";
+import { Eye, MessageCircle, Reply, CheckCheck, Bookmark, ThumbsDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ArticleCardMetricsProps {
@@ -8,7 +8,6 @@ interface ArticleCardMetricsProps {
   isRead: boolean;
   commentsOpen: boolean;
   tag?: string | null;
-  latestCommentSnippet?: string | null;
   onCommentClick: (e: React.MouseEvent) => void;
   onResponseClick: (e: React.MouseEvent) => void;
 }
