@@ -2,7 +2,7 @@ import { MessageCircle, CheckCheck } from "lucide-react";
 import { cn, toPersianNumber } from "@/lib/utils";
 import { ReactionPicker } from "./ReactionPicker";
 import { ReactionDetailsModal } from "./ReactionDetailsModal";
-import { type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
+import { REACTION_EMOJIS, type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
 import { useState } from "react";
 
 interface ArticleCardMetricsProps {
