@@ -1,4 +1,4 @@
-import { Eye, MessageSquareText, Reply, CheckCheck } from "lucide-react";
+import { Eye, MessageCircle, Reply, CheckCheck, Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ArticleCardMetricsProps {
@@ -21,20 +21,18 @@ export function ArticleCardMetrics({
   onResponseClick,
 }: ArticleCardMetricsProps) {
   return (
-    <div className="flex items-center justify-between mt-3.5">
-      {/* Left: read indicator */}
+    <div className="flex items-center justify-between mt-3">
+      {/* Left: read indicator + tag-like info */}
       <div className="flex items-center gap-1.5">
         {isRead && (
-          <span className="flex items-center gap-1 text-[10.5px] text-muted-foreground/35">
-            <CheckCheck size={13} strokeWidth={2} className="text-primary/40" />
-          </span>
+          <CheckCheck size={14} strokeWidth={2.2} className="text-primary/50" />
         )}
       </div>
 
-      {/* Right: Medium-style metrics — bold rounded icons, no borders */}
+      {/* Right: Medium-style — bold rounded icons, darker, no borders */}
       <div className="flex items-center gap-4">
         {viewCount > 0 && (
-          <span className="flex items-center gap-1 text-[11px] text-muted-foreground/40">
+          <span className="flex items-center gap-1 text-[11px] text-foreground/35">
             <Eye size={16} strokeWidth={1.8} />
             <span>{viewCount}</span>
           </span>
@@ -43,7 +41,7 @@ export function ArticleCardMetrics({
         {responseCount > 0 && (
           <button
             onClick={onResponseClick}
-            className="flex items-center gap-1 text-[11px] text-muted-foreground/40 hover:text-foreground/60 transition-colors"
+            className="flex items-center gap-1 text-[11px] text-foreground/35 hover:text-foreground/60 transition-colors"
           >
             <Reply size={16} strokeWidth={1.8} />
             <span>{responseCount}</span>
@@ -55,19 +53,26 @@ export function ArticleCardMetrics({
           className={cn(
             "flex items-center gap-1 text-[11px] transition-colors",
             commentsOpen
-              ? "text-foreground/70"
-              : "text-muted-foreground/40 hover:text-foreground/60"
+              ? "text-foreground/65"
+              : "text-foreground/35 hover:text-foreground/60"
           )}
         >
-          <MessageSquareText
+          <MessageCircle
             size={16}
             strokeWidth={1.8}
             className={cn(
               "transition-colors",
-              commentsOpen && "fill-primary/15"
+              commentsOpen && "fill-primary/20"
             )}
           />
           {commentCount > 0 && <span>{commentCount}</span>}
+        </button>
+
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+          className="text-foreground/35 hover:text-foreground/60 transition-colors"
+        >
+          <Bookmark size={16} strokeWidth={1.8} />
         </button>
       </div>
     </div>
