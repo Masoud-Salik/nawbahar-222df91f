@@ -106,7 +106,7 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
                   <span className="text-primary text-[8px] font-bold">{article.author?.display_name?.charAt(0)}</span>
                 </div>
               )}
-              <span className="text-[11.5px] text-foreground/55 group-hover/author:text-primary transition-colors font-medium truncate max-w-[80px]">
+              <span className="text-[11.5px] text-foreground/60 group-hover/author:text-primary transition-colors font-medium truncate max-w-[80px]">
                 {article.author?.display_name}
               </span>
             </button>
