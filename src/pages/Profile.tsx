@@ -140,17 +140,15 @@ const Profile = () => {
               )}
             </div>
 
-            {/* Action row - compact */}
-            <div className="flex items-center gap-2 mt-2.5">
+            {/* Action row */}
+            <div className="flex items-center gap-2 mt-2">
               {isOwnProfile ? (
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
                   onClick={() => setEditModalOpen(true)}
-                  className="rounded-lg px-5 h-[30px] text-[11.5px] font-medium border-border flex-1"
+                  className="text-[11px] text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-3 py-1 transition-colors"
                 >
-                  ویرایش پروفایل
-                </Button>
+                  ویرایش
+                </button>
               ) : (
                 viewingUserId && <FollowButton userId={viewingUserId} />
               )}
