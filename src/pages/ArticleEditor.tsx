@@ -5,10 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Send, ImagePlus, X, CornerUpRight, FileText, Bold, Italic, List, Quote, Hash } from "lucide-react";
+import { ArrowRight, Send, ImagePlus, X, CornerUpRight, FileText, Bold, Italic, List, Quote, Hash, ShieldCheck, ShieldX, Loader2 } from "lucide-react";
 import { compressArticleImage } from "@/lib/imageCompression";
 import { sanitizeError, validation } from "@/lib/errorHandler";
+import { toPersianNumber } from "@/lib/utils";
 import type { User } from "@supabase/supabase-js";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 const DRAFT_KEY = "nobahar_draft";
 
@@ -16,6 +26,13 @@ const SUGGESTED_TAGS = [
   "سیاست", "فرهنگ", "علم", "جامعه", "اقتصاد", "سلامت",
   "افغانستان", "ادبیات", "تاریخ", "هنر", "فناوری", "آموزش",
 ];
+
+interface AIResult {
+  approved: boolean;
+  rejection_reason: string;
+  scores: { science: number; ethics: number; writing: number; timing: number; innovation: number };
+  avg_percent: number;
+}
 
 const ArticleEditor = () => {
   const [searchParams] = useSearchParams();
@@ -30,6 +47,10 @@ const ArticleEditor = () => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [parentArticle, setParentArticle] = useState<{ id: string; title: string } | null>(null);
+  
+  // AI Review state
+  const [reviewState, setReviewState] = useState<"idle" | "reviewing" | "result">("idle");
+  const [aiResult, setAiResult] = useState<AIResult | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textFileInputRef = useRef<HTMLInputElement>(null);
@@ -47,9 +68,7 @@ const ArticleEditor = () => {
           if (draft.title) setTitle(draft.title);
           if (draft.content) setContent(draft.content);
           if (draft.tags) setTags(draft.tags);
-        } catch (e) {
-          // Ignore
-        }
+        } catch (e) { /* ignore */ }
       }
     }
   }, [responseToId]);
@@ -92,7 +111,10 @@ const ArticleEditor = () => {
     if (!user) { navigate("/auth"); return; }
 
     setLoading(true);
+    setReviewState("reviewing");
+
     try {
+      // Step 1: Upload cover image if any
       let coverImageUrl = null;
       if (coverImage) {
         const fileExt = coverImage.name.split('.').pop();
@@ -103,11 +125,12 @@ const ArticleEditor = () => {
         coverImageUrl = urlData.publicUrl;
       }
 
+      // Step 2: Insert as pending
       const { data: insertedArticle, error } = await supabase.from("articles").insert({
         title: title.trim(),
         content: content.trim(),
         author_id: user.id,
-        status: "published",
+        status: "pending",
         cover_image_url: coverImageUrl,
         parent_article_id: responseToId || null,
         tags,
@@ -115,20 +138,40 @@ const ArticleEditor = () => {
 
       if (error) throw error;
 
-      if (!responseToId) localStorage.removeItem(DRAFT_KEY);
-      toast({ title: "✅ موفق!", description: responseToId ? "پاسخ شما منتشر شد" : "مقاله شما منتشر شد" });
-      navigate("/");
+      // Step 3: Call AI evaluation (this will update status to published or rejected)
+      const { data: evalData, error: evalError } = await supabase.functions.invoke("ai-score-article", {
+        body: { title: title.trim(), content: content.trim(), articleId: insertedArticle.id },
+      });
 
-      // Trigger AI scoring in background
-      if (insertedArticle?.id) {
-        supabase.functions.invoke("ai-score-article", {
-          body: { title: title.trim(), content: content.trim(), articleId: insertedArticle.id },
-        }).catch(console.error);
+      if (evalError) {
+        // If AI fails, still publish (fail-open for now)
+        await supabase.from("articles").update({ status: "published" }).eq("id", insertedArticle.id);
+        toast({ title: "✅ مقاله منتشر شد", description: "ارزیابی هوش مصنوعی در دسترس نبود" });
+        if (!responseToId) localStorage.removeItem(DRAFT_KEY);
+        navigate("/");
+        return;
+      }
+
+      setAiResult(evalData);
+      setReviewState("result");
+
+      if (evalData.approved) {
+        if (!responseToId) localStorage.removeItem(DRAFT_KEY);
       }
     } catch (error: any) {
       toast({ title: "خطا", description: sanitizeError(error), variant: "destructive" });
+      setReviewState("idle");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResultClose = () => {
+    if (aiResult?.approved) {
+      navigate("/");
+    } else {
+      setReviewState("idle");
+      setAiResult(null);
     }
   };
 
@@ -193,20 +236,37 @@ const ArticleEditor = () => {
     }, 0);
   };
 
+  const scoreLabels = [
+    { key: "science", label: "علمی", max: 15 },
+    { key: "ethics", label: "اخلاقی", max: 10 },
+    { key: "writing", label: "نگارش", max: 10 },
+    { key: "timing", label: "به‌روز بودن", max: 10 },
+    { key: "innovation", label: "نوآوری", max: 5 },
+  ] as const;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border">
-        <div className="flex items-center justify-between px-4 h-12 max-w-screen-md mx-auto">
+      <header className="sticky top-0 z-50 bg-background border-b border-border">
+        <div className="flex items-center justify-between px-4 h-11 max-w-screen-md mx-auto">
           <button onClick={() => navigate("/")} className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowRight size={20} strokeWidth={1.5} />
           </button>
           <h1 className="text-sm font-medium text-foreground">
             {responseToId ? "نوشتن پاسخ" : "نوشتن مقاله"}
           </h1>
-          <Button onClick={handlePublish} disabled={loading || !title.trim() || !content.trim()} size="sm" className="gap-1.5 h-8 px-4">
-            <Send size={14} strokeWidth={1.5} />
-            {loading ? "..." : "انتشار"}
+          <Button 
+            onClick={handlePublish} 
+            disabled={loading || !title.trim() || !content.trim()} 
+            size="sm" 
+            className="gap-1.5 h-8 px-4"
+          >
+            {loading ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Send size={14} strokeWidth={1.5} />
+            )}
+            {loading ? "بررسی..." : "انتشار"}
           </Button>
         </div>
       </header>
@@ -287,7 +347,6 @@ const ArticleEditor = () => {
               <span className="text-[10px] text-muted-foreground">({tags.length}/5)</span>
             </div>
             
-            {/* Selected Tags */}
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map(tag => (
@@ -301,7 +360,6 @@ const ArticleEditor = () => {
               </div>
             )}
             
-            {/* Tag Input */}
             {tags.length < 5 && (
               <div className="flex gap-2">
                 <Input
@@ -317,7 +375,6 @@ const ArticleEditor = () => {
               </div>
             )}
             
-            {/* Suggested Tags */}
             {tags.length < 5 && (
               <div className="flex flex-wrap gap-1.5">
                 {SUGGESTED_TAGS.filter(t => !tags.includes(t)).slice(0, 8).map(tag => (
@@ -340,6 +397,101 @@ const ArticleEditor = () => {
           </div>
         </div>
       </main>
+
+      {/* AI Review Loading */}
+      <AlertDialog open={reviewState === "reviewing"}>
+        <AlertDialogContent className="max-w-xs text-center">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">بررسی مقاله</AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              <div className="flex flex-col items-center gap-4 py-4">
+                <div className="relative">
+                  <div className="w-12 h-12 border-2 border-primary/20 rounded-full" />
+                  <div className="absolute inset-0 w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  <ShieldCheck size={20} className="absolute inset-0 m-auto text-primary" />
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  هوش مصنوعی در حال بررسی محتوا و کیفیت مقاله شماست...
+                </span>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* AI Review Result */}
+      <AlertDialog open={reviewState === "result"} onOpenChange={() => handleResultClose()}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              {aiResult?.approved ? (
+                <>
+                  <ShieldCheck size={20} className="text-green-600" />
+                  مقاله تأیید شد
+                </>
+              ) : (
+                <>
+                  <ShieldX size={20} className="text-destructive" />
+                  مقاله تأیید نشد
+                </>
+              )}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div>
+                {aiResult?.approved ? (
+                  <p className="text-sm text-muted-foreground mb-4">
+                    مقاله شما با موفقیت منتشر شد ✅
+                  </p>
+                ) : (
+                  <p className="text-sm text-destructive/80 mb-4 leading-relaxed">
+                    {aiResult?.rejection_reason}
+                  </p>
+                )}
+
+                {/* Score breakdown */}
+                {aiResult?.scores && (
+                  <div className="space-y-2 pt-2 border-t border-border/50">
+                    <p className="text-[11px] text-muted-foreground/60 mb-2">نمره‌دهی هوش مصنوعی:</p>
+                    {scoreLabels.map(({ key, label, max }) => {
+                      const score = aiResult.scores[key];
+                      const percent = (score / max) * 100;
+                      return (
+                        <div key={key} className="flex items-center gap-2">
+                          <span className="text-[11px] text-muted-foreground w-16 text-left">{label}</span>
+                          <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                percent >= 60 ? "bg-green-500" : percent >= 40 ? "bg-yellow-500" : "bg-destructive"
+                              }`}
+                              style={{ width: `${percent}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] text-muted-foreground/60 w-8 text-left">
+                            {toPersianNumber(score)}/{toPersianNumber(max)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    <div className="flex items-center justify-between pt-2 border-t border-border/30">
+                      <span className="text-[11px] font-medium text-foreground">میانگین کل</span>
+                      <span className={`text-[12px] font-bold ${
+                        (aiResult.avg_percent || 0) >= 60 ? "text-green-600" : (aiResult.avg_percent || 0) >= 40 ? "text-yellow-600" : "text-destructive"
+                      }`}>
+                        {toPersianNumber(aiResult.avg_percent || 0)}٪
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleResultClose}>
+              {aiResult?.approved ? "بازگشت به خانه" : "بازگشت و ویرایش"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
