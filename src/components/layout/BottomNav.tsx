@@ -125,11 +125,8 @@ function NavItem({ to, active, children, label }: { to: string; active: boolean;
       aria-label={label}
       aria-current={active ? "page" : undefined}
     >
-      <div className="relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 group-active:scale-90">
+      <div className="relative flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-300 group-active:scale-90">
         {children}
-        {active && (
-          <span className="absolute -bottom-1 w-4 h-[3px] rounded-full bg-foreground" />
-        )}
       </div>
     </Link>
   );
