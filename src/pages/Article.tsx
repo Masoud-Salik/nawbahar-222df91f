@@ -55,7 +55,7 @@ const Article = () => {
   const { user } = useAuth();
   const { isAdmin } = useUserRole();
   const { viewCount } = useViewCount(id || "");
-  const { userReaction, likedCount, dislikedCount, setReaction } = useReactions(id || "");
+  const { summary: reactionSummary, toggleReaction } = useCardReactions(id || "");
   const { responses, responseCount, parentArticle } = useResponseArticles(id || "");
   
   const contentLength = article?.content?.length || 0;
