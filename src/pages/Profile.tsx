@@ -181,27 +181,29 @@ const Profile = () => {
 
         {/* === Tabs === */}
         <Tabs defaultValue="articles" className="w-full mt-1" dir="rtl">
-          <TabsList className="w-full bg-transparent border-b border-border rounded-none h-auto p-0 sticky top-12 z-20 bg-background flex">
-            <TabsTrigger 
-              value="articles" 
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none py-2.5 text-[12.5px] font-semibold text-muted-foreground data-[state=active]:text-foreground"
-            >
-              مقالات
-            </TabsTrigger>
-            {isOwnProfile && (
+          <TabsList className="w-full bg-transparent border-b border-border rounded-none h-auto p-0 sticky top-12 z-20 bg-background">
+            <div className="flex gap-4 px-5">
               <TabsTrigger 
-                value="saved" 
-                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none py-2.5 text-[12.5px] font-semibold text-muted-foreground data-[state=active]:text-foreground"
+                value="articles" 
+                className="rounded-none border-b-[1.5px] border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none py-2 text-[11px] font-semibold text-muted-foreground/50 data-[state=active]:text-foreground px-0"
               >
-                ذخیره‌شده‌ها
+                مقالات
               </TabsTrigger>
-            )}
-            <TabsTrigger 
-              value="about" 
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none py-2.5 text-[12.5px] font-semibold text-muted-foreground data-[state=active]:text-foreground"
-            >
-              درباره
-            </TabsTrigger>
+              {isOwnProfile && (
+                <TabsTrigger 
+                  value="saved" 
+                  className="rounded-none border-b-[1.5px] border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none py-2 text-[11px] font-semibold text-muted-foreground/50 data-[state=active]:text-foreground px-0"
+                >
+                  ذخیره‌شده‌ها
+                </TabsTrigger>
+              )}
+              <TabsTrigger 
+                value="about" 
+                className="rounded-none border-b-[1.5px] border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none py-2 text-[11px] font-semibold text-muted-foreground/50 data-[state=active]:text-foreground px-0"
+              >
+                درباره
+              </TabsTrigger>
+            </div>
           </TabsList>
 
           {/* Articles Tab */}
