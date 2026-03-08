@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { getRelativeTime } from "@/lib/relativeTime";
+import { SEOHead } from "@/components/SEOHead";
 
 interface VIPPost {
   id: string;

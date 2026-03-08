@@ -1,12 +1,25 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ArrowRight, Heart, Globe, Shield, Users } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
+import { SEOHead } from "@/components/SEOHead";
 
 const About = () => {
   const navigate = useNavigate();
 
   return (
     <AppLayout hideNav>
+      <SEOHead
+        title="درباره نوبهار"
+        description="نوبهار فضایی برای اندیشمندان و نویسندگان فارسی‌زبان است. پلتفرم نویسندگی فارسی با تمرکز بر امنیت، جامعه‌محوری و دسترسی آزاد."
+        ogUrl="/about"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "نوبهار",
+          url: "https://nawbahar.lovable.app",
+          description: "پلتفرم نویسندگی فارسی برای نخبگان",
+        }}
+      />
       <div className="p-4 space-y-6 animate-fade-in max-w-md mx-auto">
         {/* Back Button */}
         <button

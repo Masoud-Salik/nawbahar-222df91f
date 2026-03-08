@@ -119,6 +119,21 @@ const Profile = () => {
 
   return (
     <AppLayout>
+      <SEOHead
+        title={profile?.display_name || "پروفایل"}
+        description={profile?.specialty ? `${profile.display_name} - ${profile.specialty}` : `پروفایل ${profile?.display_name || "کاربر"} در نوبهار`}
+        ogUrl={`/profile/${viewingUserId}`}
+        ogImage={profile?.avatar_url || undefined}
+        noIndex={isOwnProfile}
+        jsonLd={profile ? {
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: profile.display_name,
+          description: profile.specialty || undefined,
+          image: profile.avatar_url || undefined,
+          url: `https://nawbahar.lovable.app/profile/${viewingUserId}`,
+        } : undefined}
+      />
       <div className="max-w-lg mx-auto animate-fade-in">
         {/* === Profile Header === */}
         {profile && (

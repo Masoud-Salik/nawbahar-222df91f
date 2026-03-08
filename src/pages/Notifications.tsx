@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { cn, toPersianNumber } from "@/lib/utils";
 import { getRelativeTime } from "@/lib/relativeTime";
 import { useState } from "react";
+import { SEOHead } from "@/components/SEOHead";
 
 function getNotificationIcon(type: string) {
   switch (type) {

@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { FollowButton } from "@/components/FollowButton";
 import { useToast } from "@/hooks/use-toast";
 import { toPersianNumber } from "@/lib/utils";
+import { SEOHead } from "@/components/SEOHead";
 
 interface ArticleData {
   id: string;
