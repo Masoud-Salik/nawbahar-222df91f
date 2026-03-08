@@ -26,12 +26,12 @@ const Profile = () => {
   const isOwnProfile = !paramUserId || paramUserId === user?.id;
   
   const { profile, articles, bookmarks, loading, refetch } = useProfile(viewingUserId);
-  const { followerCount, followingCount } = useFollowStats(viewingUserId);
+  const { followerCount } = useFollowStats(viewingUserId);
   const navigate = useNavigate();
   
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
-  const [showFollowing, setShowFollowing] = useState(false);
+  
 
   // Not logged in
   if (!user && isOwnProfile) {
@@ -92,89 +92,93 @@ const Profile = () => {
       <div className="max-w-lg mx-auto animate-fade-in">
         {/* === Compact Profile Header === */}
         {profile && (
-          <div className="px-5 pt-5 pb-1">
+          <div className="px-5 pt-6 pb-3">
+            {/* Top row: Avatar + Name + Follow/Edit */}
             <div className="flex items-center gap-3">
               {/* Avatar */}
-              <div className="shrink-0">
-                {profile.avatar_url ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt={profile.display_name}
-                    className="w-[56px] h-[56px] rounded-full object-cover ring-2 ring-border"
-                  />
-                ) : (
-                  <div className="w-[56px] h-[56px] rounded-full bg-muted flex items-center justify-center ring-2 ring-border">
-                    <span className="text-primary font-bold text-[20px]">
-                      {profile.display_name?.charAt(0)}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Stats */}
-              <div className="flex-1 flex items-center justify-around">
-                <div className="text-center">
-                  <span className="block text-[15px] font-bold text-foreground">{toPersianNumber(articles.length)}</span>
-                  <span className="text-[10px] text-muted-foreground">مقاله</span>
+              {profile.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt={profile.display_name}
+                  className="w-[52px] h-[52px] rounded-full object-cover ring-2 ring-border/50"
+                />
+              ) : (
+                <div className="w-[52px] h-[52px] rounded-full bg-muted flex items-center justify-center ring-2 ring-border/50">
+                  <span className="text-primary font-bold text-[18px]">
+                    {profile.display_name?.charAt(0)}
+                  </span>
                 </div>
-                <button onClick={() => setShowFollowers(true)} className="text-center hover:opacity-70 transition-opacity">
-                  <span className="block text-[15px] font-bold text-foreground">{toPersianNumber(followerCount)}</span>
-                  <span className="text-[10px] text-muted-foreground">دنبال‌کننده</span>
-                </button>
-                <button onClick={() => setShowFollowing(true)} className="text-center hover:opacity-70 transition-opacity">
-                  <span className="block text-[15px] font-bold text-foreground">{toPersianNumber(followingCount)}</span>
-                  <span className="text-[10px] text-muted-foreground">دنبال‌شده</span>
+              )}
+
+              {/* Name + Specialty + Followers */}
+              <div className="flex-1 min-w-0">
+                <h1 className="text-[15px] font-extrabold text-foreground leading-tight truncate">
+                  {profile.display_name}
+                </h1>
+                {profile.specialty && (
+                  <p className="text-[11px] text-muted-foreground/60 mt-0.5 line-clamp-1">
+                    {profile.specialty}
+                  </p>
+                )}
+                <button
+                  onClick={() => setShowFollowers(true)}
+                  className="text-[11px] text-muted-foreground/50 hover:text-foreground transition-colors mt-1"
+                >
+                  {toPersianNumber(followerCount)} دنبال‌کننده
                 </button>
               </div>
-            </div>
 
-            {/* Name & Bio - compact */}
-            <div className="mt-2">
-              <h1 className="text-[15px] font-extrabold text-foreground leading-tight truncate">
-                {profile.display_name}
-              </h1>
-              {profile.specialty && (
-                <p className="text-[11.5px] text-muted-foreground mt-0.5 line-clamp-1 leading-relaxed">
-                  {profile.specialty}
-                </p>
-              )}
-            </div>
-
-            {/* Action row */}
-            <div className="flex items-center gap-2 mt-2">
+              {/* Action */}
               {isOwnProfile ? (
                 <button
                   onClick={() => setEditModalOpen(true)}
-                  className="text-[11px] text-muted-foreground hover:text-foreground border border-border/60 rounded-md px-3 py-1 transition-colors"
+                  className="text-[11px] text-muted-foreground hover:text-foreground border border-border/50 rounded-md px-3 py-1 transition-colors shrink-0"
                 >
                   ویرایش
                 </button>
               ) : (
                 viewingUserId && <FollowButton userId={viewingUserId} />
               )}
-              {(profile.whatsapp_number || profile.facebook_url || profile.linkedin_url) && (
-                <div className="flex items-center gap-0.5">
-                  {profile.whatsapp_number && (
-                    <a href={`https://wa.me/${encodeURIComponent(profile.whatsapp_number)}`} target="_blank" rel="noopener noreferrer"
-                      className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors" aria-label="واتساپ">
-                      <WhatsApp size={14} strokeWidth={1.5} />
-                    </a>
-                  )}
-                  {profile.facebook_url && (
-                    <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer"
-                      className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors" aria-label="فیسبوک">
-                      <Facebook size={14} strokeWidth={1.5} />
-                    </a>
-                  )}
-                  {profile.linkedin_url && (
-                    <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer"
-                      className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors" aria-label="لینکدین">
-                      <Linkedin size={14} strokeWidth={1.5} />
-                    </a>
-                  )}
-                </div>
-              )}
             </div>
+
+            {/* Social links — pill style */}
+            {(profile.whatsapp_number || profile.facebook_url || profile.linkedin_url) && (
+              <div className="flex items-center gap-1.5 mt-3">
+                {profile.whatsapp_number && (
+                  <a
+                    href={`https://wa.me/${encodeURIComponent(profile.whatsapp_number)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all"
+                  >
+                    <WhatsApp size={11} strokeWidth={1.5} />
+                    <span>واتساپ</span>
+                  </a>
+                )}
+                {profile.facebook_url && (
+                  <a
+                    href={profile.facebook_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all"
+                  >
+                    <Facebook size={11} strokeWidth={1.5} />
+                    <span>فیسبوک</span>
+                  </a>
+                )}
+                {profile.linkedin_url && (
+                  <a
+                    href={profile.linkedin_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all"
+                  >
+                    <Linkedin size={11} strokeWidth={1.5} />
+                    <span>لینکدین</span>
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -327,12 +331,6 @@ const Profile = () => {
             onClose={() => setShowFollowers(false)}
             userId={viewingUserId}
             type="followers"
-          />
-          <FollowersList
-            isOpen={showFollowing}
-            onClose={() => setShowFollowing(false)}
-            userId={viewingUserId}
-            type="following"
           />
         </>
       )}
