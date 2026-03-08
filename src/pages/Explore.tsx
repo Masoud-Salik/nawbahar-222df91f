@@ -9,6 +9,7 @@ import { cn, toPersianNumber } from "@/lib/utils";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
+import { SuggestedWriters } from "@/components/profile/SuggestedWriters";
 
 const topics = [
   { id: "politics", label: "سیاست", emoji: "🏛️" },
