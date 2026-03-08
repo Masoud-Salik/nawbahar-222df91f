@@ -111,6 +111,18 @@ const Profile = () => {
                     </span>
                   </div>
                 )}
+                {isOwnProfile ? (
+                  <button
+                    onClick={() => setEditModalOpen(true)}
+                    className="text-[10px] text-primary/70 hover:text-primary mt-1.5 transition-colors"
+                  >
+                    ویرایش
+                  </button>
+                ) : viewingUserId ? (
+                  <div className="mt-1.5">
+                    <FollowButton userId={viewingUserId} size="sm" />
+                  </div>
+                ) : null}
               </div>
 
               {/* Name + Stats */}
@@ -136,26 +148,13 @@ const Profile = () => {
                   <span className="text-[11.5px] text-muted-foreground/55">
                     <span className="font-semibold text-foreground/80">{toPersianNumber(articles.length)}</span> مقاله
                   </span>
-                  {!isOwnProfile && viewingUserId && (
-                    <div className="mr-auto">
-                      <FollowButton userId={viewingUserId} />
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
 
             {/* Third row: Edit + Social — all pills aligned */}
-            {(isOwnProfile || profile.whatsapp_number || profile.facebook_url || profile.linkedin_url) && (
+            {(profile.whatsapp_number || profile.facebook_url || profile.linkedin_url) && (
               <div className="flex items-center gap-1.5 mt-3">
-                {isOwnProfile && (
-                  <button
-                    onClick={() => setEditModalOpen(true)}
-                    className="flex items-center gap-1 text-[10px] text-primary/70 hover:text-primary bg-primary/5 hover:bg-primary/10 rounded-full px-2.5 py-1 transition-all"
-                  >
-                    ویرایش پروفایل
-                  </button>
-                )}
                 {profile.whatsapp_number && (
                   <a href={`https://wa.me/${encodeURIComponent(profile.whatsapp_number)}`} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all">
