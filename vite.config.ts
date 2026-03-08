@@ -170,6 +170,13 @@ export default defineConfig(({ mode }) => ({
           },
         },
         handle_links: "preferred",
+        iarc_rating_id: "",
+        protocol_handlers: [
+          {
+            protocol: "web+nawbahar",
+            url: "/article/%s",
+          },
+        ],
         launch_handler: {
           client_mode: ["navigate-existing", "auto"],
         },
