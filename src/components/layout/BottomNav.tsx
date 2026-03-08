@@ -1,14 +1,14 @@
-import { Home, Compass, BookOpen, Bell, User } from "lucide-react";
+import { House, Search, Crown, Bell, CircleUserRound } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useNotifications } from "@/hooks/useNotifications";
 
 const navItems = [
-  { icon: Home, path: "/" },
-  { icon: Compass, path: "/explore" },
-  { icon: BookOpen, path: "/vip" },
+  { icon: House, path: "/" },
+  { icon: Search, path: "/explore" },
+  { icon: Crown, path: "/vip" },
   { icon: Bell, path: "/notifications", isBell: true },
-  { icon: User, path: "/profile" },
+  { icon: CircleUserRound, path: "/profile" },
 ];
 
 export function BottomNav() {
