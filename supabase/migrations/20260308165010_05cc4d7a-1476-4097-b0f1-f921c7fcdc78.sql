@@ -1,0 +1,1 @@
+ALTER TABLE public.reactions DROP CONSTRAINT reactions_reaction_type_check;
