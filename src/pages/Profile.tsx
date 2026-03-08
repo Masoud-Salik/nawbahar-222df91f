@@ -245,66 +245,42 @@ const Profile = () => {
           )}
 
           {/* About Tab */}
-          <TabsContent value="about" className="mt-0 px-5 py-5">
-            <div className="space-y-4">
-              {/* Bio */}
-              {profile?.bio && (
-                <p className="text-[13px] text-foreground/80 leading-[1.9] whitespace-pre-line">
-                  {profile.bio}
-                </p>
-              )}
+          <TabsContent value="about" className="mt-0 px-5 py-4">
+            {/* Bio */}
+            {profile?.bio && (
+              <p className="text-[12.5px] text-foreground/80 leading-[1.85] whitespace-pre-line mb-3">
+                {profile.bio}
+              </p>
+            )}
+
+            {/* Compact info row */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground/60">
               {profile?.specialty && (
-                <AboutItem 
-                  icon={<FileText size={14} strokeWidth={1.5} />}
-                  label="تخصص" 
-                  value={profile.specialty} 
-                />
+                <span>{profile.specialty}</span>
               )}
-              <AboutItem 
-                icon={<CalendarDays size={14} strokeWidth={1.5} />}
-                label="عضویت" 
-                value={profile?.created_at ? getRelativeTime(profile.created_at) : "نامشخص"} 
-              />
-              <AboutItem 
-                icon={<FileText size={14} strokeWidth={1.5} />}
-                label="مقالات منتشرشده" 
-                value={`${toPersianNumber(articles.length)} مقاله`} 
-              />
-              {profile?.reputation_score != null && profile.reputation_score > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Award size={14} strokeWidth={1.5} className="text-muted-foreground" />
-                    <span className="text-[11.5px] text-muted-foreground">امتیاز اعتبار</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary rounded-full transition-all"
-                        style={{ width: `${Math.min(100, profile.reputation_score)}%` }}
-                      />
-                    </div>
-                    <span className="text-[12px] font-semibold text-primary">{toPersianNumber(Math.round(profile.reputation_score))}</span>
-                  </div>
-                </div>
-              )}
-              {profile?.trust_score != null && profile.trust_score > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Shield size={14} strokeWidth={1.5} className="text-muted-foreground" />
-                    <span className="text-[11.5px] text-muted-foreground">امتیاز اعتماد</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary rounded-full transition-all"
-                        style={{ width: `${profile.trust_score}%` }}
-                      />
-                    </div>
-                    <span className="text-[12px] font-semibold text-primary">{toPersianNumber(profile.trust_score)}</span>
-                  </div>
-                </div>
-              )}
+              <span>عضویت {profile?.created_at ? getRelativeTime(profile.created_at) : "نامشخص"}</span>
+              <span>{toPersianNumber(articles.length)} مقاله</span>
             </div>
+
+            {/* Scores */}
+            {((profile?.reputation_score != null && profile.reputation_score > 0) || (profile?.trust_score != null && profile.trust_score > 0)) && (
+              <div className="flex gap-4 mt-3">
+                {profile?.reputation_score != null && profile.reputation_score > 0 && (
+                  <div className="flex items-center gap-2 text-[11px]">
+                    <Award size={12} strokeWidth={1.5} className="text-muted-foreground/50" />
+                    <span className="text-muted-foreground/50">اعتبار</span>
+                    <span className="font-semibold text-primary">{toPersianNumber(Math.round(profile.reputation_score))}</span>
+                  </div>
+                )}
+                {profile?.trust_score != null && profile.trust_score > 0 && (
+                  <div className="flex items-center gap-2 text-[11px]">
+                    <Shield size={12} strokeWidth={1.5} className="text-muted-foreground/50" />
+                    <span className="text-muted-foreground/50">اعتماد</span>
+                    <span className="font-semibold text-primary">{toPersianNumber(profile.trust_score)}</span>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Profile Reviews */}
             {viewingUserId && (
