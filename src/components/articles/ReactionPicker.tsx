@@ -24,6 +24,22 @@ interface ReactionPickerProps {
 export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summaryText, onSummaryClick }: ReactionPickerProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Track if reaction changed via user action (not initial load)
+  const [justReacted, setJustReacted] = useState(false);
+  const prevReaction = useRef(userReaction);
+
+  useEffect(() => {
+    // Only trigger pop animation if user actively changed their reaction
+    if (prevReaction.current !== userReaction && prevReaction.current !== undefined) {
+      // Skip animation on first data load (prevReaction was null initially)
+      if (prevReaction.current !== null || justReacted) {
+        setJustReacted(true);
+        const t = setTimeout(() => setJustReacted(false), 350);
+        return () => clearTimeout(t);
+      }
+    }
+    prevReaction.current = userReaction;
+  }, [userReaction]);
 
   useEffect(() => {
     if (!open) return;
@@ -74,6 +90,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
   const handleSelect = (type: ReactionKey, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setJustReacted(true);
     onReact(type);
     setOpen(false);
   };
@@ -85,22 +102,37 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
     if (userReaction) {
       const Icon = REACTION_ICONS[userReaction] || ThumbsUp;
       return (
-        <span style={{ animation: "reaction-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both", color: activeColor }}>
-          <Icon size={15} fill="currentColor" strokeWidth={0} />
+        <span
+          className="inline-flex transition-colors duration-300"
+          style={{
+            color: activeColor,
+            ...(justReacted ? { animation: "reaction-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both" } : {}),
+          }}
+        >
+          <Icon size={15} strokeWidth={1.8} />
         </span>
       );
     }
     if (topTypes && topTypes.length > 0) {
       return (
-        <span className="flex items-center -space-x-1">
+        <span className="flex items-center -space-x-1 transition-opacity duration-500">
           {topTypes.slice(0, 2).map((type) => {
             const Icon = REACTION_ICONS[type] || ThumbsUp;
-            return <Icon key={type} size={13} fill="currentColor" strokeWidth={0} className="text-muted-foreground/35" />;
+            const color = REACTION_COLORS[type]?.text;
+            return (
+              <Icon
+                key={type}
+                size={13}
+                strokeWidth={1.5}
+                className="transition-colors duration-500"
+                style={{ color: color || undefined, opacity: 0.5 }}
+              />
+            );
           })}
         </span>
       );
     }
-    return <ThumbsUp size={14} fill="currentColor" strokeWidth={0} className="text-muted-foreground/40" />;
+    return <ThumbsUp size={14} strokeWidth={1.5} className="text-muted-foreground/50" />;
   };
 
   return (
@@ -108,7 +140,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
       <button
         onClick={handleIconTap}
         className={cn(
-          "flex items-center transition-all duration-200",
+          "flex items-center transition-all duration-300",
           isReacted ? "" : "text-muted-foreground hover:text-foreground"
         )}
       >
@@ -119,7 +151,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
         <button
           onClick={handleTextClick}
           className={cn(
-            "text-[11px] truncate max-w-[150px] transition-colors duration-200",
+            "text-[11px] truncate max-w-[150px] transition-colors duration-300",
             isReacted ? "" : "text-muted-foreground"
           )}
           style={isReacted ? { color: activeColor } : undefined}
@@ -135,7 +167,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
         </button>
       )}
 
-      {/* Picker tray — outline icons with icy teal */}
+      {/* Picker tray — outline icons with muted colors */}
       {open && (
         <div
           className="fixed inset-x-0 bottom-0 sm:absolute sm:inset-auto sm:bottom-full sm:mb-2 sm:left-0 flex items-center justify-center gap-2 sm:gap-1 sm:rounded-full rounded-t-2xl px-4 sm:px-3 py-4 sm:py-2 z-50 animate-scale-in"
@@ -164,7 +196,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
                   color: isActive ? colors?.text : "hsl(var(--muted-foreground))",
                 }}
               >
-                <Icon size={20} fill="currentColor" strokeWidth={0} className="sm:w-[17px] sm:h-[17px]" />
+                <Icon size={20} strokeWidth={1.5} className="sm:w-[17px] sm:h-[17px]" />
                 <span className="text-[8px] sm:hidden mt-1 leading-none opacity-70">
                   {REACTION_LABELS[key]}
                 </span>
