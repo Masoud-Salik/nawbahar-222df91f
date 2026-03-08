@@ -257,11 +257,17 @@ const Article = () => {
           </div>
         )}
 
-        {/* Reactions */}
-        <ArticleReactions articleId={article.id} summary={reactionSummary} onReact={toggleReaction} />
-
-        {/* Bottom Signals */}
-        <ArticleBottomSignals viewCount={viewCount} commentCount={comments.length} responseCount={responseCount} />
+        {/* Reactions + Comments */}
+        <ArticleReactions
+          articleId={article.id}
+          summary={reactionSummary}
+          commentCount={comments.length}
+          onReact={toggleReaction}
+          onCommentClick={() => {
+            const el = document.getElementById("comments");
+            if (el) el.scrollIntoView({ behavior: "smooth" });
+          }}
+        />
 
         {/* Response Articles */}
         <ResponseArticles responses={responses} />
