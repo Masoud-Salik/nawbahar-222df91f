@@ -111,6 +111,18 @@ const Profile = () => {
                     </span>
                   </div>
                 )}
+                {isOwnProfile ? (
+                  <button
+                    onClick={() => setEditModalOpen(true)}
+                    className="text-[10px] text-primary/70 hover:text-primary mt-1.5 transition-colors"
+                  >
+                    ویرایش
+                  </button>
+                ) : viewingUserId ? (
+                  <div className="mt-1.5">
+                    <FollowButton userId={viewingUserId} size="sm" />
+                  </div>
+                ) : null}
               </div>
 
               {/* Name + Stats */}
@@ -136,11 +148,6 @@ const Profile = () => {
                   <span className="text-[11.5px] text-muted-foreground/55">
                     <span className="font-semibold text-foreground/80">{toPersianNumber(articles.length)}</span> مقاله
                   </span>
-                  {!isOwnProfile && viewingUserId && (
-                    <div className="mr-auto">
-                      <FollowButton userId={viewingUserId} />
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
