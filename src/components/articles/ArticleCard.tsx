@@ -115,11 +115,11 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
           </div>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 mb-2">
           <div className="flex-1 min-w-0">
             <h3
               className={cn(
-                "text-[16px] font-extrabold text-foreground leading-[1.75] line-clamp-3 transition-colors",
+                "text-[17px] font-bold text-foreground leading-[1.6] line-clamp-3 transition-colors mb-2",
                 hasBeenRead && "text-muted-foreground/65"
               )}
             >
