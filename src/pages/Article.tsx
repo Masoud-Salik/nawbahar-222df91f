@@ -248,6 +248,7 @@ const Article = () => {
             userId={userId}
             onAddComment={addComment}
             onDeleteComment={deleteComment}
+            responses={responses}
           />
         </div>
       </main>
