@@ -18,6 +18,11 @@ interface AdminArticle {
   created_at: string;
   total_feed_rank: number | null;
   view_count?: number | null;
+  ai_score_science?: number | null;
+  ai_score_ethics?: number | null;
+  ai_score_writing?: number | null;
+  ai_score_timing?: number | null;
+  ai_score_innovation?: number | null;
   editorial_score_science: number | null;
   editorial_score_ethics: number | null;
   editorial_score_writing: number | null;
