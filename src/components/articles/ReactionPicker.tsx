@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { REACTION_EMOJIS, REACTION_LABELS, type ReactionKey } from "@/hooks/useCardReactions";
+import { REACTION_EMOJIS, REACTION_LABELS, REACTION_COLORS, type ReactionKey } from "@/hooks/useCardReactions";
 import { cn } from "@/lib/utils";
 import { ThumbsUp } from "lucide-react";
 
