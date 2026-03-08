@@ -85,7 +85,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
     if (userReaction) {
       const Icon = REACTION_ICONS[userReaction] || ThumbsUp;
       return (
-        <span style={{ animation: "reaction-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both", color: icyText }}>
+        <span style={{ animation: "reaction-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both", color: activeColor }}>
           <Icon size={15} fill="currentColor" strokeWidth={0} />
         </span>
       );
