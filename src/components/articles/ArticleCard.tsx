@@ -152,53 +152,11 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
         )}
       </Link>
 
-      {/* Footer */}
-      <div className="px-5 pt-2.5 pb-4 flex items-center justify-between">
-        {/* Left: author + meta */}
-        <div className="flex items-center gap-2 min-w-0">
-          <button 
-            onClick={handleAuthorClick} 
-            className="flex items-center gap-1.5 group/author min-w-0"
-          >
-            {article.author?.avatar_url ? (
-              <img
-                src={article.author.avatar_url}
-                alt=""
-                className="w-5 h-5 rounded-full object-cover flex-shrink-0"
-                loading="lazy"
-              />
-            ) : (
-              <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                <span className="text-primary text-[8px] font-bold">
-                  {article.author?.display_name?.charAt(0)}
-                </span>
-              </div>
-            )}
-            <span className="text-[12px] text-foreground/70 group-hover/author:text-primary transition-colors font-medium truncate max-w-[90px]">
-              {article.author?.display_name}
-            </span>
-          </button>
-          
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/40">
-            <span className="text-muted-foreground/20">·</span>
-            <span>{getRelativeTime(article.created_at)}</span>
-            <span className="text-muted-foreground/20">·</span>
-            <span>{calculateReadTime(article.content)}</span>
-            {article.tags && article.tags.length > 0 && (
-              <>
-                <span className="text-muted-foreground/20">·</span>
-                <span className="bg-secondary/80 text-secondary-foreground/60 px-2 py-px rounded-full text-[10px]">
-                  {article.tags[0]}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Right: actions */}
+      {/* Action bar */}
+      <div className="px-5 pt-1.5 pb-3 flex items-center justify-end">
         <div className="flex items-center gap-0.5 flex-shrink-0">
           {formatCount(viewCount) && (
-            <span className="flex items-center gap-0.5 text-muted-foreground/35 text-[11px] px-1">
+            <span className="flex items-center gap-0.5 text-muted-foreground/30 text-[10.5px] px-1">
               <BarChart3 size={10} strokeWidth={1.5} />
               {viewCount}
             </span>
@@ -206,22 +164,22 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
           {formatCount(responseCount) && (
             <button 
               onClick={handleResponseClick}
-              className="flex items-center gap-0.5 text-muted-foreground/35 hover:text-muted-foreground transition-colors px-1 py-1 text-[11px]"
+              className="flex items-center gap-0.5 text-muted-foreground/30 hover:text-muted-foreground transition-colors px-1 py-1 text-[10.5px]"
             >
-              <CornerDownLeft size={12} strokeWidth={1.5} />
+              <CornerDownLeft size={11} strokeWidth={1.5} />
               <span>{responseCount}</span>
             </button>
           )}
           <button 
             onClick={handleCommentClick}
             className={cn(
-              "flex items-center gap-0.5 transition-colors px-1 py-1 text-[11px]",
+              "flex items-center gap-0.5 transition-colors px-1 py-1 text-[10.5px]",
               showComments 
                 ? "text-primary" 
-                : "text-muted-foreground/35 hover:text-muted-foreground"
+                : "text-muted-foreground/30 hover:text-muted-foreground"
             )}
           >
-            <MessageSquareText size={12} strokeWidth={1.5} />
+            <MessageSquareText size={11} strokeWidth={1.5} />
             {formatCount(comments.length) && (
               <span>{comments.length}</span>
             )}
