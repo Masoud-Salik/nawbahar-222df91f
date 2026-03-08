@@ -31,20 +31,12 @@ export function ArticleCardMetrics({
     <div className="mt-3 space-y-2">
       {/* Main metrics row */}
       <div className="flex items-center justify-between">
-        {/* Left side: tag + comment snippet */}
+        {/* Left side: tag */}
         <div className="flex items-center gap-2 min-w-0 flex-1 mr-3">
           {tag && (
             <span className="bg-secondary/60 text-muted-foreground/55 px-2.5 py-[3px] rounded-full text-[10px] font-medium whitespace-nowrap flex-shrink-0">
               {tag}
             </span>
-          )}
-          {latestCommentSnippet && !commentsOpen && (
-            <button
-              onClick={onCommentClick}
-              className="text-[10.5px] text-muted-foreground/40 truncate min-w-0 hover:text-muted-foreground/60 transition-colors"
-            >
-              💬 {latestCommentSnippet}
-            </button>
           )}
         </div>
 
