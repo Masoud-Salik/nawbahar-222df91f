@@ -17,27 +17,35 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
   const longPressRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Close picker on outside scroll only
   useEffect(() => {
     if (!open) return;
-    const close = () => setOpen(false);
+    const close = (e: Event) => {
+      // Don't close if scrolling inside the picker itself
+      if (containerRef.current?.contains(e.target as Node)) return;
+      setOpen(false);
+    };
     window.addEventListener("scroll", close, { passive: true, capture: true });
     return () => window.removeEventListener("scroll", close, true);
   }, [open]);
 
+  // Hover: only OPENS the picker tray, does NOT trigger any reaction
   const handlePointerEnter = () => {
     clearTimeout(timeoutRef.current);
     onHover?.();
-    timeoutRef.current = setTimeout(() => setOpen(true), 350);
+    timeoutRef.current = setTimeout(() => setOpen(true), 400);
   };
 
   const handlePointerLeave = () => {
     clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setOpen(false), 220);
+    timeoutRef.current = setTimeout(() => setOpen(false), 250);
   };
 
+  // Tap on the icon: toggle like (only if picker is NOT open)
   const handleTap = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    // If picker is open or was long-pressed, don't toggle — let user pick from tray
     if (open || longPressRef.current) {
       longPressRef.current = false;
       return;
@@ -45,6 +53,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
     onReact("like");
   };
 
+  // Touch: long-press opens picker, short tap toggles like
   const handleTouchStart = (e: React.TouchEvent) => {
     e.stopPropagation();
     longPressRef.current = false;
@@ -61,6 +70,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
     if (!longPressRef.current) clearTimeout(timeoutRef.current);
   };
 
+  // Select from picker tray — this is the ONLY way to change reaction type
   const handleSelect = (type: ReactionKey, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -80,6 +90,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
 
   useEffect(() => () => clearTimeout(timeoutRef.current), []);
 
+  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const handler = (e: Event) => {
@@ -91,7 +102,6 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
     return () => document.removeEventListener("pointerdown", handler);
   }, [open]);
 
-  const isLiked = userReaction === "like";
   const isReacted = Boolean(userReaction);
 
   return (
@@ -101,6 +111,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
     >
+      {/* Reaction icon — tap toggles like, hover opens picker */}
       <button
         onClick={handleTap}
         onTouchStart={handleTouchStart}
@@ -117,6 +128,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
         />
       </button>
 
+      {/* Summary text: names / count */}
       {summaryText && (
         <button
           onClick={handleTextClick}
@@ -129,6 +141,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
         </button>
       )}
 
+      {/* Emoji picker tray */}
       {open && (
         <div
           className="absolute bottom-full mb-2 left-0 flex items-center gap-0.5 rounded-full px-2 py-1.5 z-50 animate-scale-in"

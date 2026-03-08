@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { REACTION_EMOJIS, REACTION_LABELS, type ReactionKey } from "@/hooks/useCardReactions";
 import { getRelativeTime } from "@/lib/relativeTime";
@@ -22,6 +22,8 @@ export function ReactionDetailsModal({ articleId, isOpen, onClose }: ReactionDet
   const [reactions, setReactions] = useState<ReactionDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -58,9 +60,22 @@ export function ReactionDetailsModal({ articleId, isOpen, onClose }: ReactionDet
     fetchReactions();
   }, [articleId, isOpen]);
 
+  // Smart scroll: close on outside scroll if content is small; allow inside scroll
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleOutsideScroll = (e: Event) => {
+      // If scrolling inside the modal content, don't close
+      if (contentRef.current?.contains(e.target as Node)) return;
+      onClose();
+    };
+
+    window.addEventListener("scroll", handleOutsideScroll, { passive: true, capture: true });
+    return () => window.removeEventListener("scroll", handleOutsideScroll, true);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
-  // Count by type
   const typeCounts: Record<string, number> = {};
   reactions.forEach(r => {
     typeCounts[r.reaction_type] = (typeCounts[r.reaction_type] || 0) + 1;
@@ -72,8 +87,9 @@ export function ReactionDetailsModal({ articleId, isOpen, onClose }: ReactionDet
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm animate-fade-in" />
+      <div ref={backdropRef} className="absolute inset-0 bg-background/60 backdrop-blur-sm animate-fade-in" />
       <div
+        ref={contentRef}
         className="relative w-full max-w-md bg-card rounded-t-2xl border border-border shadow-lg animate-slide-up max-h-[70vh] flex flex-col"
         onClick={e => e.stopPropagation()}
       >
@@ -111,8 +127,8 @@ export function ReactionDetailsModal({ articleId, isOpen, onClose }: ReactionDet
             ))}
         </div>
 
-        {/* Reaction list */}
-        <div className="flex-1 overflow-y-auto">
+        {/* Reaction list — scrollable inside */}
+        <div className="flex-1 overflow-y-auto overscroll-contain">
           {loading ? (
             <div className="flex justify-center py-8">
               <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
