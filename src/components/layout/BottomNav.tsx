@@ -38,7 +38,7 @@ export function BottomNav() {
       <div className="bg-background border-t border-border/60 safe-bottom">
         <div className="flex items-center justify-around max-w-lg mx-auto h-12">
           {/* Home */}
-          <NavItem to="/" active={isActive("/")}>
+          <NavItem to="/" active={isActive("/")} label="خانه">
             <Home
               size={21}
               strokeWidth={isActive("/") ? 2.2 : 1.4}
