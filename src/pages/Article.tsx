@@ -258,7 +258,7 @@ const Article = () => {
         )}
 
         {/* Reactions */}
-        <ArticleReactions userReaction={userReaction} likedCount={likedCount} dislikedCount={dislikedCount} onReaction={setReaction} />
+        <ArticleReactions articleId={article.id} summary={reactionSummary} onReact={toggleReaction} />
 
         {/* Bottom Signals */}
         <ArticleBottomSignals viewCount={viewCount} commentCount={comments.length} responseCount={responseCount} />
