@@ -1,13 +1,13 @@
 import { useState, useMemo } from "react";
-import { MessageSquare, Eye, CornerUpRight, CornerDownLeft, Check } from "lucide-react";
+import { MessageCircle, Eye, CornerDownLeft, CornerUpRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import type { FeedArticle } from "@/hooks/useArticles";
 import { useComments } from "@/hooks/useComments";
 import { useResponseArticles } from "@/hooks/useResponseArticles";
 import { ArticleActionsMenu } from "./ArticleActionsMenu";
-import { getRelativeTime } from "@/lib/relativeTime";
 import { cn } from "@/lib/utils";
 import { SlideDownComments } from "./SlideDownComments";
+import { formatSolarShort } from "@/lib/solarHijri";
 
 interface ArticleCardProps {
   article: FeedArticle;
@@ -27,8 +27,7 @@ function getExcerpt(content: string, maxChars: number = 110): string {
 
 function isArticleRead(articleId: string): boolean {
   try {
-    const key = `article_viewed_${articleId}`;
-    return localStorage.getItem(key) !== null;
+    return localStorage.getItem(`article_viewed_${articleId}`) !== null;
   } catch {
     return false;
   }
@@ -63,24 +62,22 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
     navigate(`/write?response_to=${article.id}`);
   };
 
-  const formatCount = (count: number) => count > 0 ? count : null;
-
   return (
-    <article className={cn("group", hasBeenRead && "opacity-[0.65]")}>
+    <article className="group">
       {/* Response indicator */}
       {parentArticle && (
         <Link 
           to={`/article/${parentArticle.id}`}
-          className="flex items-center gap-1.5 px-5 pt-3 text-[11px] text-muted-foreground hover:text-primary transition-colors"
+          className="flex items-center gap-1.5 px-5 pt-3 text-[11px] text-muted-foreground/50 hover:text-primary transition-colors"
         >
-          <CornerUpRight size={10} strokeWidth={1.5} className="text-primary/60" />
+          <CornerUpRight size={10} strokeWidth={1.5} className="text-primary/40" />
           <span>پاسخ به: {parentArticle.title.slice(0, 35)}{parentArticle.title.length > 35 ? '…' : ''}</span>
         </Link>
       )}
 
       <Link to={`/article/${article.id}`} className="block px-5 pt-5 pb-1">
-        {/* Author + menu row */}
-        <div className="flex items-center justify-between mb-2">
+        {/* Author row with date */}
+        <div className="flex items-center justify-between mb-2.5">
           <button onClick={handleAuthorClick} className="flex items-center gap-1.5 group/author min-w-0">
             {article.author?.avatar_url ? (
               <img src={article.author.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0" loading="lazy" />
@@ -89,8 +86,12 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
                 <span className="text-primary text-[8px] font-bold">{article.author?.display_name?.charAt(0)}</span>
               </div>
             )}
-            <span className="text-[11px] text-foreground/60 group-hover/author:text-primary transition-colors font-medium truncate max-w-[80px]">
+            <span className="text-[11.5px] text-foreground/55 group-hover/author:text-primary transition-colors font-medium truncate max-w-[80px]">
               {article.author?.display_name}
+            </span>
+            <span className="text-muted-foreground/20 text-[10px]">·</span>
+            <span className="text-[10.5px] text-muted-foreground/35 font-normal">
+              {formatSolarShort(article.created_at)}
             </span>
           </button>
           <div onClick={(e) => e.preventDefault()} className="flex-shrink-0">
@@ -102,17 +103,24 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
           </div>
         </div>
 
+        {/* Content */}
         {hasCover ? (
           <div className="flex gap-4">
             <div className="flex-1 min-w-0">
-              <h3 className="text-[16px] font-extrabold text-foreground leading-[1.75] line-clamp-3">
+              <h3 className={cn(
+                "text-[16px] font-extrabold text-foreground leading-[1.75] line-clamp-3 transition-colors",
+                hasBeenRead && "text-muted-foreground/60"
+              )}>
                 {article.title}
               </h3>
-              <p className="text-[13px] text-muted-foreground/45 leading-[1.8] line-clamp-3 mt-1.5">
+              <p className="text-[13px] text-muted-foreground/40 leading-[1.8] line-clamp-3 mt-1.5">
                 {getExcerpt(article.content, 150)}
               </p>
             </div>
-            <div className="w-[112px] h-[75px] flex-shrink-0 rounded overflow-hidden relative bg-muted/15 self-start mt-1">
+            <div className={cn(
+              "w-[112px] h-[75px] flex-shrink-0 rounded overflow-hidden relative bg-muted/15 self-start mt-1 transition-all",
+              hasBeenRead && "opacity-50 saturate-[0.3]"
+            )}>
               {!imageLoaded && <div className="absolute inset-0 skeleton" />}
               <img
                 src={article.cover_image_url!}
@@ -129,66 +137,58 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
           </div>
         ) : (
           <div>
-            <h3 className="text-[16px] font-extrabold text-foreground leading-[1.75] line-clamp-3">
+            <h3 className={cn(
+              "text-[16px] font-extrabold text-foreground leading-[1.75] line-clamp-3 transition-colors",
+              hasBeenRead && "text-muted-foreground/60"
+            )}>
               {article.title}
             </h3>
-            <p className="text-[13px] text-muted-foreground/45 leading-[1.8] line-clamp-3 mt-1.5">
+            <p className="text-[13px] text-muted-foreground/40 leading-[1.8] line-clamp-3 mt-1.5">
               {getExcerpt(article.content, 200)}
             </p>
           </div>
         )}
 
-        {/* Footer — Medium style */}
-        <div className="flex items-center justify-between mt-3.5">
-          {/* Left: date + tag + read time */}
-          <div className="flex items-center gap-1.5 text-[11.5px] text-muted-foreground/40">
-            <span>{getRelativeTime(article.created_at)}</span>
+        {/* Footer — balanced & elegant */}
+        <div className="flex items-center justify-between mt-4 pb-1">
+          {/* Left: tag + read time */}
+          <div className="flex items-center gap-2 text-[11px] text-muted-foreground/35">
             {article.tags && article.tags.length > 0 && (
-              <>
-                <span className="text-muted-foreground/20">·</span>
-                <span className="bg-secondary/60 text-muted-foreground/50 px-2 py-0.5 rounded-full text-[10.5px]">
-                  {article.tags[0]}
-                </span>
-              </>
+              <span className="bg-secondary/50 text-muted-foreground/45 px-2.5 py-0.5 rounded-full text-[10px] font-medium">
+                {article.tags[0]}
+              </span>
             )}
-            <span className="text-muted-foreground/20">·</span>
             <span>{calculateReadTime(article.content)}</span>
-            {hasBeenRead && (
-              <>
-                <span className="text-muted-foreground/20">·</span>
-                <Check size={12} strokeWidth={2} className="text-primary/50" />
-              </>
-            )}
           </div>
           
-          {/* Right: interaction icons */}
-          <div className="flex items-center gap-3">
-            {formatCount(viewCount) && (
-              <span className="flex items-center gap-1 text-muted-foreground/30 text-[11.5px]">
-                <Eye size={14} strokeWidth={1.5} />
+          {/* Right: interaction icons — evenly spaced, subtle */}
+          <div className="flex items-center gap-4">
+            {viewCount > 0 && (
+              <span className="flex items-center gap-1 text-muted-foreground/25 text-[11px]">
+                <Eye size={14} strokeWidth={1.3} />
                 <span>{viewCount}</span>
               </span>
             )}
-            {formatCount(responseCount) && (
+            {responseCount > 0 && (
               <button 
                 onClick={handleResponseClick}
-                className="flex items-center gap-1 text-muted-foreground/30 hover:text-muted-foreground transition-colors text-[11.5px]"
+                className="flex items-center gap-1 text-muted-foreground/25 hover:text-primary/50 transition-colors text-[11px]"
               >
-                <CornerDownLeft size={14} strokeWidth={1.5} />
+                <CornerDownLeft size={14} strokeWidth={1.3} />
                 <span>{responseCount}</span>
               </button>
             )}
             <button 
               onClick={handleCommentClick}
               className={cn(
-                "flex items-center gap-1 transition-colors text-[11.5px]",
+                "flex items-center gap-1 transition-colors text-[11px]",
                 showComments 
-                  ? "text-primary" 
-                  : "text-muted-foreground/30 hover:text-muted-foreground"
+                  ? "text-primary/60" 
+                  : "text-muted-foreground/25 hover:text-primary/50"
               )}
             >
-              <MessageSquare size={14} strokeWidth={1.5} />
-              {formatCount(comments.length) && <span>{comments.length}</span>}
+              <MessageCircle size={14} strokeWidth={1.3} />
+              {comments.length > 0 && <span>{comments.length}</span>}
             </button>
           </div>
         </div>
@@ -196,7 +196,7 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
 
       {/* Comments */}
       {showComments && (
-        <div className="border-t border-border/30 mx-5">
+        <div className="border-t border-border/20 mx-5">
           <SlideDownComments
             isOpen={showComments}
             articleId={article.id}
