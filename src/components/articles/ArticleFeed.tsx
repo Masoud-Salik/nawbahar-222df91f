@@ -12,18 +12,18 @@ export function ArticleFeed({ articles, onRefresh }: ArticleFeedProps) {
   if (articles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center animate-fade-in">
-        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-6 border border-primary/10">
-          <span className="text-4xl">📝</span>
+        <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-5">
+          <span className="text-3xl">📝</span>
         </div>
-        <h3 className="text-xl font-bold text-foreground mb-3">
+        <h3 className="text-lg font-bold text-foreground mb-2">
           هنوز مقاله‌ای نیست
         </h3>
         <p className="text-sm text-muted-foreground max-w-xs mb-6 leading-relaxed">
-          اولین نفری باشید که دیدگاه خود را با جامعه به اشتراک می‌گذارد.
+          اولین نفری باشید که دیدگاه خود را به اشتراک می‌گذارد.
         </p>
         {onRefresh && (
-          <Button variant="outline" onClick={onRefresh} className="gap-2 rounded-xl">
-            <RefreshCw size={16} />
+          <Button variant="outline" onClick={onRefresh} className="gap-2 rounded-lg text-sm">
+            <RefreshCw size={14} />
             بارگذاری مجدد
           </Button>
         )}
@@ -32,12 +32,12 @@ export function ArticleFeed({ articles, onRefresh }: ArticleFeedProps) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto bg-card rounded-xl border border-border/40 overflow-hidden divide-y divide-border/0">
+    <div className="max-w-[640px] mx-auto">
       {articles.map((article, index) => (
         <div
           key={article.id}
-          className="animate-fade-in"
-          style={{ animationDelay: `${Math.min(index * 40, 200)}ms` }}
+          className={`animate-fade-in ${index < articles.length - 1 ? 'border-b border-border/50' : ''}`}
+          style={{ animationDelay: `${Math.min(index * 30, 150)}ms` }}
         >
           <ArticleCard article={article} onDelete={onRefresh} />
         </div>
