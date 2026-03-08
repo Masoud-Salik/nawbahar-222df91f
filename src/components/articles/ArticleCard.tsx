@@ -5,7 +5,7 @@ import type { FeedArticle } from "@/hooks/useArticles";
 import { useComments } from "@/hooks/useComments";
 import { useCardReactions } from "@/hooks/useCardReactions";
 import { ArticleActionsMenu } from "./ArticleActionsMenu";
-import { FollowButton } from "@/components/FollowButton";
+
 import { cn } from "@/lib/utils";
 import { SlideDownComments } from "./SlideDownComments";
 import { formatSolarShort } from "@/lib/solarHijri";
