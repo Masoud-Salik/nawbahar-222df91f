@@ -56,6 +56,13 @@ const ArticleEditor = () => {
   const [reviewState, setReviewState] = useState<"idle" | "reviewing" | "result">("idle");
   const [aiResult, setAiResult] = useState<AIResult | null>(null);
 
+  // Proofreading state
+  interface ProofIssue { word: string; suggestion: string; type: "spelling" | "grammar" | "style"; reason: string; }
+  const [proofIssues, setProofIssues] = useState<ProofIssue[]>([]);
+  const [proofActive, setProofActive] = useState(false);
+  const [proofLoading, setProofLoading] = useState(false);
+  const [selectedIssue, setSelectedIssue] = useState<ProofIssue | null>(null);
+
   // Citations state
   const [citedArticles, setCitedArticles] = useState<{ id: string; title: string }[]>([]);
   const [citationSearchQuery, setCitationSearchQuery] = useState("");
