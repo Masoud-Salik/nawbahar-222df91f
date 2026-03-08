@@ -155,8 +155,10 @@ export function SlideDownComments({
         // Fail-open: publish anyway
         await supabase.from("articles").update({ status: "published" }).eq("id", article.id);
         toast({ title: "✅ نظر به صورت عمومی منتشر شد" });
+        playSuccessSound();
       } else if (evalData.approved) {
         toast({ title: "✅ نظر به صورت عمومی منتشر شد" });
+        playSuccessSound();
       } else {
         toast({
           title: "نظر عمومی در انتظار بررسی",
