@@ -101,6 +101,7 @@ const Notifications = () => {
   return (
     <AppLayout>
       <SEOHead title="اعلانات" description="اعلانات نوبهار" ogUrl="/notifications" noIndex />
+      <OfflineFallback>
       <div className="min-h-screen animate-fade-in">
         {/* Header */}
         <div className="sticky top-11 z-30 bg-background border-b border-border px-5 py-3 flex items-center justify-between">
