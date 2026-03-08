@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN bio text DEFAULT NULL;
