@@ -98,6 +98,13 @@ export function useCardReactions(articleId: string, autoFetch = true) {
     setFetched(true);
   }, [articleId]);
 
+  // Auto-fetch on mount for persistent display
+  useEffect(() => {
+    if (autoFetch && !fetched) {
+      fetchReactions();
+    }
+  }, [autoFetch, fetched, fetchReactions]);
+
   const ensureFetched = useCallback(async () => {
     if (!fetched) await fetchReactions();
   }, [fetched, fetchReactions]);
