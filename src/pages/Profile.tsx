@@ -18,6 +18,7 @@ import { FollowButton } from "@/components/FollowButton";
 import { cn, toPersianNumber } from "@/lib/utils";
 import defaultCover from "@/assets/default-cover.jpg";
 import type { ProfileArticle } from "@/hooks/useProfile";
+import { SEOHead } from "@/components/SEOHead";
 
 const Profile = () => {
   const { userId: paramUserId } = useParams();
