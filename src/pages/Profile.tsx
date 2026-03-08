@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { LogIn, Moon, Sun, Type, LogOut, Shield, Settings } from "lucide-react";
+import { LogIn, Moon, Sun, Type, LogOut, Shield, Settings, CalendarDays, FileText, Award } from "lucide-react";
 import { MessageCircle as WhatsApp, Facebook, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -26,7 +27,6 @@ const Profile = () => {
   const { followerCount, followingCount } = useFollowStats(viewingUserId);
   const navigate = useNavigate();
   
-  // Initialize theme from localStorage
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
     if (saved) return saved === 'dark';
@@ -69,18 +69,18 @@ const Profile = () => {
     navigate("/");
   };
 
-  // Not logged in and viewing own profile
+  // Not logged in
   if (!user && isOwnProfile) {
     return (
       <AppLayout>
-        <div className="p-4 space-y-8 animate-fade-in">
-          <div className="flex flex-col items-center py-12 px-6 bg-gradient-to-br from-primary/10 to-accent/5 rounded-2xl border border-primary/20">
-            <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center mb-5">
-              <span className="text-3xl font-bold text-primary-foreground">ن</span>
+        <div className="p-5 space-y-8 animate-fade-in">
+          <div className="flex flex-col items-center py-16 px-6">
+            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-6">
+              <span className="text-2xl font-black text-primary-foreground">ن</span>
             </div>
             <h2 className="text-xl font-bold mb-2">به نوبهار خوش آمدید</h2>
-            <p className="text-muted-foreground text-sm text-center mb-6 max-w-xs leading-relaxed">
-              برای ذخیره مقالات، دنبال کردن نویسندگان و اشتراک‌گذاری صدای خود وارد شوید.
+            <p className="text-muted-foreground text-sm text-center mb-8 max-w-[260px] leading-relaxed">
+              برای ذخیره مقالات، دنبال کردن نویسندگان و نوشتن وارد شوید.
             </p>
             <Link to="/auth">
               <Button className="rounded-full px-8 h-11 btn-press">
@@ -105,12 +105,9 @@ const Profile = () => {
   if (loading) {
     return (
       <AppLayout>
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <div className="relative">
-            <div className="w-10 h-10 border-2 border-primary/20 rounded-full" />
-            <div className="absolute inset-0 w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          </div>
-          <p className="text-sm text-muted-foreground animate-pulse">در حال بارگذاری...</p>
+        <div className="flex flex-col items-center justify-center py-20 gap-3">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs text-muted-foreground">در حال بارگذاری...</p>
         </div>
       </AppLayout>
     );
@@ -119,197 +116,191 @@ const Profile = () => {
   return (
     <AppLayout>
       <div className="max-w-lg mx-auto animate-fade-in">
-        {/* Profile Header */}
+        {/* === Profile Header === */}
         {profile && (
-          <div className="px-4 pt-8 pb-6">
-            {/* Avatar & Actions */}
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
+          <div className="px-5 pt-8 pb-2">
+            {/* Top row: Avatar + Name + Admin */}
+            <div className="flex items-start gap-4">
+              {/* Avatar */}
+              <div className="shrink-0">
                 {profile.avatar_url ? (
                   <img
                     src={profile.avatar_url}
                     alt={profile.display_name}
-                    className="w-[72px] h-[72px] rounded-2xl object-cover ring-2 ring-primary/10"
+                    className="w-[76px] h-[76px] rounded-full object-cover ring-[3px] ring-border"
                   />
                 ) : (
-                  <div className="w-[72px] h-[72px] rounded-2xl bg-primary/10 flex items-center justify-center">
-                    <span className="text-primary font-bold text-3xl">
+                  <div className="w-[76px] h-[76px] rounded-full bg-muted flex items-center justify-center ring-[3px] ring-border">
+                    <span className="text-primary font-bold text-[28px]">
                       {profile.display_name?.charAt(0)}
                     </span>
                   </div>
                 )}
-                <div>
-                  <h1 className="text-lg font-bold text-foreground">{profile.display_name}</h1>
-                  {profile.specialty && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">{profile.specialty}</p>
-                  )}
-                  {profile.trust_score != null && profile.trust_score > 0 && (
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full transition-all"
-                          style={{ width: `${profile.trust_score}%` }}
-                        />
-                      </div>
-                      <span className="text-[10px] text-muted-foreground">{profile.trust_score}</span>
-                    </div>
+              </div>
+
+              {/* Name & Bio */}
+              <div className="flex-1 min-w-0 pt-1">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-[19px] font-extrabold text-foreground leading-tight truncate">
+                    {profile.display_name}
+                  </h1>
+                  {isOwnProfile && isAdmin && (
+                    <Link 
+                      to="/admin" 
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                      aria-label="پنل مدیریت"
+                    >
+                      <Shield size={16} strokeWidth={1.5} />
+                    </Link>
                   )}
                 </div>
+                {profile.specialty && (
+                  <p className="text-[13px] text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
+                    {profile.specialty}
+                  </p>
+                )}
               </div>
-              
-              {/* Admin icon */}
-              {isOwnProfile && isAdmin && (
-                <Link 
-                  to="/admin" 
-                  className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-muted"
-                  aria-label="پنل مدیریت"
-                >
-                  <Shield size={20} strokeWidth={1.5} />
-                </Link>
-              )}
             </div>
 
-            {/* Follow Stats */}
-            <div className="flex items-center gap-5 mt-5">
+            {/* Stats row */}
+            <div className="flex items-center gap-6 mt-5">
+              <div className="text-center">
+                <span className="block text-[17px] font-bold text-foreground">{articles.length}</span>
+                <span className="text-[11px] text-muted-foreground">مقاله</span>
+              </div>
               <button 
                 onClick={() => setShowFollowers(true)}
-                className="hover:opacity-80 transition-opacity"
+                className="text-center hover:opacity-70 transition-opacity"
               >
-                <span className="font-bold text-foreground text-lg">{followerCount}</span>
-                <span className="text-muted-foreground text-sm mr-1">دنبال‌کننده</span>
+                <span className="block text-[17px] font-bold text-foreground">{followerCount}</span>
+                <span className="text-[11px] text-muted-foreground">دنبال‌کننده</span>
               </button>
-              <span className="text-muted-foreground/30">|</span>
               <button 
                 onClick={() => setShowFollowing(true)}
-                className="hover:opacity-80 transition-opacity"
+                className="text-center hover:opacity-70 transition-opacity"
               >
-                <span className="font-bold text-foreground text-lg">{followingCount}</span>
-                <span className="text-muted-foreground text-sm mr-1">دنبال‌شده</span>
+                <span className="block text-[17px] font-bold text-foreground">{followingCount}</span>
+                <span className="text-[11px] text-muted-foreground">دنبال‌شده</span>
               </button>
             </div>
 
-            {/* Social Links */}
-            {(profile.whatsapp_number || profile.facebook_url || profile.linkedin_url) && (
-              <div className="flex items-center gap-2 mt-4">
-                {profile.whatsapp_number && (
-                  <a 
-                    href={`https://wa.me/${encodeURIComponent(profile.whatsapp_number)}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted"
-                    aria-label="واتساپ"
-                  >
-                    <WhatsApp size={18} strokeWidth={1.5} />
-                  </a>
-                )}
-                {profile.facebook_url && (
-                  <a 
-                    href={profile.facebook_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted"
-                    aria-label="فیسبوک"
-                  >
-                    <Facebook size={18} strokeWidth={1.5} />
-                  </a>
-                )}
-                {profile.linkedin_url && (
-                  <a 
-                    href={profile.linkedin_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted"
-                    aria-label="لینکدین"
-                  >
-                    <Linkedin size={18} strokeWidth={1.5} />
-                  </a>
-                )}
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex gap-2 mt-5">
+            {/* Action row */}
+            <div className="flex items-center gap-2 mt-5">
               {isOwnProfile ? (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setEditModalOpen(true)}
-                  className="rounded-full px-5"
+                  className="rounded-full px-6 h-9 text-[13px] font-medium border-border"
                 >
                   ویرایش پروفایل
                 </Button>
               ) : (
                 viewingUserId && <FollowButton userId={viewingUserId} />
               )}
+
+              {/* Social Links inline */}
+              {(profile.whatsapp_number || profile.facebook_url || profile.linkedin_url) && (
+                <div className="flex items-center gap-0.5 mr-auto">
+                  {profile.whatsapp_number && (
+                    <a 
+                      href={`https://wa.me/${encodeURIComponent(profile.whatsapp_number)}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-2 text-muted-foreground/60 hover:text-foreground transition-colors"
+                      aria-label="واتساپ"
+                    >
+                      <WhatsApp size={17} strokeWidth={1.5} />
+                    </a>
+                  )}
+                  {profile.facebook_url && (
+                    <a 
+                      href={profile.facebook_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-2 text-muted-foreground/60 hover:text-foreground transition-colors"
+                      aria-label="فیسبوک"
+                    >
+                      <Facebook size={17} strokeWidth={1.5} />
+                    </a>
+                  )}
+                  {profile.linkedin_url && (
+                    <a 
+                      href={profile.linkedin_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-2 text-muted-foreground/60 hover:text-foreground transition-colors"
+                      aria-label="لینکدین"
+                    >
+                      <Linkedin size={17} strokeWidth={1.5} />
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Tabs */}
-        <Tabs defaultValue="articles" className="w-full">
+        {/* === Tabs === */}
+        <Tabs defaultValue="articles" className="w-full mt-2">
           <TabsList className={cn(
-            "w-full bg-transparent border-b border-border rounded-none h-auto p-0 sticky top-12 z-20 bg-card grid",
+            "w-full bg-transparent border-b border-border rounded-none h-auto p-0 sticky top-12 z-20 bg-background grid",
             isOwnProfile ? "grid-cols-3" : "grid-cols-2"
           )}>
             <TabsTrigger 
               value="articles" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 text-sm font-medium"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 text-[13px] font-semibold text-muted-foreground data-[state=active]:text-foreground"
             >
               مقالات
             </TabsTrigger>
             {isOwnProfile && (
               <TabsTrigger 
                 value="saved" 
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 text-sm font-medium"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 text-[13px] font-semibold text-muted-foreground data-[state=active]:text-foreground"
               >
                 ذخیره‌شده‌ها
               </TabsTrigger>
             )}
             <TabsTrigger 
               value="about" 
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 text-sm font-medium"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none py-3 text-[13px] font-semibold text-muted-foreground data-[state=active]:text-foreground"
             >
               درباره
             </TabsTrigger>
           </TabsList>
 
+          {/* Articles Tab */}
           <TabsContent value="articles" className="mt-0">
             {articles.length === 0 ? (
-              <div className="text-center py-16 text-muted-foreground text-sm">
-                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
-                  📝
-                </div>
-                {isOwnProfile ? "هنوز مقاله‌ای ننوشته‌اید" : "هنوز مقاله‌ای ندارد"}
-              </div>
+              <EmptyState 
+                emoji="📝" 
+                text={isOwnProfile ? "هنوز مقاله‌ای ننوشته‌اید" : "هنوز مقاله‌ای ندارد"} 
+              />
             ) : (
-              <div className="divide-y divide-border">
+              <div>
                 {articles.map((article, index) => (
                   <ProfileArticleItem 
                     key={article.id} 
                     article={article}
-                    style={{ animationDelay: `${index * 50}ms` }}
+                    style={{ animationDelay: `${index * 40}ms` }}
                   />
                 ))}
               </div>
             )}
           </TabsContent>
 
+          {/* Saved Tab */}
           {isOwnProfile && (
             <TabsContent value="saved" className="mt-0">
               {bookmarks.length === 0 ? (
-                <div className="text-center py-16 text-muted-foreground text-sm">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
-                    🔖
-                  </div>
-                  هنوز مقاله‌ای ذخیره نکرده‌اید
-                </div>
+                <EmptyState emoji="🔖" text="هنوز مقاله‌ای ذخیره نکرده‌اید" />
               ) : (
-                <div className="divide-y divide-border">
+                <div>
                   {bookmarks.map((article, index) => (
                     <ProfileArticleItem 
                       key={article.id} 
                       article={article}
-                      style={{ animationDelay: `${index * 50}ms` }}
+                      style={{ animationDelay: `${index * 40}ms` }}
                     />
                   ))}
                 </div>
@@ -317,35 +308,57 @@ const Profile = () => {
             </TabsContent>
           )}
 
-          <TabsContent value="about" className="mt-0 p-4">
-            <div className="space-y-3">
+          {/* About Tab */}
+          <TabsContent value="about" className="mt-0 px-5 py-6">
+            <div className="space-y-5">
               {profile?.specialty && (
-                <div className="bg-muted/50 rounded-xl p-4">
-                  <h4 className="text-xs font-medium text-muted-foreground mb-1">تخصص</h4>
-                  <p className="text-sm text-foreground">{profile.specialty}</p>
-                </div>
+                <AboutItem 
+                  icon={<FileText size={15} strokeWidth={1.5} />}
+                  label="تخصص" 
+                  value={profile.specialty} 
+                />
               )}
-              <div className="bg-muted/50 rounded-xl p-4">
-                <h4 className="text-xs font-medium text-muted-foreground mb-1">تاریخ عضویت</h4>
-                <p className="text-sm text-foreground">
-                  {profile?.created_at ? getRelativeTime(profile.created_at) : "نامشخص"}
-                </p>
-              </div>
-              <div className="bg-muted/50 rounded-xl p-4">
-                <h4 className="text-xs font-medium text-muted-foreground mb-1">آمار</h4>
-                <p className="text-sm text-foreground">{articles.length} مقاله منتشر شده</p>
-              </div>
+              <AboutItem 
+                icon={<CalendarDays size={15} strokeWidth={1.5} />}
+                label="عضویت" 
+                value={profile?.created_at ? getRelativeTime(profile.created_at) : "نامشخص"} 
+              />
+              <AboutItem 
+                icon={<FileText size={15} strokeWidth={1.5} />}
+                label="مقالات منتشرشده" 
+                value={`${articles.length} مقاله`} 
+              />
               {profile?.reputation_score != null && profile.reputation_score > 0 && (
-                <div className="bg-muted/50 rounded-xl p-4">
-                  <h4 className="text-xs font-medium text-muted-foreground mb-1">امتیاز اعتبار</h4>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Award size={15} strokeWidth={1.5} className="text-muted-foreground" />
+                    <span className="text-[12px] text-muted-foreground">امتیاز اعتبار</span>
+                  </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-primary rounded-full"
+                        className="h-full bg-primary rounded-full transition-all"
                         style={{ width: `${Math.min(100, profile.reputation_score)}%` }}
                       />
                     </div>
-                    <span className="text-sm font-semibold text-primary">{Math.round(profile.reputation_score)}</span>
+                    <span className="text-[13px] font-semibold text-primary">{Math.round(profile.reputation_score)}</span>
+                  </div>
+                </div>
+              )}
+              {profile?.trust_score != null && profile.trust_score > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield size={15} strokeWidth={1.5} className="text-muted-foreground" />
+                    <span className="text-[12px] text-muted-foreground">امتیاز اعتماد</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary rounded-full transition-all"
+                        style={{ width: `${profile.trust_score}%` }}
+                      />
+                    </div>
+                    <span className="text-[13px] font-semibold text-primary">{profile.trust_score}</span>
                   </div>
                 </div>
               )}
@@ -353,9 +366,10 @@ const Profile = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Settings & Sign Out */}
+        {/* === Settings & Sign Out === */}
         {isOwnProfile && user && (
-          <div className="p-4 space-y-4 border-t border-border mt-6">
+          <div className="px-5 py-6 mt-4">
+            <Separator className="mb-6" />
             <SettingsSection
               isDark={isDark}
               setIsDark={setIsDark}
@@ -364,19 +378,18 @@ const Profile = () => {
               textSizes={textSizes}
             />
 
-            <Button
-              variant="outline"
+            <button
               onClick={handleSignOut}
-              className="w-full gap-2 text-destructive border-destructive/30 hover:bg-destructive hover:text-destructive-foreground h-11"
+              className="w-full flex items-center justify-center gap-2 mt-6 py-3 text-[13px] font-medium text-destructive hover:bg-destructive/5 rounded-xl transition-colors"
             >
-              <LogOut size={16} />
+              <LogOut size={16} strokeWidth={1.5} />
               خروج از حساب
-            </Button>
+            </button>
           </div>
         )}
       </div>
 
-      {/* Edit Profile Modal */}
+      {/* Modals */}
       {profile && isOwnProfile && user && (
         <EditProfileModal
           open={editModalOpen}
@@ -392,7 +405,6 @@ const Profile = () => {
         />
       )}
 
-      {/* Followers List Modal */}
       {viewingUserId && (
         <>
           <FollowersList
@@ -413,7 +425,29 @@ const Profile = () => {
   );
 };
 
-// Profile Article Item
+// --- Sub Components ---
+
+function EmptyState({ emoji, text }: { emoji: string; text: string }) {
+  return (
+    <div className="text-center py-20 text-muted-foreground text-[13px]">
+      <div className="text-2xl mb-3">{emoji}</div>
+      {text}
+    </div>
+  );
+}
+
+function AboutItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="text-muted-foreground mt-0.5">{icon}</div>
+      <div>
+        <span className="text-[12px] text-muted-foreground block">{label}</span>
+        <span className="text-[14px] text-foreground font-medium">{value}</span>
+      </div>
+    </div>
+  );
+}
+
 function ProfileArticleItem({ 
   article, 
   style 
@@ -424,28 +458,27 @@ function ProfileArticleItem({
   return (
     <Link
       to={`/article/${article.id}`}
-      className="flex gap-4 px-4 py-4 hover:bg-muted/30 transition-colors animate-slide-up"
+      className="flex items-center gap-4 px-5 py-4 hover:bg-muted/30 transition-colors animate-slide-up border-b border-border/60"
       style={style}
     >
+      <div className="flex-1 min-w-0">
+        <h3 className="font-semibold text-foreground text-[14px] line-clamp-2 leading-relaxed">{article.title}</h3>
+        <p className="text-[11px] text-muted-foreground mt-1.5">
+          {getRelativeTime(article.created_at)}
+        </p>
+      </div>
       {article.cover_image_url && (
         <img 
           src={article.cover_image_url} 
           alt="" 
-          className="w-14 h-14 rounded-lg object-cover shrink-0"
+          className="w-[56px] h-[56px] rounded-lg object-cover shrink-0"
           loading="lazy"
         />
       )}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-foreground text-sm line-clamp-2">{article.title}</h3>
-        <p className="text-xs text-muted-foreground mt-1">
-          {getRelativeTime(article.created_at)}
-        </p>
-      </div>
     </Link>
   );
 }
 
-// Settings Section
 function SettingsSection({
   isDark,
   setIsDark,
@@ -460,29 +493,29 @@ function SettingsSection({
   textSizes: { key: 'sm' | 'base' | 'lg' | 'xl'; label: string; size: string }[];
 }) {
   return (
-    <div className="space-y-3">
-      <h3 className="text-base font-semibold flex items-center gap-2">
-        <Settings size={16} className="text-muted-foreground" />
+    <div className="space-y-4">
+      <h3 className="text-[13px] font-semibold text-muted-foreground flex items-center gap-2">
+        <Settings size={14} strokeWidth={1.5} />
         تنظیمات
       </h3>
 
       {/* Dark Mode */}
-      <div className="flex items-center justify-between p-4 bg-card rounded-xl border border-border">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {isDark ? <Moon size={18} className="text-primary" /> : <Sun size={18} className="text-primary" />}
-          <span className="font-medium text-sm">حالت تاریک</span>
+          {isDark ? <Moon size={16} className="text-muted-foreground" /> : <Sun size={16} className="text-muted-foreground" />}
+          <span className="text-[13px] text-foreground">حالت تاریک</span>
         </div>
         <button
           onClick={() => setIsDark(!isDark)}
           className={cn(
-            "w-12 h-6 rounded-full transition-colors relative",
+            "w-11 h-6 rounded-full transition-colors relative",
             isDark ? 'bg-primary' : 'bg-muted'
           )}
           aria-label={isDark ? "غیرفعال کردن حالت تاریک" : "فعال کردن حالت تاریک"}
         >
           <span
             className={cn(
-              "absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all",
+              "absolute top-0.5 w-5 h-5 rounded-full bg-background shadow-sm transition-all",
               isDark ? 'left-0.5' : 'right-0.5'
             )}
           />
@@ -490,12 +523,12 @@ function SettingsSection({
       </div>
 
       {/* Text Size */}
-      <div className="p-4 bg-card rounded-xl border border-border">
+      <div>
         <div className="flex items-center gap-3 mb-3">
-          <Type size={18} className="text-primary" />
-          <span className="font-medium text-sm">اندازه متن</span>
+          <Type size={16} className="text-muted-foreground" />
+          <span className="text-[13px] text-foreground">اندازه متن</span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           {textSizes.map((ts) => (
             <button
               key={ts.key}
@@ -504,7 +537,7 @@ function SettingsSection({
                 "flex-1 py-2 rounded-lg font-medium transition-all duration-200",
                 ts.size,
                 textSize === ts.key
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-foreground text-background"
                   : "bg-muted text-muted-foreground hover:bg-muted/80"
               )}
             >
