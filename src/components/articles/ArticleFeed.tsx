@@ -41,7 +41,7 @@ export function ArticleFeed({ articles, onRefresh }: ArticleFeedProps) {
         >
           <ArticleCard article={article} onDelete={onRefresh} />
           {index < articles.length - 1 && (
-            <div className="mx-5 border-b border-border/40" />
+            <div className="mx-5 border-b border-border" />
           )}
         </div>
       ))}
