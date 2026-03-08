@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { formatSolarShort } from "@/lib/solarHijri";
+import { toPersianNumber } from "@/lib/utils";
+import defaultCover from "@/assets/default-cover.jpg";
+import { MessageCircle, Eye } from "lucide-react";
 
 interface RelatedArticle {
   id: string;
   title: string;
+  content: string;
   cover_image_url: string | null;
   created_at: string;
+  view_count: number | null;
   author_id: string;
-  author?: { display_name: string; avatar_url: string | null };
+  comment_count?: number;
+  reaction_count?: number;
 }
 
 interface RelatedArticlesProps {
@@ -26,10 +32,9 @@ export function RelatedArticles({ articleId, tags, authorId }: RelatedArticlesPr
   }, [articleId]);
 
   const fetchRelated = async () => {
-    // Fetch articles by same author or overlapping tags
     const { data } = await supabase
       .from("articles")
-      .select("id, title, cover_image_url, created_at, author_id")
+      .select("id, title, content, cover_image_url, created_at, author_id, view_count")
       .eq("status", "published")
       .neq("id", articleId)
       .order("created_at", { ascending: false })
@@ -37,14 +42,13 @@ export function RelatedArticles({ articleId, tags, authorId }: RelatedArticlesPr
 
     if (!data || data.length === 0) return;
 
-    // Score by relevance: same author = 3, matching tag = 1 each
+    // Score by relevance
     const scored = data.map((a) => {
       let score = 0;
       if (a.author_id === authorId) score += 3;
       return { ...a, score };
     });
 
-    // If we have tags, fetch all articles' tags to compare
     if (tags.length > 0) {
       const ids = data.map((a) => a.id);
       const { data: tagData } = await supabase
@@ -68,7 +72,6 @@ export function RelatedArticles({ articleId, tags, authorId }: RelatedArticlesPr
       .sort((a, b) => b.score - a.score)
       .slice(0, 4);
 
-    // If not enough related, fill with recent
     if (top.length < 3) {
       const existing = new Set(top.map((a) => a.id));
       for (const a of scored) {
@@ -79,62 +82,97 @@ export function RelatedArticles({ articleId, tags, authorId }: RelatedArticlesPr
       }
     }
 
-    // Fetch author profiles
-    const authorIds = [...new Set(top.map((a) => a.author_id))];
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, display_name, avatar_url")
-      .in("id", authorIds);
+    // Fetch comment & reaction counts
+    const topIds = top.map((a) => a.id);
+    const [commentsRes, reactionsRes] = await Promise.all([
+      supabase.from("comments").select("article_id").in("article_id", topIds),
+      supabase.from("reactions").select("article_id").in("article_id", topIds),
+    ]);
 
-    const profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
+    const commentCounts = new Map<string, number>();
+    const reactionCounts = new Map<string, number>();
+    (commentsRes.data || []).forEach((c) => {
+      commentCounts.set(c.article_id, (commentCounts.get(c.article_id) || 0) + 1);
+    });
+    (reactionsRes.data || []).forEach((r) => {
+      reactionCounts.set(r.article_id, (reactionCounts.get(r.article_id) || 0) + 1);
+    });
 
     setArticles(
       top.map((a) => ({
         ...a,
-        author: profileMap.get(a.author_id) || undefined,
+        comment_count: commentCounts.get(a.id) || 0,
+        reaction_count: reactionCounts.get(a.id) || 0,
       }))
     );
   };
 
   if (articles.length === 0) return null;
 
+  const stripHtml = (html: string) => html.replace(/<[^>]*>/g, "");
+
   return (
     <div className="mt-10 pt-8 border-t border-border/50">
-      <h3 className="text-sm font-semibold text-foreground mb-5">مقالات مرتبط</h3>
-      <div className="space-y-4">
-        {articles.map((a) => (
-          <Link
-            key={a.id}
-            to={`/article/${a.id}`}
-            className="flex gap-3 group"
-          >
-            {a.cover_image_url && (
-              <img
-                src={a.cover_image_url}
-                alt=""
-                className="w-16 h-16 rounded object-cover flex-shrink-0 bg-muted"
-                loading="lazy"
-              />
-            )}
-            <div className="flex-1 min-w-0">
-              <h4 className="text-[13px] font-bold text-foreground leading-[1.7] line-clamp-2 group-hover:text-primary transition-colors">
-                {a.title}
-              </h4>
-              <div className="flex items-center gap-1.5 mt-1">
-                {a.author?.avatar_url ? (
-                  <img src={a.author.avatar_url} alt="" className="w-4 h-4 rounded-full object-cover" />
-                ) : (
-                  <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center">
-                    <span className="text-[7px] text-muted-foreground">{a.author?.display_name?.charAt(0)}</span>
-                  </div>
-                )}
-                <span className="text-[11px] text-muted-foreground/60">{a.author?.display_name}</span>
-                <span className="text-muted-foreground/20 text-[10px]">·</span>
-                <span className="text-[10px] text-muted-foreground/40">{formatSolarShort(a.created_at)}</span>
+      <h3 className="text-sm font-semibold text-foreground mb-4 px-1">نوشتارهای مرتبط</h3>
+      <div className="divide-y divide-border/30">
+        {articles.map((a) => {
+          const coverImage = a.cover_image_url || defaultCover;
+          const excerpt = stripHtml(a.content).slice(0, 80).trim();
+
+          return (
+            <Link
+              key={a.id}
+              to={`/article/${a.id}`}
+              className="block py-4 hover:bg-muted/20 transition-colors"
+            >
+              <div className="flex gap-3.5">
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-[15px] font-extrabold text-foreground leading-[1.75] line-clamp-2 group-hover:text-primary transition-colors">
+                    {a.title}
+                  </h4>
+                  <p className="text-[12.5px] text-muted-foreground/40 leading-[1.7] line-clamp-2 mt-1">
+                    {excerpt}{excerpt.length >= 80 ? "…" : ""}
+                  </p>
+                </div>
+                <div className="w-[88px] h-[60px] flex-shrink-0 rounded overflow-hidden bg-muted/15 self-start mt-0.5">
+                  <img
+                    src={coverImage}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+              <div className="flex items-center gap-3 mt-2 text-[11px] text-muted-foreground/45">
+                <span>{formatSolarShort(a.created_at)}</span>
+                {(a.view_count ?? 0) > 0 && (
+                  <>
+                    <span className="text-muted-foreground/20">·</span>
+                    <span className="flex items-center gap-0.5">
+                      <Eye size={11} strokeWidth={1.3} />
+                      {toPersianNumber(a.view_count ?? 0)}
+                    </span>
+                  </>
+                )}
+                {(a.comment_count ?? 0) > 0 && (
+                  <>
+                    <span className="text-muted-foreground/20">·</span>
+                    <span className="flex items-center gap-0.5">
+                      <MessageCircle size={11} strokeWidth={1.3} />
+                      {toPersianNumber(a.comment_count ?? 0)}
+                    </span>
+                  </>
+                )}
+                {(a.reaction_count ?? 0) > 0 && (
+                  <>
+                    <span className="text-muted-foreground/20">·</span>
+                    <span>{toPersianNumber(a.reaction_count ?? 0)} واکنش</span>
+                  </>
+                )}
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
