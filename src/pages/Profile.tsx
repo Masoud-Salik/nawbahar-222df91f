@@ -26,7 +26,7 @@ const Profile = () => {
   const isOwnProfile = !paramUserId || paramUserId === user?.id;
   
   const { profile, articles, bookmarks, loading, refetch } = useProfile(viewingUserId);
-  const { followerCount, followingCount } = useFollowStats(viewingUserId);
+  const { followerCount } = useFollowStats(viewingUserId);
   const navigate = useNavigate();
   
   const [editModalOpen, setEditModalOpen] = useState(false);
