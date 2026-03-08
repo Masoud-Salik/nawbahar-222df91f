@@ -130,7 +130,7 @@ export default defineConfig(({ mode }) => ({
         clientsClaim: true,
         skipWaiting: true,
         navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/api/, /^\/auth/, /^\/~oauth/],
+        navigateFallbackDenylist: [/^\/api/, /^\/~oauth/],
         importScripts: ['/sw-push.js'],
         runtimeCaching: [
           {
