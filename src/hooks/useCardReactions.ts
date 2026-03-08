@@ -3,18 +3,22 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const REACTION_EMOJIS: Record<string, string> = {
   like: "👍",
-  clap: "👏",
   love: "❤️",
+  laugh: "😂",
+  clap: "👏",
   insightful: "💡",
   fire: "🔥",
+  sad: "😢",
 };
 
 export const REACTION_LABELS: Record<string, string> = {
   like: "پسند",
-  clap: "تحسین",
   love: "عالی",
+  laugh: "خنده",
+  clap: "تحسین",
   insightful: "آموزنده",
   fire: "الهام‌بخش",
+  sad: "غمگین",
 };
 
 export type ReactionKey = keyof typeof REACTION_EMOJIS;
