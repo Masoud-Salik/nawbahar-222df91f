@@ -67,7 +67,10 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
   const isReacted = Boolean(userReaction);
   const activeColor = userReaction ? REACTION_COLORS[userReaction]?.text : undefined;
 
-  /** Render the emoji icon(s) shown inline */
+  /**
+   * Stable inline emoji — NEVER changes due to async data loading.
+   * Shows 👍 by default. Only shows user's own reaction emoji if they reacted.
+   */
   const renderInlineEmoji = () => {
     if (userReaction) {
       return (
@@ -79,15 +82,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
         </span>
       );
     }
-    if (topTypes && topTypes.length > 0) {
-      return (
-        <span className="flex items-center -space-x-0.5">
-          {topTypes.slice(0, 2).map((type) => (
-            <span key={type} className="text-[13px] leading-none">{REACTION_EMOJIS[type]}</span>
-          ))}
-        </span>
-      );
-    }
+    // Always show stable 👍 — no topTypes switching
     return <span className="text-[14px] leading-none opacity-45">👍</span>;
   };
 
