@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Send, ImagePlus, X, CornerUpRight, FileText, Bold, Italic, List, Quote, Hash, ShieldCheck, ShieldX, Loader2, Save, Clock, CalendarClock, Link2, Search } from "lucide-react";
+import { ArrowRight, Send, ImagePlus, X, CornerUpRight, FileText, Bold, Italic, List, Quote, Hash, ShieldCheck, ShieldX, Loader2, Save, CalendarClock, Link2, Search, ChevronUp } from "lucide-react";
 import { compressArticleImage } from "@/lib/imageCompression";
 import { sanitizeError, validation } from "@/lib/errorHandler";
 import { playSuccessSound } from "@/lib/sounds";
@@ -418,11 +418,13 @@ const ArticleEditor = () => {
     }
   };
 
+  const [showExtras, setShowExtras] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background border-b border-border">
-        <div className="flex items-center justify-between px-4 h-11 max-w-screen-md mx-auto">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50">
+        <div className="flex items-center justify-between px-4 h-12 max-w-screen-md mx-auto">
           <button
             onClick={() => {
               if (window.history.length > 1) navigate(-1);
@@ -432,25 +434,15 @@ const ArticleEditor = () => {
           >
             <ArrowRight size={20} strokeWidth={1.5} />
           </button>
-          <h1 className="text-sm font-medium text-foreground">
-            {isEditMode ? "ویرایش مقاله" : responseToId ? "نوشتن پاسخ" : "نوشتن مقاله"}
-          </h1>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={handleSaveDraft}
               disabled={loading || !title.trim()}
-              className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30"
+              className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground border border-border/50 rounded-lg transition-colors disabled:opacity-30 flex items-center gap-1.5"
               title="ذخیره پیش‌نویس"
             >
-              <Save size={16} strokeWidth={1.5} />
-            </button>
-            <button
-              onClick={() => setShowSchedule(!showSchedule)}
-              disabled={loading}
-              className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30"
-              title="زمان‌بندی انتشار"
-            >
-              <Clock size={16} strokeWidth={1.5} />
+              <Save size={14} strokeWidth={1.5} />
+              <span className="hidden sm:inline">پیش‌نویس</span>
             </button>
             <Button 
               onClick={handlePublish} 
@@ -459,249 +451,203 @@ const ArticleEditor = () => {
               className="gap-1.5 h-8 px-4"
             >
               {loading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} strokeWidth={1.5} />}
-              {loading ? "..." : "انتشار"}
+              انتشار
             </Button>
           </div>
         </div>
-        {/* Schedule bar */}
-        {showSchedule && (
-          <div className="flex items-center gap-2 px-4 py-2.5 border-t border-border/50 bg-muted/30">
-            <CalendarClock size={14} className="text-muted-foreground shrink-0" />
-            <input
-              type="date"
-              value={scheduledDate}
-              onChange={(e) => setScheduledDate(e.target.value)}
-              className="h-7 px-2 text-xs bg-background border border-border rounded-md"
-            />
-            <input
-              type="time"
-              value={scheduledTime}
-              onChange={(e) => setScheduledTime(e.target.value)}
-              className="h-7 px-2 text-xs bg-background border border-border rounded-md w-24"
-            />
-            <Button size="sm" variant="outline" className="h-7 text-xs px-3" onClick={handleSchedulePublish} disabled={loading}>
-              تنظیم
-            </Button>
-          </div>
-        )}
       </header>
 
       {/* Editor */}
-      <main className="max-w-screen-md mx-auto px-4 py-4 pb-24">
-        <div className="space-y-4">
-          {/* Response indicator */}
-          {parentArticle && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground p-3 bg-primary/5 rounded-xl border border-primary/10">
-              <CornerUpRight size={14} strokeWidth={1.5} className="text-primary" />
-              <span>در پاسخ به:</span>
-              <Link to={`/article/${parentArticle.id}`} className="text-foreground hover:underline line-clamp-1 font-medium">
-                {parentArticle.title}
-              </Link>
-            </div>
-          )}
+      <main className="max-w-screen-md mx-auto px-4 pt-3 pb-28">
+        {/* Response indicator */}
+        {parentArticle && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground p-2.5 mb-3 bg-primary/5 rounded-lg border border-primary/10">
+            <CornerUpRight size={13} className="text-primary shrink-0" />
+            <span>پاسخ به:</span>
+            <Link to={`/article/${parentArticle.id}`} className="text-foreground hover:underline line-clamp-1 font-medium">
+              {parentArticle.title}
+            </Link>
+          </div>
+        )}
 
-          {/* File inputs */}
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
-          <input ref={textFileInputRef} type="file" accept=".txt,.md,.rtf" onChange={handleTextFileUpload} className="hidden" />
+        {/* File inputs (hidden) */}
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
+        <input ref={textFileInputRef} type="file" accept=".txt,.md,.rtf" onChange={handleTextFileUpload} className="hidden" />
 
-          {/* Toolbar */}
-          <div className="flex items-center gap-1 p-1.5 bg-muted/50 rounded-xl border border-border/50">
-            <button onClick={() => fileInputRef.current?.click()} className="p-2 text-muted-foreground hover:text-foreground hover:bg-background rounded-lg transition-colors" title="افزودن تصویر">
-              <ImagePlus size={18} strokeWidth={1.5} />
-            </button>
-            <button onClick={() => textFileInputRef.current?.click()} className="p-2 text-muted-foreground hover:text-foreground hover:bg-background rounded-lg transition-colors" title="بارگذاری فایل">
-              <FileText size={18} strokeWidth={1.5} />
-            </button>
-            <div className="w-px h-5 bg-border mx-1" />
-            <button onClick={() => insertFormat("**")} className="p-2 text-muted-foreground hover:text-foreground hover:bg-background rounded-lg transition-colors" title="پررنگ">
-              <Bold size={18} strokeWidth={1.5} />
-            </button>
-            <button onClick={() => insertFormat("*")} className="p-2 text-muted-foreground hover:text-foreground hover:bg-background rounded-lg transition-colors" title="مورب">
-              <Italic size={18} strokeWidth={1.5} />
-            </button>
-            <button onClick={() => insertFormat("\n- ", "")} className="p-2 text-muted-foreground hover:text-foreground hover:bg-background rounded-lg transition-colors" title="لیست">
-              <List size={18} strokeWidth={1.5} />
-            </button>
-            <button onClick={() => insertFormat("\n> ", "")} className="p-2 text-muted-foreground hover:text-foreground hover:bg-background rounded-lg transition-colors" title="نقل قول">
-              <Quote size={18} strokeWidth={1.5} />
+        {/* Cover Image Preview */}
+        {coverPreview && (
+          <div className="relative rounded-xl overflow-hidden mb-3">
+            <img src={coverPreview} alt="Cover" className="w-full h-36 object-cover" />
+            <button onClick={removeCoverImage} className="absolute top-2 left-2 p-1.5 bg-background/80 backdrop-blur-sm rounded-full hover:bg-background transition-colors">
+              <X size={14} strokeWidth={1.5} />
             </button>
           </div>
-          
-          {/* Cover Image Preview */}
-          {coverPreview && (
-            <div className="relative rounded-xl overflow-hidden">
-              <img src={coverPreview} alt="Cover" className="w-full h-40 object-cover" />
-              <button onClick={removeCoverImage} className="absolute top-2 left-2 p-1.5 bg-background/80 backdrop-blur-sm rounded-full hover:bg-background transition-colors">
-                <X size={14} strokeWidth={1.5} />
-              </button>
-            </div>
-          )}
-          
-          <Input
-            placeholder="عنوان..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="text-lg font-semibold border-0 border-b border-border rounded-none px-0 focus-visible:ring-0 bg-transparent h-auto py-3"
-            maxLength={300}
-          />
+        )}
 
-          <Textarea
-            ref={textareaRef}
-            placeholder="متن مقاله خود را اینجا بنویسید..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="min-h-[50vh] border-0 resize-none px-0 focus-visible:ring-0 bg-transparent text-base"
-            style={{ lineHeight: '2.2' }}
-          />
+        {/* Title */}
+        <Input
+          placeholder="عنوان مقاله..."
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="text-lg font-bold border-0 border-b border-border/30 rounded-none px-0 focus-visible:ring-0 bg-transparent h-auto py-3 placeholder:text-muted-foreground/30"
+          maxLength={300}
+        />
 
-          {/* Citations / References Section */}
-          <div className="border-t border-border pt-4 space-y-3">
-            <div className="flex items-center justify-between">
+        {/* Inline Toolbar */}
+        <div className="flex items-center gap-0.5 py-2 border-b border-border/20">
+          <button onClick={() => fileInputRef.current?.click()} className="p-1.5 text-muted-foreground/50 hover:text-foreground rounded-md transition-colors" title="تصویر کاور">
+            <ImagePlus size={16} strokeWidth={1.5} />
+          </button>
+          <button onClick={() => textFileInputRef.current?.click()} className="p-1.5 text-muted-foreground/50 hover:text-foreground rounded-md transition-colors" title="بارگذاری فایل">
+            <FileText size={16} strokeWidth={1.5} />
+          </button>
+          <div className="w-px h-4 bg-border/30 mx-1" />
+          <button onClick={() => insertFormat("**")} className="p-1.5 text-muted-foreground/50 hover:text-foreground rounded-md transition-colors" title="پررنگ">
+            <Bold size={16} strokeWidth={1.5} />
+          </button>
+          <button onClick={() => insertFormat("*")} className="p-1.5 text-muted-foreground/50 hover:text-foreground rounded-md transition-colors" title="مورب">
+            <Italic size={16} strokeWidth={1.5} />
+          </button>
+          <button onClick={() => insertFormat("\n- ", "")} className="p-1.5 text-muted-foreground/50 hover:text-foreground rounded-md transition-colors" title="لیست">
+            <List size={16} strokeWidth={1.5} />
+          </button>
+          <button onClick={() => insertFormat("\n> ", "")} className="p-1.5 text-muted-foreground/50 hover:text-foreground rounded-md transition-colors" title="نقل قول">
+            <Quote size={16} strokeWidth={1.5} />
+          </button>
+          <div className="flex-1" />
+          <span className="text-[10px] text-muted-foreground/30">{toPersianNumber(wordCount)} کلمه</span>
+        </div>
+
+        {/* Content */}
+        <Textarea
+          ref={textareaRef}
+          placeholder="متن مقاله خود را بنویسید..."
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="min-h-[45vh] border-0 resize-none px-0 focus-visible:ring-0 bg-transparent text-[15px] placeholder:text-muted-foreground/25"
+          style={{ lineHeight: '2.2' }}
+        />
+
+        {/* Extras Toggle */}
+        <button
+          onClick={() => setShowExtras(!showExtras)}
+          className="w-full flex items-center justify-center gap-2 py-2.5 text-xs text-muted-foreground/50 hover:text-muted-foreground border-t border-border/20 transition-colors"
+        >
+          {showExtras ? "بستن تنظیمات" : "برچسب، ارجاع و زمان‌بندی"}
+          <ChevronUp size={14} className={`transition-transform ${showExtras ? "" : "rotate-180"}`} />
+        </button>
+
+        {showExtras && (
+          <div className="space-y-4 pt-2 animate-fade-in">
+            {/* Tags - Compact */}
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Link2 size={16} className="text-muted-foreground" />
-                <span className="text-sm font-medium text-foreground">ارجاعات</span>
-                {citedArticles.length > 0 && (
-                  <span className="text-[10px] text-muted-foreground">({toPersianNumber(citedArticles.length)})</span>
-                )}
+                <Hash size={14} className="text-muted-foreground/50" />
+                <span className="text-xs font-medium text-muted-foreground">برچسب‌ها</span>
+                <span className="text-[10px] text-muted-foreground/40">({tags.length}/۵)</span>
               </div>
-              <button
-                onClick={() => setShowCitationSearch(!showCitationSearch)}
-                className="text-[11px] text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
-              >
-                <Search size={12} />
-                افزودن ارجاع
-              </button>
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {tags.map(tag => (
+                    <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-primary/8 text-primary rounded-full text-[11px] font-medium">
+                      #{tag}
+                      <button onClick={() => removeTag(tag)} className="hover:text-destructive transition-colors"><X size={10} /></button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              {tags.length < 5 && (
+                <>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="برچسب..."
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(tagInput); } }}
+                      className="h-8 text-xs"
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {SUGGESTED_TAGS.filter(t => !tags.includes(t)).slice(0, 6).map(tag => (
+                      <button key={tag} onClick={() => addTag(tag)} className="px-2 py-0.5 bg-muted/60 text-muted-foreground/60 rounded-full text-[10px] hover:bg-primary/10 hover:text-primary transition-colors">
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
 
-            {/* Citation search */}
-            {showCitationSearch && (
-              <div className="space-y-2 animate-fade-in">
-                <Input
-                  placeholder="جستجوی مقاله برای ارجاع..."
-                  value={citationSearchQuery}
-                  onChange={(e) => handleCitationSearch(e.target.value)}
-                  className="h-9 text-sm"
-                  autoFocus
-                />
-                {citationSearching && (
-                  <div className="flex justify-center py-2">
-                    <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                  </div>
-                )}
-                {citationResults.length > 0 && (
-                  <div className="border border-border/50 rounded-lg overflow-hidden divide-y divide-border/30 max-h-[200px] overflow-y-auto">
-                    {citationResults
-                      .filter(r => !citedArticles.find(c => c.id === r.id))
-                      .map(article => (
-                        <button
-                          key={article.id}
-                          onClick={() => addCitedArticle(article)}
-                          className="w-full text-right px-3 py-2 text-[12px] hover:bg-muted/50 transition-colors line-clamp-1"
-                        >
-                          {article.title}
-                        </button>
-                      ))
-                    }
-                  </div>
-                )}
+            {/* Citations - Compact */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Link2 size={14} className="text-muted-foreground/50" />
+                  <span className="text-xs font-medium text-muted-foreground">ارجاعات</span>
+                  {citedArticles.length > 0 && <span className="text-[10px] text-muted-foreground/40">({toPersianNumber(citedArticles.length)})</span>}
+                </div>
+                <button onClick={() => setShowCitationSearch(!showCitationSearch)} className="text-[10px] text-primary/70 hover:text-primary transition-colors flex items-center gap-1">
+                  <Search size={10} /> افزودن
+                </button>
               </div>
-            )}
-
-            {/* Cited articles list */}
-            {citedArticles.length > 0 && (
-              <div className="space-y-1.5">
-                {citedArticles.map((article, i) => (
-                  <div
-                    key={article.id}
-                    className="flex items-center gap-2 px-3 py-2 bg-muted/30 rounded-lg border border-border/30"
-                  >
-                    <Link2 size={12} className="text-primary/50 shrink-0" />
-                    <span className="text-[12px] text-foreground flex-1 line-clamp-1">{article.title}</span>
-                    <button
-                      onClick={() => removeCitedArticle(article.id)}
-                      className="text-muted-foreground/40 hover:text-destructive transition-colors shrink-0"
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Tags Section */}
-          <div className="border-t border-border pt-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <Hash size={16} className="text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">برچسب‌ها</span>
-              <span className="text-[10px] text-muted-foreground">({tags.length}/5)</span>
+              {showCitationSearch && (
+                <div className="space-y-1.5 animate-fade-in">
+                  <Input placeholder="جستجوی مقاله..." value={citationSearchQuery} onChange={(e) => handleCitationSearch(e.target.value)} className="h-8 text-xs" autoFocus />
+                  {citationSearching && <div className="flex justify-center py-1"><div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}
+                  {citationResults.filter(r => !citedArticles.find(c => c.id === r.id)).length > 0 && (
+                    <div className="border border-border/30 rounded-lg overflow-hidden divide-y divide-border/20 max-h-[150px] overflow-y-auto">
+                      {citationResults.filter(r => !citedArticles.find(c => c.id === r.id)).map(article => (
+                        <button key={article.id} onClick={() => addCitedArticle(article)} className="w-full text-right px-3 py-1.5 text-[11px] hover:bg-muted/50 transition-colors line-clamp-1">{article.title}</button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {citedArticles.length > 0 && (
+                <div className="space-y-1">
+                  {citedArticles.map(article => (
+                    <div key={article.id} className="flex items-center gap-2 px-2.5 py-1.5 bg-muted/20 rounded-md">
+                      <Link2 size={10} className="text-primary/40 shrink-0" />
+                      <span className="text-[11px] text-foreground/80 flex-1 line-clamp-1">{article.title}</span>
+                      <button onClick={() => removeCitedArticle(article.id)} className="text-muted-foreground/30 hover:text-destructive transition-colors"><X size={10} /></button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {tags.map(tag => (
-                  <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
-                    #{tag}
-                    <button onClick={() => removeTag(tag)} className="hover:text-destructive ml-0.5 transition-colors">
-                      <X size={12} />
-                    </button>
-                  </span>
-                ))}
+
+            {/* Schedule - Compact */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <CalendarClock size={14} className="text-muted-foreground/50" />
+                <span className="text-xs font-medium text-muted-foreground">زمان‌بندی انتشار</span>
               </div>
-            )}
-            
-            {tags.length < 5 && (
-              <div className="flex gap-2">
-                <Input
-                  placeholder="برچسب جدید..."
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(tagInput); } }}
-                  className="h-9 text-sm"
-                />
-                <Button size="sm" variant="outline" onClick={() => addTag(tagInput)} disabled={!tagInput.trim()} className="h-9 shrink-0">
-                  افزودن
+              <div className="flex items-center gap-2">
+                <input type="date" value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)} className="h-8 px-2 text-xs bg-background border border-border/50 rounded-md flex-1" />
+                <input type="time" value={scheduledTime} onChange={(e) => setScheduledTime(e.target.value)} className="h-8 px-2 text-xs bg-background border border-border/50 rounded-md w-24" />
+                <Button size="sm" variant="outline" className="h-8 text-xs px-3 shrink-0" onClick={handleSchedulePublish} disabled={loading || !scheduledDate || !scheduledTime}>
+                  تنظیم
                 </Button>
               </div>
-            )}
-            
-            {tags.length < 5 && (
-              <div className="flex flex-wrap gap-1.5">
-                {SUGGESTED_TAGS.filter(t => !tags.includes(t)).slice(0, 8).map(tag => (
-                  <button
-                    key={tag}
-                    onClick={() => addTag(tag)}
-                    className="px-2.5 py-1 bg-muted text-muted-foreground rounded-full text-[11px] hover:bg-primary/10 hover:text-primary transition-colors"
-                  >
-                    #{tag}
-                  </button>
-                ))}
-              </div>
-            )}
+            </div>
           </div>
-
-          {/* Word count footer */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border">
-            <span>{wordCount.toLocaleString("fa-IR")} کلمه</span>
-            <span>~{readTime} دقیقه مطالعه</span>
-          </div>
-        </div>
+        )}
       </main>
 
       {/* AI Review Loading */}
       <AlertDialog open={reviewState === "reviewing"}>
         <AlertDialogContent className="max-w-xs text-center">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-center">بررسی مقاله</AlertDialogTitle>
+            <AlertDialogTitle className="text-center text-sm">بررسی مقاله</AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              <div className="flex flex-col items-center gap-4 py-4">
+              <div className="flex flex-col items-center gap-3 py-3">
                 <div className="relative">
-                  <div className="w-12 h-12 border-2 border-primary/20 rounded-full" />
-                  <div className="absolute inset-0 w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  <ShieldCheck size={20} className="absolute inset-0 m-auto text-primary" />
+                  <div className="w-10 h-10 border-2 border-primary/20 rounded-full" />
+                  <div className="absolute inset-0 w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  <ShieldCheck size={16} className="absolute inset-0 m-auto text-primary" />
                 </div>
-                <span className="text-sm text-muted-foreground">
-                  هوش مصنوعی در حال بررسی محتوا و کیفیت مقاله شماست...
+                <span className="text-xs text-muted-foreground">
+                  در حال بررسی کیفیت مقاله...
                 </span>
               </div>
             </AlertDialogDescription>
@@ -713,42 +659,30 @@ const ArticleEditor = () => {
       <AlertDialog open={reviewState === "result"} onOpenChange={() => handleResultClose()}>
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
+            <AlertDialogTitle className="flex items-center gap-2 text-sm">
               {aiResult?.approved ? (
-                <>
-                  <ShieldCheck size={20} className="text-green-600" />
-                  مقاله تأیید شد
-                </>
+                <><ShieldCheck size={18} className="text-green-600" /> مقاله تأیید شد</>
               ) : (
-                <>
-                  <ShieldX size={20} className="text-destructive" />
-                  مقاله تأیید نشد
-                </>
+                <><ShieldX size={18} className="text-destructive" /> مقاله تأیید نشد</>
               )}
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div>
                 {aiResult?.approved ? (
-                  <p className="text-sm text-muted-foreground mb-4">
-                    مقاله شما با موفقیت منتشر شد ✅
-                  </p>
+                  <p className="text-xs text-muted-foreground mb-3">مقاله شما با موفقیت منتشر شد ✅</p>
                 ) : (
-                  <p className="text-sm text-destructive/80 mb-4 leading-relaxed">
-                    {aiResult?.rejection_reason}
-                  </p>
+                  <p className="text-xs text-destructive/80 mb-3 leading-relaxed">{aiResult?.rejection_reason}</p>
                 )}
-
-                {/* Score breakdown */}
                 {aiResult?.scores && (
-                  <div className="space-y-2 pt-2 border-t border-border/50">
-                    <p className="text-[11px] text-muted-foreground/60 mb-2">نمره‌دهی هوش مصنوعی:</p>
+                  <div className="space-y-1.5 pt-2 border-t border-border/50">
+                    <p className="text-[10px] text-muted-foreground/50 mb-1.5">امتیازدهی:</p>
                     {scoreLabels.map(({ key, label, max }) => {
                       const score = aiResult.scores[key];
                       const percent = (score / max) * 100;
                       return (
                         <div key={key} className="flex items-center gap-2">
-                          <span className="text-[11px] text-muted-foreground w-16 text-left">{label}</span>
-                          <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <span className="text-[10px] text-muted-foreground w-14 text-left">{label}</span>
+                          <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${
                                 percent >= 60 ? "bg-green-500" : percent >= 40 ? "bg-yellow-500" : "bg-destructive"
@@ -756,15 +690,15 @@ const ArticleEditor = () => {
                               style={{ width: `${percent}%` }}
                             />
                           </div>
-                          <span className="text-[10px] text-muted-foreground/60 w-8 text-left">
+                          <span className="text-[9px] text-muted-foreground/50 w-7 text-left">
                             {toPersianNumber(score)}/{toPersianNumber(max)}
                           </span>
                         </div>
                       );
                     })}
-                    <div className="flex items-center justify-between pt-2 border-t border-border/30">
-                      <span className="text-[11px] font-medium text-foreground">میانگین کل</span>
-                      <span className={`text-[12px] font-bold ${
+                    <div className="flex items-center justify-between pt-1.5 border-t border-border/30">
+                      <span className="text-[10px] font-medium text-foreground">میانگین</span>
+                      <span className={`text-[11px] font-bold ${
                         (aiResult.avg_percent || 0) >= 60 ? "text-green-600" : (aiResult.avg_percent || 0) >= 40 ? "text-yellow-600" : "text-destructive"
                       }`}>
                         {toPersianNumber(aiResult.avg_percent || 0)}٪
@@ -776,7 +710,7 @@ const ArticleEditor = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={handleResultClose}>
+            <AlertDialogAction onClick={handleResultClose} className="text-xs">
               {aiResult?.approved ? "بازگشت به خانه" : "بازگشت و ویرایش"}
             </AlertDialogAction>
           </AlertDialogFooter>
