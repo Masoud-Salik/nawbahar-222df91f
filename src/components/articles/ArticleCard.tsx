@@ -70,11 +70,16 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
 
       <Link to={`/article/${article.id}`} className="block">
         {hasCover ? (
-          /* --- Card WITH image: poster + text below --- */
+          /* --- Card WITH image: unified poster card --- */
           <div className="px-4 pt-4">
-            {/* Image with title overlay */}
-            <div className="rounded-t-xl overflow-hidden relative">
-              <div className="aspect-[2.6/1] relative bg-muted/30">
+            <div className="rounded-2xl overflow-hidden relative border border-border/40 bg-card"
+              style={{
+                borderImage: 'linear-gradient(to bottom, hsl(var(--primary) / 0.18), hsl(var(--accent) / 0.12), hsl(var(--border) / 0.08)) 1',
+                borderImageSlice: 1,
+              }}
+            >
+              {/* Cover image with title overlay */}
+              <div className="aspect-[2.4/1] relative bg-muted/30">
                 {!imageLoaded && <div className="absolute inset-0 skeleton" />}
                 <img
                   src={article.cover_image_url!}
@@ -87,23 +92,51 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
                   decoding="async"
                   onLoad={() => setImageLoaded(true)}
                 />
-                {/* Soft gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
+                {/* Cinematic gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
                 
                 {/* Title on image */}
                 <div className="absolute bottom-0 right-0 left-0 px-4 pb-3">
-                  <h3 className="text-[14px] font-bold text-white leading-[1.8] line-clamp-2 drop-shadow-sm">
+                  <h3 className="text-[14px] font-bold text-white leading-[1.8] line-clamp-2 drop-shadow-md">
                     {article.title}
                   </h3>
                 </div>
               </div>
-            </div>
-            
-            {/* Excerpt below image — seamlessly connected */}
-            <div className="bg-secondary/40 rounded-b-xl px-4 py-2.5">
-              <p className="text-[12.5px] text-muted-foreground/70 leading-[1.9] line-clamp-2">
-                {getExcerpt(article.content, 110)}
-              </p>
+              
+              {/* Excerpt + author inside the card */}
+              <div className="px-4 py-3 bg-gradient-to-b from-card to-secondary/30">
+                <p className="text-[12.5px] text-muted-foreground/65 leading-[1.9] line-clamp-2">
+                  {getExcerpt(article.content, 110)}
+                </p>
+                
+                {/* Inline author + meta */}
+                <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-border/20">
+                  <button onClick={handleAuthorClick} className="flex items-center gap-1.5 group/author min-w-0">
+                    {article.author?.avatar_url ? (
+                      <img src={article.author.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0" loading="lazy" />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-primary text-[8px] font-bold">{article.author?.display_name?.charAt(0)}</span>
+                      </div>
+                    )}
+                    <span className="text-[11.5px] text-foreground/65 group-hover/author:text-primary transition-colors font-medium truncate max-w-[80px]">
+                      {article.author?.display_name}
+                    </span>
+                  </button>
+                  
+                  <div className="flex items-center gap-2 text-[10.5px] text-muted-foreground/40">
+                    <span>{getRelativeTime(article.created_at)}</span>
+                    <span className="text-muted-foreground/15">·</span>
+                    <span>{calculateReadTime(article.content)}</span>
+                    {article.tags?.[0] && (
+                      <>
+                        <span className="text-muted-foreground/15">·</span>
+                        <span className="bg-primary/6 text-primary/50 px-1.5 py-px rounded-full text-[9.5px]">{article.tags[0]}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
