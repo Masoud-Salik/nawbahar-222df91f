@@ -115,24 +115,24 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
     }
     if (topTypes && topTypes.length > 0) {
       return (
-        <span className="flex items-center -space-x-1 transition-opacity duration-500">
+        <span className="flex items-center -space-x-1">
           {topTypes.slice(0, 2).map((type) => {
             const Icon = REACTION_ICONS[type] || ThumbsUp;
             const color = REACTION_COLORS[type]?.text;
             return (
               <Icon
                 key={type}
-                size={13}
-                strokeWidth={1.5}
-                className="transition-colors duration-500"
-                style={{ color: color || undefined, opacity: 0.5 }}
+                size={14}
+                strokeWidth={1.6}
+                style={{ color: color || undefined, opacity: 0.7 }}
               />
             );
           })}
         </span>
       );
     }
-    return <ThumbsUp size={14} strokeWidth={1.5} className="text-muted-foreground/50" />;
+    // Always show ThumbsUp as default - consistent from mount
+    return <ThumbsUp size={14} strokeWidth={1.5} className="text-muted-foreground/40" />;
   };
 
   return (
