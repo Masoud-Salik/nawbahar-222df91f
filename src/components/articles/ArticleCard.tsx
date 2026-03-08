@@ -51,7 +51,7 @@ export function ArticleCard({ article, onDelete: _onDelete }: ArticleCardProps) 
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const viewCount = (article as any).view_count || 0;
-  const hasCover = !!article.cover_image_url;
+  const coverImage = article.cover_image_url || defaultCover;
   const hasBeenRead = useMemo(() => isArticleRead(article.id), [article.id]);
 
   const handleAuthorClick = (e: React.MouseEvent) => {
