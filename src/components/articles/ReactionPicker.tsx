@@ -164,7 +164,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
                   color: isActive ? colors?.text : "hsl(var(--muted-foreground))",
                 }}
               >
-                <Icon size={20} strokeWidth={1.4} className="sm:w-[17px] sm:h-[17px]" />
+                <Icon size={20} fill="currentColor" strokeWidth={0} className="sm:w-[17px] sm:h-[17px]" />
                 <span className="text-[8px] sm:hidden mt-1 leading-none opacity-70">
                   {REACTION_LABELS[key]}
                 </span>
