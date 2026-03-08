@@ -140,7 +140,7 @@ const ArticleEditor = () => {
 
     try {
       // Step 1: Upload cover image if any
-      let coverImageUrl = null;
+      let coverImageUrl = coverPreview; // keep existing cover for edit mode
       if (coverImage) {
         const fileExt = coverImage.name.split('.').pop();
         const fileName = `${user.id}/${Date.now()}.${fileExt}`;
@@ -150,18 +150,33 @@ const ArticleEditor = () => {
         coverImageUrl = urlData.publicUrl;
       }
 
-      // Step 2: Insert as pending
-      const { data: insertedArticle, error } = await supabase.from("articles").insert({
-        title: title.trim(),
-        content: content.trim(),
-        author_id: user.id,
-        status: "pending",
-        cover_image_url: coverImageUrl,
-        parent_article_id: responseToId || null,
-        tags,
-      }).select("id").single();
+      let articleId: string;
 
-      if (error) throw error;
+      if (isEditMode && editId) {
+        // Update existing article
+        const { error } = await supabase.from("articles").update({
+          title: title.trim(),
+          content: content.trim(),
+          cover_image_url: coverImageUrl,
+          tags,
+          status: "pending",
+        }).eq("id", editId);
+        if (error) throw error;
+        articleId = editId;
+      } else {
+        // Insert new article as pending
+        const { data: insertedArticle, error } = await supabase.from("articles").insert({
+          title: title.trim(),
+          content: content.trim(),
+          author_id: user.id,
+          status: "pending",
+          cover_image_url: coverImageUrl,
+          parent_article_id: responseToId || null,
+          tags,
+        }).select("id").single();
+        if (error) throw error;
+        articleId = insertedArticle.id;
+      }
 
       // Step 3: Call AI evaluation (this will update status to published or rejected)
       const { data: evalData, error: evalError } = await supabase.functions.invoke("ai-score-article", {
