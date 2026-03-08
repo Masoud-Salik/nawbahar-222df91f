@@ -50,10 +50,14 @@ export function ArticleCard({ article, onDelete: _onDelete }: ArticleCardProps) 
   const { responseCount, parentArticle } = useResponseArticles(article.id);
   const [showComments, setShowComments] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { latestComment } = useLatestComment(article.id);
 
   const viewCount = (article as any).view_count || 0;
   const coverImage = article.cover_image_url || defaultCover;
   const hasBeenRead = useMemo(() => isArticleRead(article.id), [article.id]);
+  const commentSnippet = latestComment
+    ? `${latestComment.author_name}: ${latestComment.content.slice(0, 40)}${latestComment.content.length > 40 ? "…" : ""}`
+    : null;
 
   const handleAuthorClick = (e: React.MouseEvent) => {
     e.preventDefault();
