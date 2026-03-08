@@ -227,6 +227,7 @@ const Notifications = () => {
           </div>
         )}
       </div>
+      </OfflineFallback>
     </AppLayout>
   );
 };
