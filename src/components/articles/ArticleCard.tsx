@@ -72,10 +72,13 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
         {hasCover ? (
           /* --- Card WITH image: unified poster card --- */
           <div className="px-4 pt-4">
-            <div className="rounded-2xl overflow-hidden relative border border-border/40 bg-card"
+            <div className="rounded-2xl overflow-hidden relative bg-card"
               style={{
-                borderImage: 'linear-gradient(to bottom, hsl(var(--primary) / 0.18), hsl(var(--accent) / 0.12), hsl(var(--border) / 0.08)) 1',
-                borderImageSlice: 1,
+                boxShadow: `
+                  inset 0 0 0 1px hsl(var(--primary) / 0.1),
+                  0 1px 3px hsl(var(--primary) / 0.04),
+                  0 4px 16px -4px hsl(var(--primary) / 0.06)
+                `,
               }}
             >
               {/* Cover image with title overlay */}
