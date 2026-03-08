@@ -332,12 +332,6 @@ const Profile = () => {
             userId={viewingUserId}
             type="followers"
           />
-          <FollowersList
-            isOpen={showFollowing}
-            onClose={() => setShowFollowing(false)}
-            userId={viewingUserId}
-            type="following"
-          />
         </>
       )}
     </AppLayout>
