@@ -1,4 +1,4 @@
-import { Bell, Menu, Info, Moon, Sun, Type, LogOut, Shield } from "lucide-react";
+import { Bell, Menu, Info, Moon, Sun, Type, LogOut, Shield, MessageSquare } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useAuth } from "@/hooks/useAuth";
