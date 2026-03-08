@@ -113,43 +113,29 @@ export function Header() {
             </button>
 
             {menuOpen && (
-              <div className="absolute left-0 top-full mt-1.5 w-56 bg-card border border-border rounded-xl shadow-lg animate-scale-in origin-top-left z-50 overflow-hidden">
-                {/* Theme Toggle */}
-                <div className="px-4 py-3 flex items-center justify-between border-b border-border/50">
-                  <div className="flex items-center gap-2.5">
-                    {isDark ? <Moon size={15} strokeWidth={1.5} className="text-muted-foreground" /> : <Sun size={15} strokeWidth={1.5} className="text-muted-foreground" />}
-                    <span className="text-[12.5px] text-foreground">حالت تاریک</span>
-                  </div>
+              <div className="absolute left-0 top-full mt-1.5 w-52 bg-card border border-border rounded-xl shadow-lg animate-scale-in origin-top-left z-50 overflow-hidden">
+                {/* Theme + Text Size compact row */}
+                <div className="px-3 py-2.5 flex items-center justify-between border-b border-border/50">
                   <button
                     onClick={() => setIsDark(!isDark)}
                     className={cn(
-                      "w-10 h-[22px] rounded-full transition-colors relative",
-                      isDark ? 'bg-primary' : 'bg-muted'
+                      "flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-full transition-all",
+                      isDark ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                     )}
                   >
-                    <span className={cn(
-                      "absolute top-[2px] w-[18px] h-[18px] rounded-full bg-background shadow-sm transition-all",
-                      isDark ? 'left-[2px]' : 'right-[2px]'
-                    )} />
+                    {isDark ? <Moon size={13} strokeWidth={1.5} /> : <Sun size={13} strokeWidth={1.5} />}
+                    {isDark ? "تاریک" : "روشن"}
                   </button>
-                </div>
-
-                {/* Text Size */}
-                <div className="px-4 py-3 border-b border-border/50">
-                  <div className="flex items-center gap-2.5 mb-2.5">
-                    <Type size={15} strokeWidth={1.5} className="text-muted-foreground" />
-                    <span className="text-[12.5px] text-foreground">اندازه متن</span>
-                  </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-0.5">
                     {textSizes.map((ts) => (
                       <button
                         key={ts.key}
                         onClick={() => setTextSize(ts.key)}
                         className={cn(
-                          "flex-1 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200",
+                          "w-6 h-6 rounded-md text-[10px] font-medium transition-all",
                           textSize === ts.key
                             ? "bg-foreground text-background"
-                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                            : "bg-muted/60 text-muted-foreground hover:bg-muted"
                         )}
                       >
                         {ts.label}
@@ -161,26 +147,26 @@ export function Header() {
                 {isAdmin && (
                   <button
                     onClick={() => { setMenuOpen(false); navigate("/admin"); }}
-                    className="w-full px-4 py-3 flex items-center gap-2.5 text-[12.5px] text-foreground hover:bg-muted/40 transition-colors border-b border-border/50"
+                    className="w-full px-3 py-2 flex items-center gap-2 text-[11.5px] text-foreground hover:bg-muted/40 transition-colors border-b border-border/30"
                   >
-                    <Shield size={15} strokeWidth={1.5} className="text-muted-foreground" />
+                    <Shield size={14} strokeWidth={1.5} className="text-muted-foreground" />
                     پنل مدیریت
                   </button>
                 )}
 
                 <button
                   onClick={() => { setMenuOpen(false); navigate("/about"); }}
-                  className="w-full px-4 py-3 flex items-center gap-2.5 text-[12.5px] text-foreground hover:bg-muted/40 transition-colors border-b border-border/50"
+                  className="w-full px-3 py-2 flex items-center gap-2 text-[11.5px] text-foreground hover:bg-muted/40 transition-colors border-b border-border/30"
                 >
-                  <Info size={15} strokeWidth={1.5} className="text-muted-foreground" />
+                  <Info size={14} strokeWidth={1.5} className="text-muted-foreground" />
                   درباره نوبهار
                 </button>
 
                 <button
                   onClick={() => { setMenuOpen(false); navigate("/install"); }}
-                  className="w-full px-4 py-3 flex items-center gap-2.5 text-[12.5px] text-foreground hover:bg-muted/40 transition-colors border-b border-border/50"
+                  className="w-full px-3 py-2 flex items-center gap-2 text-[11.5px] text-foreground hover:bg-muted/40 transition-colors border-b border-border/30"
                 >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" y1="15" x2="12" y2="3" />
@@ -191,10 +177,10 @@ export function Header() {
                 {user && (
                   <button
                     onClick={handleSignOut}
-                    className="w-full px-4 py-3 flex items-center gap-2.5 text-[12.5px] text-destructive hover:bg-destructive/5 transition-colors"
+                    className="w-full px-3 py-2 flex items-center gap-2 text-[11.5px] text-destructive hover:bg-destructive/5 transition-colors"
                   >
-                    <LogOut size={15} strokeWidth={1.5} />
-                    خروج از حساب
+                    <LogOut size={14} strokeWidth={1.5} />
+                    خروج
                   </button>
                 )}
               </div>
