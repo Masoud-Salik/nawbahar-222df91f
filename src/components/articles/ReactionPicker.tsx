@@ -15,6 +15,14 @@ export function ReactionPicker({ userReaction, onReact, onHover }: ReactionPicke
   const longPressRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Close on scroll
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    window.addEventListener("scroll", close, { passive: true, capture: true });
+    return () => window.removeEventListener("scroll", close, true);
+  }, [open]);
+
   const handlePointerEnter = () => {
     clearTimeout(timeoutRef.current);
     onHover?.();
@@ -106,7 +114,7 @@ export function ReactionPicker({ userReaction, onReact, onHover }: ReactionPicke
 
       {open && (
         <div
-          className="absolute bottom-full mb-2 left-0 flex items-center gap-0.5 rounded-full px-2 py-1.5 z-50"
+          className="absolute bottom-full mb-2 left-0 flex items-center gap-0.5 rounded-full px-2 py-1.5 z-50 animate-scale-in"
           style={{
             background: "hsl(var(--background))",
             boxShadow: "0 4px 20px -4px hsl(var(--foreground) / 0.12), 0 0 0 1px hsl(var(--border) / 0.6)",
@@ -122,7 +130,7 @@ export function ReactionPicker({ userReaction, onReact, onHover }: ReactionPicke
                 userReaction === key && "bg-muted scale-110"
               )}
               style={{
-                animation: `scale-in 0.18s ease-out ${i * 20}ms both`,
+                animation: `scale-in 0.18s ease-out ${i * 25}ms both`,
               }}
               title={REACTION_LABELS[key]}
             >

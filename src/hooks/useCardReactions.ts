@@ -6,8 +6,6 @@ export const REACTION_EMOJIS: Record<string, string> = {
   clap: "👏",
   love: "❤️",
   insightful: "💡",
-  laugh: "😂",
-  sad: "😢",
   fire: "🔥",
 };
 
@@ -16,8 +14,6 @@ export const REACTION_LABELS: Record<string, string> = {
   clap: "تحسین",
   love: "عالی",
   insightful: "آموزنده",
-  laugh: "خنده",
-  sad: "غمگین",
   fire: "الهام‌بخش",
 };
 
@@ -84,7 +80,7 @@ export function useCardReactions(articleId: string) {
 
     let reactorNames: string[] = [];
     if (uniqueOtherReactorIds.length > 0) {
-      const reactorIdsToShow = uniqueOtherReactorIds.slice(0, 3);
+      const reactorIdsToShow = uniqueOtherReactorIds.slice(0, 2);
       const { data: profiles } = await supabase
         .from("profiles")
         .select("id, display_name")
@@ -103,7 +99,6 @@ export function useCardReactions(articleId: string) {
   }, [fetched, fetchReactions]);
 
   const toggleReaction = async (type: ReactionKey) => {
-    // Ensure data is loaded first
     if (!fetched) await fetchReactions();
     
     const { data: { session } } = await supabase.auth.getSession();
