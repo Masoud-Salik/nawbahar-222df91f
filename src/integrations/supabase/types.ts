@@ -346,6 +346,30 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_reviews: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          profile_id: string
+          reviewer_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          profile_id: string
+          reviewer_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          profile_id?: string
+          reviewer_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
