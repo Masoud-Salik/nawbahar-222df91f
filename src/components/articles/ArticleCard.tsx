@@ -75,35 +75,36 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
 
   // Shared actions row
   const actionsRow = (
-    <div className="flex items-center gap-1">
-      <span className="text-[10px] text-muted-foreground/30">{calculateReadTime(article.content)}</span>
+    <div className="flex items-center gap-2.5">
       {formatCount(viewCount) && (
-        <span className="flex items-center gap-0.5 text-muted-foreground/25 text-[10px] px-0.5">
-          <BarChart3 size={9} strokeWidth={1.5} />
+        <span className="flex items-center gap-1 text-muted-foreground/30 text-[11px]">
+          <BarChart3 size={12} strokeWidth={1.5} />
           {viewCount}
         </span>
       )}
       {formatCount(responseCount) && (
         <button 
           onClick={handleResponseClick}
-          className="flex items-center gap-0.5 text-muted-foreground/25 hover:text-muted-foreground transition-colors px-0.5 py-1 text-[10px]"
+          className="flex items-center gap-1 text-muted-foreground/30 hover:text-muted-foreground transition-colors text-[11px]"
         >
-          <CornerDownLeft size={9} strokeWidth={1.5} />
+          <CornerDownLeft size={12} strokeWidth={1.5} />
           <span>{responseCount}</span>
         </button>
       )}
-      <button 
-        onClick={handleCommentClick}
-        className={cn(
-          "flex items-center gap-0.5 transition-colors px-0.5 py-1 text-[10px]",
-          showComments 
-            ? "text-primary" 
-            : "text-muted-foreground/25 hover:text-muted-foreground"
-        )}
-      >
-        <MessageSquareText size={9} strokeWidth={1.5} />
-        {formatCount(comments.length) && <span>{comments.length}</span>}
-      </button>
+      {(formatCount(comments.length) || true) && (
+        <button 
+          onClick={handleCommentClick}
+          className={cn(
+            "flex items-center gap-1 transition-colors text-[11px]",
+            showComments 
+              ? "text-primary" 
+              : "text-muted-foreground/30 hover:text-muted-foreground"
+          )}
+        >
+          <MessageSquareText size={12} strokeWidth={1.5} />
+          {formatCount(comments.length) && <span>{comments.length}</span>}
+        </button>
+      )}
     </div>
   );
 
@@ -140,8 +141,8 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
               <h3 className="text-[16px] font-extrabold text-foreground leading-[1.75] line-clamp-3">
                 {article.title}
               </h3>
-              <p className="text-[13px] text-muted-foreground/45 leading-[1.8] line-clamp-2 mt-1.5">
-                {getExcerpt(article.content, 100)}
+              <p className="text-[13px] text-muted-foreground/45 leading-[1.8] line-clamp-3 mt-1.5">
+                {getExcerpt(article.content, 150)}
               </p>
             </div>
             
@@ -166,8 +167,8 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
             <h3 className="text-[16px] font-extrabold text-foreground leading-[1.75] line-clamp-3">
               {article.title}
             </h3>
-            <p className="text-[13px] text-muted-foreground/45 leading-[1.8] line-clamp-2 mt-1.5">
-              {getExcerpt(article.content, 150)}
+            <p className="text-[13px] text-muted-foreground/45 leading-[1.8] line-clamp-3 mt-1.5">
+              {getExcerpt(article.content, 200)}
             </p>
           </div>
         )}
