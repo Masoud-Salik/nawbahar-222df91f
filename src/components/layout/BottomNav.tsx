@@ -35,7 +35,7 @@ export function BottomNav() {
         isVisible ? "translate-y-0" : "translate-y-full"
       )}
     >
-      <div className="bg-background/95 backdrop-blur-md border-t border-border/40 safe-bottom" style={{ boxShadow: '0 -1px 8px -2px rgba(0,0,0,0.06)' }}>
+      <div className="bg-background border-t border-border/30 safe-bottom">
         <div className="flex items-center justify-around max-w-lg mx-auto h-12">
           {/* Home */}
           <NavItem to="/" active={isActive("/")} label="خانه">
@@ -88,20 +88,20 @@ export function BottomNav() {
                 src={avatarUrl}
                 alt=""
                 className={cn(
-                  "w-[22px] h-[22px] rounded-full object-cover transition-all duration-200",
+                  "w-[21px] h-[21px] rounded-full object-cover transition-all duration-200",
                   isProfileActive
-                    ? "ring-[1.5px] ring-foreground scale-110"
-                    : "opacity-45 group-active:opacity-70 group-active:scale-90"
+                    ? "ring-[1.5px] ring-foreground ring-offset-1 ring-offset-background"
+                    : "opacity-60 grayscale-[30%] group-active:opacity-80 group-active:scale-95"
                 )}
               />
             ) : (
               <div className={cn(
-                "w-[22px] h-[22px] rounded-full bg-muted-foreground/20 flex items-center justify-center transition-all duration-200",
+                "w-[21px] h-[21px] rounded-full bg-muted flex items-center justify-center transition-all duration-200",
                 isProfileActive
-                  ? "ring-[1.5px] ring-foreground scale-110"
-                  : "group-active:scale-90 group-active:bg-muted-foreground/30"
+                  ? "ring-[1.5px] ring-foreground ring-offset-1 ring-offset-background"
+                  : "opacity-50 group-active:scale-95"
               )}>
-                <span className="text-[9px] text-muted-foreground font-bold">؟</span>
+                <span className="text-[9px] text-muted-foreground font-medium">؟</span>
               </div>
             )}
           </Link>
@@ -118,7 +118,7 @@ function NavItem({ to, active, children, label }: { to: string; active: boolean;
       to={to}
       className={cn(
         "flex items-center justify-center flex-1 h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-md group transition-colors duration-200",
-        active ? "text-foreground" : "text-muted-foreground/40"
+        active ? "text-foreground" : "text-muted-foreground/50"
       )}
       aria-label={label}
       aria-current={active ? "page" : undefined}
