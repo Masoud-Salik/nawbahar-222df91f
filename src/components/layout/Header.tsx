@@ -49,12 +49,6 @@ export function Header() {
     navigate("/");
   };
 
-  const textSizes = [
-    { key: 'sm' as const, label: 'ک' },
-    { key: 'base' as const, label: 'م' },
-    { key: 'lg' as const, label: 'ب' },
-    { key: 'xl' as const, label: 'خ' },
-  ];
 
   return (
     <header className="sticky top-0 z-40 bg-background border-b border-border safe-top">
