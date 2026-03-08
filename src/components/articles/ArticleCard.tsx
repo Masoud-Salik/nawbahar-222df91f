@@ -105,7 +105,7 @@ export function ArticleCard({ article, onDelete: _onDelete }: ArticleCardProps) 
               {article.author?.display_name}
             </span>
             <span className="text-muted-foreground/20 text-[10px]">·</span>
-            <span className="text-[10.5px] text-muted-foreground/40 font-normal">{formatSolarNumeric(article.created_at)}</span>
+            <span className="text-[10.5px] text-muted-foreground/40 font-normal">{formatSolarShort(article.created_at)}</span>
           </button>
 
           <div onClick={(e) => e.preventDefault()} className="flex-shrink-0">
