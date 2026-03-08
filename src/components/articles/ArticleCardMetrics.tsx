@@ -2,7 +2,7 @@ import { MessageCircle, CheckCheck } from "lucide-react";
 import { cn, toPersianNumber } from "@/lib/utils";
 import { ReactionPicker } from "./ReactionPicker";
 import { ReactionDetailsModal } from "./ReactionDetailsModal";
-import { REACTION_EMOJIS, type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
+import { type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
 import { useState } from "react";
 
 interface ArticleCardMetricsProps {
@@ -89,31 +89,11 @@ export function ArticleCardMetrics({
               </span>
             </button>
 
-            {/* LinkedIn-style top emoji bubbles */}
-            {reactionSummary.topTypes.length > 0 && (
-              <button
-                onClick={handleSummaryClick}
-                className="flex items-center -space-x-1 mr-0.5"
-              >
-                {reactionSummary.topTypes.slice(0, 2).map((type, i) => (
-                  <span
-                    key={type}
-                    className="w-[18px] h-[18px] rounded-full flex items-center justify-center text-[11px] border border-background shadow-sm"
-                    style={{
-                      background: "hsl(var(--muted))",
-                      zIndex: 2 - i,
-                    }}
-                  >
-                    {REACTION_EMOJIS[type]}
-                  </span>
-                ))}
-              </button>
-            )}
-
             <ReactionPicker
               userReaction={userReaction}
               onReact={onReact}
               onHover={onReactionHover}
+              topTypes={reactionSummary.topTypes}
               summaryText={reactionText || undefined}
               onSummaryClick={hasReactions ? handleSummaryClick : undefined}
             />

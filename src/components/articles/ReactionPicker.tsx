@@ -7,11 +7,12 @@ interface ReactionPickerProps {
   userReaction: ReactionKey | null;
   onReact: (type: ReactionKey) => void;
   onHover?: () => void;
+  topTypes?: ReactionKey[];
   summaryText?: string;
   onSummaryClick?: (e: React.MouseEvent) => void;
 }
 
-export function ReactionPicker({ userReaction, onReact, onHover, summaryText, onSummaryClick }: ReactionPickerProps) {
+export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summaryText, onSummaryClick }: ReactionPickerProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -76,10 +77,31 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
 
   const isReacted = Boolean(userReaction);
   const activeEmoji = userReaction ? REACTION_EMOJIS[userReaction] : null;
+  
+  // Smart icon: user's own emoji > top 1-2 emojis > default thumbs up
+  const renderSmartIcon = () => {
+    if (activeEmoji) {
+      return (
+        <span className="text-[15px] leading-none select-none" style={{ animation: "reaction-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both" }}>
+          {activeEmoji}
+        </span>
+      );
+    }
+    if (topTypes && topTypes.length > 0) {
+      return (
+        <span className="flex items-center -space-x-0.5">
+          {topTypes.slice(0, 2).map((type) => (
+            <span key={type} className="text-[13px] leading-none select-none">{REACTION_EMOJIS[type]}</span>
+          ))}
+        </span>
+      );
+    }
+    return <ThumbsUp size={14} strokeWidth={1.5} />;
+  };
 
   return (
     <div ref={containerRef} className="relative flex items-center gap-1.5">
-      {/* Reaction icon — shows emoji if reacted, ThumbsUp outline if not */}
+      {/* Smart reaction icon */}
       <button
         onClick={handleIconTap}
         className={cn(
@@ -87,13 +109,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, summaryText, on
           isReacted ? "text-foreground" : "text-muted-foreground hover:text-foreground"
         )}
       >
-        {activeEmoji ? (
-          <span className="text-[15px] leading-none select-none" style={{ animation: "reaction-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both" }}>
-            {activeEmoji}
-          </span>
-        ) : (
-          <ThumbsUp size={14} strokeWidth={1.5} />
-        )}
+        {renderSmartIcon()}
       </button>
 
       {/* Text: summary with details or "واکنش" to open picker */}
