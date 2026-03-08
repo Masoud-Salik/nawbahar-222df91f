@@ -11,10 +11,10 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, hideHeader, hideNav, className }: AppLayoutProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {!hideHeader && <Header />}
       <main 
-        className={`${!hideNav ? 'pb-20' : ''} ${!hideHeader ? 'pt-13' : ''} max-w-[540px] mx-auto ${className || ''}`}
+        className={`${!hideNav ? 'pb-20' : ''} max-w-[540px] mx-auto w-full flex-1 ${className || ''}`}
         role="main"
       >
         {children}

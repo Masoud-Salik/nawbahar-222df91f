@@ -1,11 +1,9 @@
 import { Bell } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { useNotifications } from "@/hooks/useNotifications";
-import { cn, toPersianNumber } from "@/lib/utils";
+import { toPersianNumber } from "@/lib/utils";
 
 export function Header() {
-  const isVisible = useScrollDirection();
   const { unreadCount } = useNotifications();
 
   return (

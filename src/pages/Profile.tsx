@@ -458,12 +458,12 @@ function ProfileArticleItem({
   return (
     <Link
       to={`/article/${article.id}`}
-      className="flex items-center gap-4 px-5 py-4 hover:bg-muted/30 transition-colors animate-slide-up border-b border-border/60"
+      className="flex gap-3.5 px-5 py-4 hover:bg-muted/20 transition-colors animate-slide-up border-b border-border/40"
       style={style}
     >
       <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-foreground text-[14px] line-clamp-2 leading-relaxed">{article.title}</h3>
-        <p className="text-[11px] text-muted-foreground mt-1.5">
+        <h3 className="font-bold text-foreground text-[14px] line-clamp-2 leading-[1.7]">{article.title}</h3>
+        <p className="text-[11px] text-muted-foreground/50 mt-1.5">
           {getRelativeTime(article.created_at)}
         </p>
       </div>
@@ -471,7 +471,7 @@ function ProfileArticleItem({
         <img 
           src={article.cover_image_url} 
           alt="" 
-          className="w-[56px] h-[56px] rounded-lg object-cover shrink-0"
+          className="w-[72px] h-[48px] rounded object-cover shrink-0 bg-muted self-center"
           loading="lazy"
         />
       )}
