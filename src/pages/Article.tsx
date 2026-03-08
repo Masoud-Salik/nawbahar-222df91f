@@ -19,6 +19,7 @@ import { ResponseArticles } from "@/components/articles/ResponseArticles";
 import { Button } from "@/components/ui/button";
 import { FollowButton } from "@/components/FollowButton";
 import { useToast } from "@/hooks/use-toast";
+import { toPersianNumber } from "@/lib/utils";
 
 interface ArticleData {
   id: string;
