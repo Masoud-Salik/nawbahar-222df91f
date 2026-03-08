@@ -140,8 +140,8 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
               <h3 className="text-[16px] font-extrabold text-foreground leading-[1.75] line-clamp-3">
                 {article.title}
               </h3>
-              <p className="text-[13px] text-muted-foreground/45 leading-[1.8] line-clamp-2 mt-1.5">
-                {getExcerpt(article.content, 100)}
+              <p className="text-[13px] text-muted-foreground/45 leading-[1.8] line-clamp-3 mt-1.5">
+                {getExcerpt(article.content, 150)}
               </p>
             </div>
             
