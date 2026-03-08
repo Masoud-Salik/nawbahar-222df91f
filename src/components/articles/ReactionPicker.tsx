@@ -109,14 +109,10 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
         {renderInlineEmoji()}
       </button>
 
-      {/* Summary text or "واکنش" label */}
+      {/* Summary text — always muted to match comment text */}
       <button
         onClick={handleSummaryClick}
-        className={cn(
-          "text-[11px] truncate max-w-[150px] transition-colors duration-200",
-          isReacted ? "font-medium" : "text-muted-foreground hover:text-foreground"
-        )}
-        style={isReacted ? { color: activeColor } : undefined}
+        className="text-[11px] truncate max-w-[150px] text-muted-foreground hover:text-foreground transition-colors duration-200"
       >
         {summaryText || "واکنش"}
       </button>
