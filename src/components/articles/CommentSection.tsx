@@ -39,6 +39,7 @@ export function CommentSection({
   userId,
   onAddComment,
   onDeleteComment,
+  responses = [],
 }: CommentSectionProps) {
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -46,7 +47,6 @@ export function CommentSection({
   const [expandedReplies, setExpandedReplies] = useState<Record<string, boolean>>({});
   const [likedComments, setLikedComments] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
-  const responses = (arguments[0] as CommentSectionProps).responses || [];
 
   const topLevelComments = comments.filter((c) => !c.parent_id);
   const getReplies = (parentId: string) => comments.filter((c) => c.parent_id === parentId);
