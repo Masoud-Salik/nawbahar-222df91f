@@ -32,12 +32,12 @@ export function ArticleFeed({ articles, onRefresh }: ArticleFeedProps) {
   }
 
   return (
-    <div className="py-3 space-y-3 px-3">
+    <div className="max-w-2xl mx-auto bg-card rounded-xl border border-border/40 overflow-hidden divide-y divide-border/0">
       {articles.map((article, index) => (
         <div
           key={article.id}
-          className="animate-slide-up"
-          style={{ animationDelay: `${Math.min(index * 60, 300)}ms` }}
+          className="animate-fade-in"
+          style={{ animationDelay: `${Math.min(index * 40, 200)}ms` }}
         >
           <ArticleCard article={article} onDelete={onRefresh} />
         </div>

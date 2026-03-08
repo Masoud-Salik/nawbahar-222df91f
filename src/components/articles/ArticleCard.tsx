@@ -21,9 +21,9 @@ function calculateReadTime(content: string): string {
   return `${minutes} دقیقه`;
 }
 
-function getExcerpt(content: string, maxChars: number = 140): string {
+function getExcerpt(content: string, maxChars: number = 120): string {
   if (content.length <= maxChars) return content;
-  return content.slice(0, maxChars).trim() + "...";
+  return content.slice(0, maxChars).trim() + "…";
 }
 
 export function ArticleCard({ article, onDelete }: ArticleCardProps) {
@@ -57,145 +57,133 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
   const formatCount = (count: number) => count > 0 ? count : null;
 
   return (
-    <article className="group bg-card rounded-2xl border border-border/50 overflow-hidden card-elevated relative">
-      {/* Decorative accent — thin gold line on right */}
-      <div className="absolute top-4 bottom-4 right-0 w-[2px] bg-gradient-to-b from-accent/0 via-accent/50 to-accent/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full" />
-
+    <article className="group bg-card border-b border-border/40 last:border-b-0">
       {/* Response indicator */}
       {parentArticle && (
         <Link 
           to={`/article/${parentArticle.id}`}
-          className="flex items-center gap-1.5 px-5 pt-3.5 text-[11px] text-muted-foreground hover:text-accent transition-colors"
+          className="flex items-center gap-1.5 px-4 pt-3 text-[11px] text-muted-foreground hover:text-primary transition-colors"
         >
-          <CornerUpRight size={12} strokeWidth={1.5} className="text-accent/70" />
-          <span>پاسخ به: {parentArticle.title.slice(0, 40)}{parentArticle.title.length > 40 ? '...' : ''}</span>
+          <CornerUpRight size={11} strokeWidth={1.5} className="text-primary/60" />
+          <span>پاسخ به: {parentArticle.title.slice(0, 35)}{parentArticle.title.length > 35 ? '…' : ''}</span>
         </Link>
       )}
 
-      {/* Main Content Area */}
-      <Link to={`/article/${article.id}`} className="block">
-        {/* Author Row */}
-        <div className="px-5 pt-4 pb-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={handleAuthorClick} 
-              className="flex items-center gap-3 group/author"
-              aria-label={`پروفایل ${article.author?.display_name}`}
-            >
-              {article.author?.avatar_url ? (
-                <img
-                  src={article.author.avatar_url}
-                  alt=""
-                  className="w-9 h-9 rounded-xl object-cover ring-1 ring-border group-hover/author:ring-primary/30 transition-all duration-300"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center ring-1 ring-border group-hover/author:ring-primary/30 transition-all duration-300">
-                  <span className="text-primary text-sm font-bold">
-                    {article.author?.display_name?.charAt(0)}
-                  </span>
-                </div>
-              )}
-              <div className="flex flex-col">
-                <span className="text-[13px] text-foreground group-hover/author:text-primary transition-colors font-semibold leading-tight">
-                  {article.author?.display_name}
-                </span>
-                <span className="text-[11px] text-muted-foreground/70 leading-tight mt-0.5">
-                  {getRelativeTime(article.created_at)}
-                </span>
-              </div>
-            </button>
-          </div>
-          <div onClick={(e) => e.preventDefault()}>
-            <ArticleActionsMenu
-              articleId={article.id}
-              authorId={article.author_id}
-              articleTitle={article.title}
+      {/* Author Row — compact */}
+      <div className="px-4 pt-3 pb-1.5 flex items-center justify-between">
+        <button 
+          onClick={handleAuthorClick} 
+          className="flex items-center gap-2 group/author"
+          aria-label={`پروفایل ${article.author?.display_name}`}
+        >
+          {article.author?.avatar_url ? (
+            <img
+              src={article.author.avatar_url}
+              alt=""
+              className="w-7 h-7 rounded-full object-cover"
+              loading="lazy"
             />
+          ) : (
+            <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center">
+              <span className="text-primary text-xs font-semibold">
+                {article.author?.display_name?.charAt(0)}
+              </span>
+            </div>
+          )}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[13px] text-foreground group-hover/author:text-primary transition-colors font-medium">
+              {article.author?.display_name}
+            </span>
+            <span className="text-muted-foreground/40">·</span>
+            <span className="text-[11px] text-muted-foreground/60">
+              {getRelativeTime(article.created_at)}
+            </span>
           </div>
+        </button>
+        <div onClick={(e) => e.preventDefault()}>
+          <ArticleActionsMenu
+            articleId={article.id}
+            authorId={article.author_id}
+            articleTitle={article.title}
+          />
         </div>
+      </div>
 
-        {/* Title */}
-        <div className="px-5 pb-2">
-          <h3 className="text-[15px] font-bold text-foreground leading-8 line-clamp-2 text-center">
-            {article.title}
-          </h3>
-        </div>
+      {/* Content — Medium style: text left, thumbnail right */}
+      <Link to={`/article/${article.id}`} className="block px-4 pb-2">
+        <div className={cn("flex gap-4", article.cover_image_url ? "items-start" : "")}>
+          {/* Text content */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-[15px] font-bold text-foreground leading-7 line-clamp-2 mb-1">
+              {article.title}
+            </h3>
+            <p className="text-[13px] text-muted-foreground leading-6 line-clamp-2">
+              {getExcerpt(article.content, 120)}
+            </p>
+          </div>
 
-        {/* Cover Image */}
-        {article.cover_image_url && (
-          <div className="px-4 pb-3">
-            <div className="aspect-[2.2/1] overflow-hidden bg-muted/30 rounded-xl relative">
-              {!imageLoaded && (
-                <div className="absolute inset-0 skeleton" />
-              )}
+          {/* Thumbnail — small, on the left (visually right in RTL) */}
+          {article.cover_image_url && (
+            <div className="flex-shrink-0 w-[100px] h-[72px] rounded-lg overflow-hidden bg-muted/30 relative">
+              {!imageLoaded && <div className="absolute inset-0 skeleton" />}
               <img
                 src={article.cover_image_url}
                 alt=""
                 className={cn(
-                  "w-full h-full object-cover transition-all duration-700",
-                  imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-105"
+                  "w-full h-full object-cover transition-opacity duration-500",
+                  imageLoaded ? "opacity-100" : "opacity-0"
                 )}
                 loading="lazy"
                 decoding="async"
                 onLoad={() => setImageLoaded(true)}
               />
-              {/* Subtle vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-card/10 to-transparent pointer-events-none" />
             </div>
-          </div>
-        )}
-
-        {/* Excerpt */}
-        <div className="px-5 pb-3">
-          <p className="text-[13px] text-muted-foreground leading-7 line-clamp-2">
-            {getExcerpt(article.content, 140)}
-          </p>
+          )}
         </div>
       </Link>
 
-      {/* Bottom Bar — refined */}
-      <div className="border-t border-border/30 px-5 py-2.5 flex items-center justify-between bg-muted/20">
-        <div className="flex items-center gap-3">
-          {/* Read time */}
-          <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/80 bg-secondary/80 px-2.5 py-1 rounded-lg font-medium">
-            <Clock size={10} strokeWidth={2} className="text-accent/70" />
+      {/* Footer — clean, inline */}
+      <div className="px-4 pb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <span className="text-[11px] text-muted-foreground/60">
             {calculateReadTime(article.content)}
           </span>
-          
-          <div className="flex items-center gap-1 text-muted-foreground/50 hover:text-muted-foreground transition-colors rounded-lg px-1.5 py-1 hover:bg-muted/50">
-            <Eye size={12} strokeWidth={1.5} />
-            {formatCount(viewCount) && (
-              <span className="text-[10px]">{viewCount}</span>
-            )}
-          </div>
+          {formatCount(viewCount) && (
+            <>
+              <span className="text-muted-foreground/30">·</span>
+              <span className="flex items-center gap-0.5 text-[11px] text-muted-foreground/60">
+                <Eye size={11} strokeWidth={1.5} />
+                {viewCount}
+              </span>
+            </>
+          )}
         </div>
 
-        <div className="flex items-center gap-0.5">
+        <div className="flex items-center gap-1">
           <button 
             onClick={handleCommentClick}
             className={cn(
-              "flex items-center gap-1 transition-all duration-200 rounded-lg px-2 py-1",
+              "flex items-center gap-1 transition-colors rounded-full px-2 py-1 text-[11px]",
               showComments 
-                ? "text-primary bg-primary/8" 
-                : "text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/50"
+                ? "text-primary bg-primary/5" 
+                : "text-muted-foreground/50 hover:text-muted-foreground"
             )}
             aria-label={`${comments.length} نظر`}
           >
-            <MessageCircle size={12} strokeWidth={1.5} />
+            <MessageCircle size={13} strokeWidth={1.5} />
             {formatCount(comments.length) && (
-              <span className="text-[10px] font-medium">{comments.length}</span>
+              <span className="font-medium">{comments.length}</span>
             )}
           </button>
           
           <button 
             onClick={handleResponseClick}
-            className="flex items-center gap-1 text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/50 transition-all duration-200 rounded-lg px-2 py-1"
+            className="flex items-center gap-1 text-muted-foreground/50 hover:text-muted-foreground transition-colors rounded-full px-2 py-1 text-[11px]"
             aria-label={`${responseCount} پاسخ`}
           >
-            <CornerDownLeft size={12} strokeWidth={1.5} />
+            <CornerDownLeft size={13} strokeWidth={1.5} />
             {formatCount(responseCount) && (
-              <span className="text-[10px] font-medium">{responseCount}</span>
+              <span className="font-medium">{responseCount}</span>
             )}
           </button>
         </div>
@@ -204,13 +192,12 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
       {/* Latest Comment Teaser */}
       {latestComment && !showComments && (
         <div 
-          className="bg-muted/30 border-t border-border/20 px-5 py-2.5 cursor-pointer hover:bg-muted/50 transition-colors"
+          className="border-t border-border/20 px-4 py-2 cursor-pointer hover:bg-muted/30 transition-colors"
           onClick={handleCommentClick}
         >
-          <p className="text-[12px] text-muted-foreground leading-5 line-clamp-1">
-            <span className="font-semibold text-foreground/70">{latestComment.author_name}</span>
-            <span className="mx-1.5 text-accent/40">·</span>
-            <span className="text-muted-foreground/70">{latestComment.content}</span>
+          <p className="text-[11px] text-muted-foreground leading-5 line-clamp-1">
+            <span className="font-medium text-foreground/70">{latestComment.author_name}:</span>
+            <span className="mr-1 text-muted-foreground/60">{latestComment.content}</span>
           </p>
         </div>
       )}
