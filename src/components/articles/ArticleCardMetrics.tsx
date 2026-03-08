@@ -1,4 +1,4 @@
-import { MessageCircle, Heart, CheckCheck } from "lucide-react";
+import { MessageCircle, ThumbsUp, CheckCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ArticleCardMetricsProps {
