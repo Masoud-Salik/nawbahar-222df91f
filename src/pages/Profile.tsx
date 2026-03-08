@@ -121,80 +121,70 @@ const Profile = () => {
       <div className="max-w-lg mx-auto animate-fade-in">
         {/* === Profile Header === */}
         {profile && (
-          <div className="px-5 pt-8 pb-2">
-            {/* Top row: Avatar + Name + Admin */}
-            <div className="flex items-start gap-4">
+          <div className="px-5 pt-6 pb-1">
+            {/* Top row: Avatar + Name + Stats */}
+            <div className="flex items-center gap-3.5">
               {/* Avatar */}
               <div className="shrink-0">
                 {profile.avatar_url ? (
                   <img
                     src={profile.avatar_url}
                     alt={profile.display_name}
-                    className="w-[76px] h-[76px] rounded-full object-cover ring-[3px] ring-border"
+                    className="w-[64px] h-[64px] rounded-full object-cover ring-2 ring-border"
                   />
                 ) : (
-                  <div className="w-[76px] h-[76px] rounded-full bg-muted flex items-center justify-center ring-[3px] ring-border">
-                    <span className="text-primary font-bold text-[28px]">
+                  <div className="w-[64px] h-[64px] rounded-full bg-muted flex items-center justify-center ring-2 ring-border">
+                    <span className="text-primary font-bold text-[24px]">
                       {profile.display_name?.charAt(0)}
                     </span>
                   </div>
                 )}
               </div>
 
-              {/* Name & Bio */}
-              <div className="flex-1 min-w-0 pt-1">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-[19px] font-extrabold text-foreground leading-tight truncate">
-                    {profile.display_name}
-                  </h1>
-                  {isOwnProfile && isAdmin && (
-                    <Link 
-                      to="/admin" 
-                      className="text-muted-foreground hover:text-primary transition-colors"
-                      aria-label="پنل مدیریت"
-                    >
-                      <Shield size={16} strokeWidth={1.5} />
-                    </Link>
-                  )}
+              {/* Stats row - Instagram style */}
+              <div className="flex-1 flex items-center justify-around">
+                <div className="text-center">
+                  <span className="block text-[16px] font-bold text-foreground">{toPersianNumber(articles.length)}</span>
+                  <span className="text-[10px] text-muted-foreground">مقاله</span>
                 </div>
-                {profile.specialty && (
-                  <p className="text-[13px] text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
-                    {profile.specialty}
-                  </p>
-                )}
+                <button onClick={() => setShowFollowers(true)} className="text-center hover:opacity-70 transition-opacity">
+                  <span className="block text-[16px] font-bold text-foreground">{toPersianNumber(followerCount)}</span>
+                  <span className="text-[10px] text-muted-foreground">دنبال‌کننده</span>
+                </button>
+                <button onClick={() => setShowFollowing(true)} className="text-center hover:opacity-70 transition-opacity">
+                  <span className="block text-[16px] font-bold text-foreground">{toPersianNumber(followingCount)}</span>
+                  <span className="text-[10px] text-muted-foreground">دنبال‌شده</span>
+                </button>
               </div>
             </div>
 
-            {/* Stats row */}
-            <div className="flex items-center gap-6 mt-5">
-              <div className="text-center">
-                <span className="block text-[17px] font-bold text-foreground">{toPersianNumber(articles.length)}</span>
-                <span className="text-[11px] text-muted-foreground">مقاله</span>
+            {/* Name & Bio */}
+            <div className="mt-3">
+              <div className="flex items-center gap-2">
+                <h1 className="text-[16px] font-extrabold text-foreground leading-tight truncate">
+                  {profile.display_name}
+                </h1>
+                {isOwnProfile && isAdmin && (
+                  <Link to="/admin" className="text-muted-foreground hover:text-primary transition-colors" aria-label="پنل مدیریت">
+                    <Shield size={14} strokeWidth={1.5} />
+                  </Link>
+                )}
               </div>
-              <button 
-                onClick={() => setShowFollowers(true)}
-                className="text-center hover:opacity-70 transition-opacity"
-              >
-                <span className="block text-[17px] font-bold text-foreground">{toPersianNumber(followerCount)}</span>
-                <span className="text-[11px] text-muted-foreground">دنبال‌کننده</span>
-              </button>
-              <button 
-                onClick={() => setShowFollowing(true)}
-                className="text-center hover:opacity-70 transition-opacity"
-              >
-                <span className="block text-[17px] font-bold text-foreground">{toPersianNumber(followingCount)}</span>
-                <span className="text-[11px] text-muted-foreground">دنبال‌شده</span>
-              </button>
+              {profile.specialty && (
+                <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-1 leading-relaxed">
+                  {profile.specialty}
+                </p>
+              )}
             </div>
 
             {/* Action row */}
-            <div className="flex items-center gap-2 mt-5">
+            <div className="flex items-center gap-2 mt-3">
               {isOwnProfile ? (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setEditModalOpen(true)}
-                  className="rounded-full px-6 h-9 text-[13px] font-medium border-border"
+                  className="rounded-lg px-5 h-8 text-[12px] font-medium border-border flex-1"
                 >
                   ویرایش پروفایل
                 </Button>
@@ -204,38 +194,23 @@ const Profile = () => {
 
               {/* Social Links inline */}
               {(profile.whatsapp_number || profile.facebook_url || profile.linkedin_url) && (
-                <div className="flex items-center gap-0.5 mr-auto">
+                <div className="flex items-center gap-0.5">
                   {profile.whatsapp_number && (
-                    <a 
-                      href={`https://wa.me/${encodeURIComponent(profile.whatsapp_number)}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-2 text-muted-foreground/60 hover:text-foreground transition-colors"
-                      aria-label="واتساپ"
-                    >
-                      <WhatsApp size={17} strokeWidth={1.5} />
+                    <a href={`https://wa.me/${encodeURIComponent(profile.whatsapp_number)}`} target="_blank" rel="noopener noreferrer"
+                      className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors" aria-label="واتساپ">
+                      <WhatsApp size={15} strokeWidth={1.5} />
                     </a>
                   )}
                   {profile.facebook_url && (
-                    <a 
-                      href={profile.facebook_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-2 text-muted-foreground/60 hover:text-foreground transition-colors"
-                      aria-label="فیسبوک"
-                    >
-                      <Facebook size={17} strokeWidth={1.5} />
+                    <a href={profile.facebook_url} target="_blank" rel="noopener noreferrer"
+                      className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors" aria-label="فیسبوک">
+                      <Facebook size={15} strokeWidth={1.5} />
                     </a>
                   )}
                   {profile.linkedin_url && (
-                    <a 
-                      href={profile.linkedin_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-2 text-muted-foreground/60 hover:text-foreground transition-colors"
-                      aria-label="لینکدین"
-                    >
-                      <Linkedin size={17} strokeWidth={1.5} />
+                    <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer"
+                      className="p-1.5 text-muted-foreground/60 hover:text-foreground transition-colors" aria-label="لینکدین">
+                      <Linkedin size={15} strokeWidth={1.5} />
                     </a>
                   )}
                 </div>
