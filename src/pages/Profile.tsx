@@ -93,9 +93,8 @@ const Profile = () => {
         {/* === Compact Profile Header === */}
         {profile && (
           <div className="px-5 pt-6 pb-3">
-            {/* Top row: Avatar + Name + Follow/Edit */}
-            <div className="flex items-center gap-3">
-              {/* Avatar */}
+            {/* Row 1: Avatar + Name/Specialty */}
+            <div className="flex items-center gap-3.5">
               {profile.avatar_url ? (
                 <img
                   src={profile.avatar_url}
@@ -110,35 +109,37 @@ const Profile = () => {
                 </div>
               )}
 
-              {/* Name + meta */}
               <div className="flex-1 min-w-0">
                 <h1 className="text-[15px] font-extrabold text-foreground leading-tight truncate">
                   {profile.display_name}
-                  {profile.specialty && (
-                    <span className="text-[11px] font-normal text-muted-foreground/60 mr-1.5">
-                      {profile.specialty}
-                    </span>
-                  )}
                 </h1>
-                <div className="flex items-center gap-2.5 mt-1">
-                  <button
-                    onClick={() => setShowFollowers(true)}
-                    className="text-[11px] text-muted-foreground/50 hover:text-foreground transition-colors"
-                  >
-                    {toPersianNumber(followerCount)} دنبال‌کننده
-                  </button>
-                  <span className="text-muted-foreground/20 text-[9px]">·</span>
-                  <span className="text-[11px] text-muted-foreground/50">
-                    {toPersianNumber(articles.length)} مقاله
-                  </span>
-                </div>
+                {profile.specialty && (
+                  <p className="text-[11px] text-muted-foreground/55 mt-0.5 line-clamp-1">
+                    {profile.specialty}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Row 2: Stats + Edit/Follow */}
+            <div className="flex items-center justify-between mt-3">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowFollowers(true)}
+                  className="text-[11.5px] text-muted-foreground/55 hover:text-foreground transition-colors"
+                >
+                  <span className="font-semibold text-foreground/80">{toPersianNumber(followerCount)}</span> دنبال‌کننده
+                </button>
+                <span className="text-muted-foreground/20 text-[9px]">·</span>
+                <span className="text-[11.5px] text-muted-foreground/55">
+                  <span className="font-semibold text-foreground/80">{toPersianNumber(articles.length)}</span> مقاله
+                </span>
               </div>
 
-              {/* Action */}
               {isOwnProfile ? (
                 <button
                   onClick={() => setEditModalOpen(true)}
-                  className="text-[11px] text-muted-foreground hover:text-foreground border border-border/50 rounded-md px-3 py-1 transition-colors shrink-0"
+                  className="text-[11px] text-muted-foreground hover:text-foreground border border-border/50 rounded-md px-3 py-1 transition-colors"
                 >
                   ویرایش
                 </button>
