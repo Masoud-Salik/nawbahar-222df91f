@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { SlideDownComments } from "./SlideDownComments";
 import { formatSolarShort } from "@/lib/solarHijri";
 import { ArticleCardMetrics } from "./ArticleCardMetrics";
+import { useLatestComment } from "@/hooks/useLatestComment";
 import defaultCover from "@/assets/default-cover.jpg";
 
 interface ArticleCardProps {
@@ -49,10 +50,14 @@ export function ArticleCard({ article, onDelete: _onDelete }: ArticleCardProps) 
   const { responseCount, parentArticle } = useResponseArticles(article.id);
   const [showComments, setShowComments] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { latestComment } = useLatestComment(article.id);
 
   const viewCount = (article as any).view_count || 0;
   const coverImage = article.cover_image_url || defaultCover;
   const hasBeenRead = useMemo(() => isArticleRead(article.id), [article.id]);
+  const commentSnippet = latestComment
+    ? `${latestComment.author_name}: ${latestComment.content.slice(0, 40)}${latestComment.content.length > 40 ? "…" : ""}`
+    : null;
 
   const handleAuthorClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -146,20 +151,14 @@ export function ArticleCard({ article, onDelete: _onDelete }: ArticleCardProps) 
           </div>
         </div>
 
-        <div className="flex items-center mt-3.5">
-          {article.tags && article.tags.length > 0 && (
-            <span className="bg-secondary/50 text-muted-foreground/45 px-2.5 py-0.5 rounded-full text-[10px] font-medium">
-              {article.tags[0]}
-            </span>
-          )}
-        </div>
-
         <ArticleCardMetrics
           viewCount={viewCount}
           commentCount={comments.length}
           responseCount={responseCount}
           isRead={hasBeenRead}
           commentsOpen={showComments}
+          tag={article.tags?.[0] || null}
+          latestCommentSnippet={commentSnippet}
           onCommentClick={handleCommentClick}
           onResponseClick={handleResponseClick}
         />
