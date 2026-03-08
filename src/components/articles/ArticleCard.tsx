@@ -70,11 +70,19 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
 
       <Link to={`/article/${article.id}`} className="block">
         {hasCover ? (
-          /* --- Card WITH image: poster + text below --- */
+          /* --- Card WITH image: unified poster card --- */
           <div className="px-4 pt-4">
-            {/* Image with title overlay */}
-            <div className="rounded-t-xl overflow-hidden relative">
-              <div className="aspect-[2.6/1] relative bg-muted/30">
+            <div className="rounded-2xl overflow-hidden relative bg-card"
+              style={{
+                boxShadow: `
+                  inset 0 0 0 1px hsl(var(--primary) / 0.1),
+                  0 1px 3px hsl(var(--primary) / 0.04),
+                  0 4px 16px -4px hsl(var(--primary) / 0.06)
+                `,
+              }}
+            >
+              {/* Cover image with title overlay */}
+              <div className="aspect-[2.4/1] relative bg-muted/30">
                 {!imageLoaded && <div className="absolute inset-0 skeleton" />}
                 <img
                   src={article.cover_image_url!}
@@ -87,23 +95,51 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
                   decoding="async"
                   onLoad={() => setImageLoaded(true)}
                 />
-                {/* Soft gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
+                {/* Cinematic gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
                 
                 {/* Title on image */}
                 <div className="absolute bottom-0 right-0 left-0 px-4 pb-3">
-                  <h3 className="text-[14px] font-bold text-white leading-[1.8] line-clamp-2 drop-shadow-sm">
+                  <h3 className="text-[14px] font-bold text-white leading-[1.8] line-clamp-2 drop-shadow-md">
                     {article.title}
                   </h3>
                 </div>
               </div>
-            </div>
-            
-            {/* Excerpt below image — seamlessly connected */}
-            <div className="bg-secondary/40 rounded-b-xl px-4 py-2.5">
-              <p className="text-[12.5px] text-muted-foreground/70 leading-[1.9] line-clamp-2">
-                {getExcerpt(article.content, 110)}
-              </p>
+              
+              {/* Excerpt + author inside the card */}
+              <div className="px-4 py-3 bg-gradient-to-b from-card to-secondary/30">
+                <p className="text-[12.5px] text-muted-foreground/65 leading-[1.9] line-clamp-2">
+                  {getExcerpt(article.content, 110)}
+                </p>
+                
+                {/* Inline author + meta */}
+                <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-border/20">
+                  <button onClick={handleAuthorClick} className="flex items-center gap-1.5 group/author min-w-0">
+                    {article.author?.avatar_url ? (
+                      <img src={article.author.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0" loading="lazy" />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-primary text-[8px] font-bold">{article.author?.display_name?.charAt(0)}</span>
+                      </div>
+                    )}
+                    <span className="text-[11.5px] text-foreground/65 group-hover/author:text-primary transition-colors font-medium truncate max-w-[80px]">
+                      {article.author?.display_name}
+                    </span>
+                  </button>
+                  
+                  <div className="flex items-center gap-2 text-[10.5px] text-muted-foreground/40">
+                    <span>{getRelativeTime(article.created_at)}</span>
+                    <span className="text-muted-foreground/15">·</span>
+                    <span>{calculateReadTime(article.content)}</span>
+                    {article.tags?.[0] && (
+                      <>
+                        <span className="text-muted-foreground/15">·</span>
+                        <span className="bg-primary/6 text-primary/50 px-1.5 py-px rounded-full text-[9.5px]">{article.tags[0]}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
@@ -119,53 +155,11 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
         )}
       </Link>
 
-      {/* Footer */}
-      <div className="px-5 pt-2.5 pb-4 flex items-center justify-between">
-        {/* Left: author + meta */}
-        <div className="flex items-center gap-2 min-w-0">
-          <button 
-            onClick={handleAuthorClick} 
-            className="flex items-center gap-1.5 group/author min-w-0"
-          >
-            {article.author?.avatar_url ? (
-              <img
-                src={article.author.avatar_url}
-                alt=""
-                className="w-5 h-5 rounded-full object-cover flex-shrink-0"
-                loading="lazy"
-              />
-            ) : (
-              <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                <span className="text-primary text-[8px] font-bold">
-                  {article.author?.display_name?.charAt(0)}
-                </span>
-              </div>
-            )}
-            <span className="text-[12px] text-foreground/70 group-hover/author:text-primary transition-colors font-medium truncate max-w-[90px]">
-              {article.author?.display_name}
-            </span>
-          </button>
-          
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/40">
-            <span className="text-muted-foreground/20">·</span>
-            <span>{getRelativeTime(article.created_at)}</span>
-            <span className="text-muted-foreground/20">·</span>
-            <span>{calculateReadTime(article.content)}</span>
-            {article.tags && article.tags.length > 0 && (
-              <>
-                <span className="text-muted-foreground/20">·</span>
-                <span className="bg-secondary/80 text-secondary-foreground/60 px-2 py-px rounded-full text-[10px]">
-                  {article.tags[0]}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Right: actions */}
+      {/* Action bar */}
+      <div className="px-5 pt-1.5 pb-3 flex items-center justify-end">
         <div className="flex items-center gap-0.5 flex-shrink-0">
           {formatCount(viewCount) && (
-            <span className="flex items-center gap-0.5 text-muted-foreground/35 text-[11px] px-1">
+            <span className="flex items-center gap-0.5 text-muted-foreground/30 text-[10.5px] px-1">
               <BarChart3 size={10} strokeWidth={1.5} />
               {viewCount}
             </span>
@@ -173,22 +167,22 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
           {formatCount(responseCount) && (
             <button 
               onClick={handleResponseClick}
-              className="flex items-center gap-0.5 text-muted-foreground/35 hover:text-muted-foreground transition-colors px-1 py-1 text-[11px]"
+              className="flex items-center gap-0.5 text-muted-foreground/30 hover:text-muted-foreground transition-colors px-1 py-1 text-[10.5px]"
             >
-              <CornerDownLeft size={12} strokeWidth={1.5} />
+              <CornerDownLeft size={11} strokeWidth={1.5} />
               <span>{responseCount}</span>
             </button>
           )}
           <button 
             onClick={handleCommentClick}
             className={cn(
-              "flex items-center gap-0.5 transition-colors px-1 py-1 text-[11px]",
+              "flex items-center gap-0.5 transition-colors px-1 py-1 text-[10.5px]",
               showComments 
                 ? "text-primary" 
-                : "text-muted-foreground/35 hover:text-muted-foreground"
+                : "text-muted-foreground/30 hover:text-muted-foreground"
             )}
           >
-            <MessageSquareText size={12} strokeWidth={1.5} />
+            <MessageSquareText size={11} strokeWidth={1.5} />
             {formatCount(comments.length) && (
               <span>{comments.length}</span>
             )}
