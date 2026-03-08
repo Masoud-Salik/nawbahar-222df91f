@@ -6,9 +6,10 @@ import { ThumbsUp } from "lucide-react";
 interface ReactionPickerProps {
   userReaction: ReactionKey | null;
   onReact: (type: ReactionKey) => void;
+  onHover?: () => void;
 }
 
-export function ReactionPicker({ userReaction, onReact }: ReactionPickerProps) {
+export function ReactionPicker({ userReaction, onReact, onHover }: ReactionPickerProps) {
   const [open, setOpen] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const longPressRef = useRef(false);
@@ -16,6 +17,7 @@ export function ReactionPicker({ userReaction, onReact }: ReactionPickerProps) {
 
   const handlePointerEnter = () => {
     clearTimeout(timeoutRef.current);
+    onHover?.();
     timeoutRef.current = setTimeout(() => setOpen(true), 350);
   };
 
@@ -38,6 +40,7 @@ export function ReactionPicker({ userReaction, onReact }: ReactionPickerProps) {
     e.stopPropagation();
     longPressRef.current = false;
     clearTimeout(timeoutRef.current);
+    onHover?.();
     timeoutRef.current = setTimeout(() => {
       longPressRef.current = true;
       setOpen(true);

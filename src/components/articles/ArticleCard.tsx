@@ -46,8 +46,8 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
     submitting,
   } = useComments(article.id, { lazy: !showComments });
 
-  // Lazy-load full reaction data only when needed (picker interaction)
-  const { summary: reactionSummary, toggleReaction } = useCardReactions(article.id);
+  // Lazy reactions — no fetch on mount, uses article.reaction_count for display
+  const { summary: reactionSummary, toggleReaction, ensureFetched } = useCardReactions(article.id);
 
   const viewCount = article.view_count || 0;
   const coverImage = article.cover_image_url || defaultCover;
@@ -154,6 +154,7 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
           articleId={article.id}
           viewCount={viewCount}
           commentCount={article.comment_count}
+          reactionCount={article.reaction_count}
           responseCount={0}
           isRead={hasBeenRead}
           commentsOpen={showComments}
@@ -161,6 +162,7 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
           onResponseClick={handleResponseClick}
           reactionSummary={reactionSummary}
           onReact={(type) => { toggleReaction(type); }}
+          onReactionHover={ensureFetched}
         />
       </Link>
 

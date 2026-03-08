@@ -1,4 +1,4 @@
-import { MessageCircle, CheckCheck, CornerUpRight } from "lucide-react";
+import { MessageCircle, CheckCheck } from "lucide-react";
 import { cn, toPersianNumber } from "@/lib/utils";
 import { ReactionPicker } from "./ReactionPicker";
 import { ReactionDetailsModal } from "./ReactionDetailsModal";
@@ -9,6 +9,7 @@ interface ArticleCardMetricsProps {
   articleId: string;
   viewCount: number;
   commentCount: number;
+  reactionCount: number;
   responseCount: number;
   isRead: boolean;
   commentsOpen: boolean;
@@ -16,28 +17,36 @@ interface ArticleCardMetricsProps {
   onResponseClick: (e: React.MouseEvent) => void;
   reactionSummary: ReactionSummary;
   onReact: (type: ReactionKey) => void;
+  onReactionHover?: () => void;
 }
 
 export function ArticleCardMetrics({
   articleId,
   commentCount,
-  responseCount,
+  reactionCount,
   isRead,
   commentsOpen,
   onCommentClick,
-  onResponseClick,
   reactionSummary,
   onReact,
+  onReactionHover,
 }: ArticleCardMetricsProps) {
   const { topTypes, totalCount, reactorNames, userReaction } = reactionSummary;
   const [showReactionDetails, setShowReactionDetails] = useState(false);
 
+  // Use fetched totalCount if available, otherwise fall back to denormalized count
+  const displayCount = totalCount > 0 ? totalCount : reactionCount;
+
   const buildReactorText = () => {
-    if (totalCount === 0) return null;
+    if (displayCount === 0) return null;
+    // If full data not fetched yet, just show count
+    if (totalCount === 0 && reactionCount > 0) {
+      return `${toPersianNumber(reactionCount)} واکنش`;
+    }
     const names = [...reactorNames];
     if (userReaction) names.unshift("شما");
     const displayNames = names.slice(0, 2);
-    const remaining = totalCount - displayNames.length;
+    const remaining = displayCount - displayNames.length;
     if (displayNames.length === 0 && remaining > 0) return `${toPersianNumber(remaining)} واکنش`;
     let text = displayNames.join(" و ");
     if (remaining > 0) text += ` و ${toPersianNumber(remaining)} نفر دیگر`;
@@ -49,6 +58,7 @@ export function ArticleCardMetrics({
   const handleReactionSummaryClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    onReactionHover?.();
     setShowReactionDetails(true);
   };
 
@@ -70,35 +80,31 @@ export function ArticleCardMetrics({
               </span>
             </button>
 
-            {responseCount > 0 && (
-              <button
-                onClick={onResponseClick}
-                className="flex items-center gap-1 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <CornerUpRight size={13} strokeWidth={1.5} />
-                <span className="text-[11.5px]">{toPersianNumber(responseCount)}</span>
-              </button>
-            )}
+            <ReactionPicker 
+              userReaction={userReaction} 
+              onReact={onReact}
+              onHover={onReactionHover}
+            />
 
-            <ReactionPicker userReaction={userReaction} onReact={onReact} />
-
-            {totalCount > 0 && (
+            {displayCount > 0 && (
               <button
                 onClick={handleReactionSummaryClick}
                 className="flex items-center gap-1 hover:opacity-80 transition-opacity"
               >
-                <div className="flex items-center gap-px">
-                  {topTypes.slice(0, 2).map((type) => (
-                    <span
-                      key={type}
-                      className="text-base leading-none"
-                      role="img"
-                      aria-label={type}
-                    >
-                      {REACTION_EMOJIS[type]}
-                    </span>
-                  ))}
-                </div>
+                {topTypes.length > 0 && (
+                  <div className="flex items-center gap-px">
+                    {topTypes.slice(0, 2).map((type) => (
+                      <span
+                        key={type}
+                        className="text-base leading-none"
+                        role="img"
+                        aria-label={type}
+                      >
+                        {REACTION_EMOJIS[type]}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {reactorText && (
                   <span className="text-[10.5px] text-muted-foreground/50 truncate max-w-[120px] mr-0.5">
                     {reactorText}

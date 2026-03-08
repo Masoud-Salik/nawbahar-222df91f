@@ -10,8 +10,8 @@
     "standalone",
     "minimal-ui"
   ],
-  "background_color": "#ffffff",
-  "theme_color": "#0f766e",
+  "background_color": "#faf8f5",
+  "theme_color": "#2a6f6a",
   "orientation": "portrait-primary",
   "dir": "rtl",
   "lang": "fa-IR",
@@ -24,8 +24,56 @@
   ],
   "icons": [
     {
+      "src": "/pwa-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/pwa-192x192.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-384x384.png",
+      "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
@@ -77,7 +125,7 @@
       "icons": [
         {
           "src": "/icons/write-96x96.png",
-          "sizes": "512x512",
+          "sizes": "96x96",
           "type": "image/png"
         }
       ]
@@ -90,7 +138,7 @@
       "icons": [
         {
           "src": "/icons/bookmark-96x96.png",
-          "sizes": "512x512",
+          "sizes": "96x96",
           "type": "image/png"
         }
       ]
@@ -103,7 +151,7 @@
       "icons": [
         {
           "src": "/icons/notification-96x96.png",
-          "sizes": "512x512",
+          "sizes": "96x96",
           "type": "image/png"
         }
       ]
@@ -124,8 +172,5 @@
       "navigate-existing",
       "auto"
     ]
-  },
-  "edge_side_panel": {
-    "preferred_width": 400
   }
 }

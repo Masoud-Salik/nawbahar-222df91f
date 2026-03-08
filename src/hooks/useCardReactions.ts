@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const REACTION_EMOJIS: Record<string, string> = {
@@ -24,22 +24,27 @@ export const REACTION_LABELS: Record<string, string> = {
 export type ReactionKey = keyof typeof REACTION_EMOJIS;
 
 export interface ReactionSummary {
-  /** Top 1-2 reaction types by count (like is default if present) */
   topTypes: ReactionKey[];
   totalCount: number;
-  /** Names of people user follows who reacted, prioritized */
   reactorNames: string[];
   userReaction: ReactionKey | null;
 }
 
+const EMPTY_SUMMARY: ReactionSummary = {
+  topTypes: [],
+  totalCount: 0,
+  reactorNames: [],
+  userReaction: null,
+};
+
+/**
+ * Lazy card reactions hook — does NOT fetch on mount.
+ * Uses article.reaction_count for display count.
+ * Full reaction data is only fetched on first user interaction.
+ */
 export function useCardReactions(articleId: string) {
-  const [summary, setSummary] = useState<ReactionSummary>({
-    topTypes: [],
-    totalCount: 0,
-    reactorNames: [],
-    userReaction: null,
-  });
-  const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState<ReactionSummary>(EMPTY_SUMMARY);
+  const [fetched, setFetched] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
   const fetchReactions = useCallback(async () => {
@@ -53,64 +58,31 @@ export function useCardReactions(articleId: string) {
       .eq("article_id", articleId);
 
     if (!reactions || reactions.length === 0) {
-      setSummary({ topTypes: [], totalCount: 0, reactorNames: [], userReaction: null });
-      setLoading(false);
+      setSummary(EMPTY_SUMMARY);
+      setFetched(true);
       return;
     }
 
-    // Count each reaction type
     const typeCounts: Record<string, number> = {};
     reactions.forEach((r) => {
       typeCounts[r.reaction_type] = (typeCounts[r.reaction_type] || 0) + 1;
     });
 
-    // Sort by count, but always put "like" first if it exists
     const sorted = Object.entries(typeCounts)
       .sort((a, b) => b[1] - a[1])
       .map(([key]) => key as ReactionKey);
-
-    // Take top 2 unique types
     const topTypes = sorted.slice(0, 2);
 
-    // User's own reaction
     const userReaction = currentUserId
       ? (reactions.find((r) => r.user_id === currentUserId)?.reaction_type as ReactionKey | undefined) || null
       : null;
 
-    // Get reactor IDs (exclude self)
     const otherReactorIds = reactions
       .filter((r) => r.user_id !== currentUserId)
       .map((r) => r.user_id);
 
     let reactorNames: string[] = [];
-
-    if (currentUserId && otherReactorIds.length > 0) {
-      // Get IDs the user follows — prioritize these names (uses own follows, allowed by RLS)
-      const { data: followData } = await supabase
-        .from("follows")
-        .select("following_id")
-        .eq("follower_id", currentUserId)
-        .in("following_id", otherReactorIds.slice(0, 20));
-
-      const followedIds = new Set(followData?.map((f) => f.following_id) || []);
-
-      // Sort: followed users first
-      const prioritized = [...otherReactorIds].sort((a, b) => {
-        const aFollowed = followedIds.has(a) ? 0 : 1;
-        const bFollowed = followedIds.has(b) ? 0 : 1;
-        return aFollowed - bFollowed;
-      });
-
-      const topIds = prioritized.slice(0, 2);
-      if (topIds.length > 0) {
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("display_name")
-          .in("id", topIds);
-        reactorNames = profiles?.map((p) => p.display_name) || [];
-      }
-    } else if (otherReactorIds.length > 0) {
-      // Not logged in — just show first 2
+    if (otherReactorIds.length > 0) {
       const { data: profiles } = await supabase
         .from("profiles")
         .select("display_name")
@@ -118,45 +90,33 @@ export function useCardReactions(articleId: string) {
       reactorNames = profiles?.map((p) => p.display_name) || [];
     }
 
-    setSummary({
-      topTypes,
-      totalCount: reactions.length,
-      reactorNames,
-      userReaction,
-    });
-    setLoading(false);
+    setSummary({ topTypes, totalCount: reactions.length, reactorNames, userReaction });
+    setFetched(true);
   }, [articleId]);
 
-  useEffect(() => {
-    fetchReactions();
-  }, [fetchReactions]);
+  const ensureFetched = useCallback(async () => {
+    if (!fetched) await fetchReactions();
+  }, [fetched, fetchReactions]);
 
   const toggleReaction = async (type: ReactionKey) => {
-    if (!userId) return false;
+    // Ensure data is loaded first
+    if (!fetched) await fetchReactions();
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    const uid = session?.user?.id;
+    if (!uid) return false;
 
     if (summary.userReaction === type) {
-      await supabase
-        .from("reactions")
-        .delete()
-        .eq("article_id", articleId)
-        .eq("user_id", userId);
+      await supabase.from("reactions").delete().eq("article_id", articleId).eq("user_id", uid);
+    } else if (summary.userReaction) {
+      await supabase.from("reactions").update({ reaction_type: type }).eq("article_id", articleId).eq("user_id", uid);
     } else {
-      if (summary.userReaction) {
-        await supabase
-          .from("reactions")
-          .update({ reaction_type: type })
-          .eq("article_id", articleId)
-          .eq("user_id", userId);
-      } else {
-        await supabase
-          .from("reactions")
-          .insert({ article_id: articleId, user_id: userId, reaction_type: type });
-      }
+      await supabase.from("reactions").insert({ article_id: articleId, user_id: uid, reaction_type: type });
     }
 
     await fetchReactions();
     return true;
   };
 
-  return { summary, loading, userId, toggleReaction };
+  return { summary, loading: false, userId, toggleReaction, ensureFetched, fetched };
 }

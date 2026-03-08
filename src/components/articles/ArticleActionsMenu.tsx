@@ -19,7 +19,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface ArticleActionsMenuProps {
@@ -45,14 +45,34 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle, onDelete
   const [isOpen, setIsOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  // Report flow: step 1 = confirm, step 2 = reason selection
   const [reportStep, setReportStep] = useState<0 | 1 | 2>(0);
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [reportNote, setReportNote] = useState("");
+  const [bookmarkChecked, setBookmarkChecked] = useState(false);
+
+  // Only get userId on mount — don't check bookmark yet
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id || null);
+    });
+  }, []);
+
+  // Check bookmark status lazily when menu opens
+  const checkBookmark = useCallback(async () => {
+    if (bookmarkChecked || !userId) return;
+    const { data: bookmark } = await supabase
+      .from("bookmarks")
+      .select("id")
+      .eq("article_id", articleId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    setIsBookmarked(!!bookmark);
+    setBookmarkChecked(true);
+  }, [articleId, userId, bookmarkChecked]);
 
   useEffect(() => {
-    checkAuth();
-  }, [articleId]);
+    if (isOpen) checkBookmark();
+  }, [isOpen, checkBookmark]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -64,21 +84,6 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle, onDelete
       window.removeEventListener("touchstart", close);
     };
   }, [isOpen]);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    const uid = session?.user?.id;
-    setUserId(uid || null);
-    if (uid) {
-      const { data: bookmark } = await supabase
-        .from("bookmarks")
-        .select("id")
-        .eq("article_id", articleId)
-        .eq("user_id", uid)
-        .maybeSingle();
-      setIsBookmarked(!!bookmark);
-    }
-  };
 
   const isOwner = userId === authorId;
 
@@ -159,7 +164,7 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle, onDelete
       : selectedReason;
 
     const { error } = await supabase.from("reported_comments").insert({
-      comment_id: articleId, // Using as generic report
+      comment_id: articleId,
       reporter_id: userId,
       reason,
     });
@@ -229,7 +234,6 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle, onDelete
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Delete Confirmation - Two Step */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
@@ -251,7 +255,6 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle, onDelete
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Report Step 1: Confirm */}
       <AlertDialog open={reportStep === 1} onOpenChange={(open) => !open && closeReport()}>
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
@@ -269,7 +272,6 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle, onDelete
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Report Step 2: Reason Selection */}
       <AlertDialog open={reportStep === 2} onOpenChange={(open) => !open && closeReport()}>
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
