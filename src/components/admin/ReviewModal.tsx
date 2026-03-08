@@ -57,9 +57,17 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
   const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
   const { toast } = useToast();
 
-  const aiScores = generateAIScores(article.content, article.title);
+  // Use stored AI scores if available, otherwise use fallback
+  const aiScores = {
+    science: article.ai_score_science ?? fallbackAIScores(article.content, article.title).science,
+    ethics: article.ai_score_ethics ?? fallbackAIScores(article.content, article.title).ethics,
+    writing: article.ai_score_writing ?? fallbackAIScores(article.content, article.title).writing,
+    timing: article.ai_score_timing ?? fallbackAIScores(article.content, article.title).timing,
+    innovation: article.ai_score_innovation ?? fallbackAIScores(article.content, article.title).innovation,
+  };
 
   const [scores, setScores] = useState({
     science: article.editorial_score_science ?? aiScores.science,
@@ -70,14 +78,41 @@ export function ReviewModal({ article, onClose, onComplete }: ReviewModalProps) 
   });
 
   const [activeSlider, setActiveSlider] = useState<string | null>(null);
-  const totalScore = Object.values(scores).reduce((sum, v) => sum + v, 0);
+  const totalScore = Object.values(scores).reduce((sum: number, v: number) => sum + v, 0);
   const maxPossibleScore = 50;
   const scorePercent = Math.round((totalScore / maxPossibleScore) * 100);
+
+  // Trigger real AI scoring
+  const runAIScoring = async () => {
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-score-article", {
+        body: { title: article.title, content: article.content, articleId: article.id },
+      });
+      if (error) throw error;
+      if (data?.scores) {
+        const s = data.scores;
+        setScores({
+          science: s.science,
+          ethics: s.ethics,
+          writing: s.writing,
+          timing: s.timing,
+          innovation: s.innovation,
+        });
+        toast({ title: "✅ ارزیابی هوش مصنوعی انجام شد" });
+      }
+    } catch (e) {
+      console.error("AI scoring error:", e);
+      toast({ title: "خطا در ارزیابی هوش مصنوعی", variant: "destructive" });
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleApprove = async () => {
     setLoading(true);
     
-    const aiTotal = Object.values(aiScores).reduce((sum, v) => sum + v, 0);
+    const aiTotal = Object.values(aiScores).reduce((sum: number, v: number) => sum + v, 0);
     const editorTotal = totalScore;
     const authorTrust = 50;
     const engagement = 0;
