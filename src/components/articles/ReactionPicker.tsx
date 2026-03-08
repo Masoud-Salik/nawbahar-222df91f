@@ -72,7 +72,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
     if (userReaction) {
       return (
         <span
-          className="text-[16px] leading-none"
+          className="text-[15px] leading-none"
           style={justReacted ? { animation: "reaction-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both" } : {}}
         >
           {REACTION_EMOJIS[userReaction]}
@@ -83,12 +83,12 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
       return (
         <span className="flex items-center -space-x-0.5">
           {topTypes.slice(0, 2).map((type) => (
-            <span key={type} className="text-[14px] leading-none">{REACTION_EMOJIS[type]}</span>
+            <span key={type} className="text-[13px] leading-none">{REACTION_EMOJIS[type]}</span>
           ))}
         </span>
       );
     }
-    return <span className="text-[15px] leading-none opacity-50">👍</span>;
+    return <span className="text-[14px] leading-none opacity-45">👍</span>;
   };
 
   const handleSummaryClick = (e: React.MouseEvent) => {
