@@ -140,56 +140,50 @@ const Profile = () => {
               </div>
             </div>
 
-            {/* Edit button — own row */}
-            {isOwnProfile && (
-              <div className="mt-3 mr-[68px]">
+            {/* Social links + Edit button row */}
+            <div className="flex items-center gap-1.5 mt-3 mr-[68px]">
+              {isOwnProfile && (
                 <button
                   onClick={() => setEditModalOpen(true)}
-                  className="text-[11px] text-muted-foreground/50 hover:text-foreground border border-border/40 rounded-md px-3 py-1 transition-colors"
+                  className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all"
                 >
                   ویرایش پروفایل
                 </button>
-              </div>
-            )}
-
-            {/* Social links — pill style */}
-            {(profile.whatsapp_number || profile.facebook_url || profile.linkedin_url) && (
-              <div className="flex items-center gap-1.5 mt-3">
-                {profile.whatsapp_number && (
-                  <a
-                    href={`https://wa.me/${encodeURIComponent(profile.whatsapp_number)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all"
-                  >
-                    <WhatsApp size={11} strokeWidth={1.5} />
-                    <span>واتساپ</span>
-                  </a>
-                )}
-                {profile.facebook_url && (
-                  <a
-                    href={profile.facebook_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all"
-                  >
-                    <Facebook size={11} strokeWidth={1.5} />
-                    <span>فیسبوک</span>
-                  </a>
-                )}
-                {profile.linkedin_url && (
-                  <a
-                    href={profile.linkedin_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all"
-                  >
-                    <Linkedin size={11} strokeWidth={1.5} />
-                    <span>لینکدین</span>
-                  </a>
-                )}
-              </div>
-            )}
+              )}
+              {profile.whatsapp_number && (
+                <a
+                  href={`https://wa.me/${encodeURIComponent(profile.whatsapp_number)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all"
+                >
+                  <WhatsApp size={11} strokeWidth={1.5} />
+                  <span>واتساپ</span>
+                </a>
+              )}
+              {profile.facebook_url && (
+                <a
+                  href={profile.facebook_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all"
+                >
+                  <Facebook size={11} strokeWidth={1.5} />
+                  <span>فیسبوک</span>
+                </a>
+              )}
+              {profile.linkedin_url && (
+                <a
+                  href={profile.linkedin_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground bg-muted/40 hover:bg-muted/70 rounded-full px-2.5 py-1 transition-all"
+                >
+                  <Linkedin size={11} strokeWidth={1.5} />
+                  <span>لینکدین</span>
+                </a>
+              )}
+            </div>
           </div>
         )}
 
