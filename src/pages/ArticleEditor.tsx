@@ -212,6 +212,7 @@ const ArticleEditor = () => {
       if (evalError) {
         await supabase.from("articles").update({ status: "published" }).eq("id", articleId);
         toast({ title: "✅ مقاله منتشر شد", description: "ارزیابی هوش مصنوعی در دسترس نبود" });
+        playSuccessSound();
         if (!responseToId && !isEditMode) localStorage.removeItem(DRAFT_KEY);
         navigate("/");
         return;
