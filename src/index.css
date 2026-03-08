@@ -176,10 +176,10 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Subtle paper grain texture */
+    /* Subtle paper grain texture + slight gradient for depth */
     background-image: 
-      radial-gradient(ellipse at 20% 50%, hsl(var(--primary) / 0.015) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, hsl(var(--accent) / 0.02) 0%, transparent 50%);
+      radial-gradient(ellipse at top center, hsl(var(--primary) / 0.03) 0%, transparent 70%),
+      radial-gradient(ellipse at bottom left, hsl(var(--accent) / 0.02) 0%, transparent 60%);
     background-attachment: fixed;
   }
 

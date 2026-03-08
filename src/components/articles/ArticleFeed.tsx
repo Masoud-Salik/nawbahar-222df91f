@@ -57,19 +57,21 @@ export function ArticleFeed({ articles, onRefresh, hasMore, loadingMore, onLoadM
   }
 
   return (
-    <div className="max-w-[640px] mx-auto">
-      {articles.map((article, index) => (
-        <div
-          key={article.id}
-          className="animate-fade-in"
-          style={{ animationDelay: `${Math.min(index * 25, 120)}ms` }}
-        >
-          <ArticleCard article={article} onDelete={onRefresh} />
-          {index < articles.length - 1 && (
-            <div className="mx-5 border-b border-border" />
-          )}
-        </div>
-      ))}
+    <div className="max-w-[640px] mx-auto pb-20">
+      <div className="flex flex-col gap-2 sm:gap-4 sm:p-4">
+        {articles.map((article, index) => (
+          <div
+            key={article.id}
+            className="bg-card sm:rounded-2xl sm:border border-border/30 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] animate-fade-in overflow-hidden"
+            style={{ animationDelay: `${Math.min(index * 25, 120)}ms` }}
+          >
+            <ArticleCard article={article} onDelete={onRefresh} />
+            {index < articles.length - 1 && (
+              <div className="mx-5 border-b border-border/40 sm:hidden" />
+            )}
+          </div>
+        ))}
+      </div>
 
       {/* Infinite scroll sentinel */}
       <div ref={sentinelRef} className="h-1" />

@@ -125,13 +125,13 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
             >
               {article.title}
             </h3>
-            <p className="text-[13px] text-muted-foreground/55 leading-[1.8] line-clamp-3 mt-1.5">
-              {getExcerpt(article.content, 150)}
+            <p className="text-[13.5px] text-muted-foreground/70 leading-[1.7] line-clamp-2 font-medium">
+              {getExcerpt(article.content, 120)}
             </p>
           </div>
           <div
             className={cn(
-              "w-[112px] h-[75px] flex-shrink-0 rounded overflow-hidden relative bg-muted/15 self-start mt-1 transition-all duration-300",
+              "w-[100px] h-[100px] flex-shrink-0 rounded-xl overflow-hidden relative bg-muted/20 self-start shadow-sm border border-border/20 transition-all duration-300",
               hasBeenRead && "opacity-50 saturate-[0.3] blur-[0.5px]"
             )}
           >

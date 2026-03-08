@@ -51,8 +51,8 @@ export function Header() {
 
 
   return (
-    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40 safe-top" style={{ boxShadow: '0 1px 8px -2px rgba(0,0,0,0.06)' }}>
-      <div className="flex items-center justify-between px-4 h-11 max-w-lg mx-auto">
+    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/20 safe-top transition-all duration-300">
+      <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
         <Link to="/" className="flex items-center group">
           <span className="text-[15px] font-extrabold tracking-tight text-foreground leading-none">
             نوبهار
