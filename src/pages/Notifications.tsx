@@ -80,6 +80,7 @@ const Notifications = () => {
   if (!user) {
     return (
       <AppLayout>
+        <SEOHead title="اعلانات" description="اعلانات نوبهار" ogUrl="/notifications" noIndex />
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center animate-fade-in">
           <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-5">
             <Bell size={28} className="text-muted-foreground/40" />

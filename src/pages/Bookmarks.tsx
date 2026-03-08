@@ -17,6 +17,7 @@ const Bookmarks = () => {
   if (!user) {
     return (
       <AppLayout>
+        <SEOHead title="ذخیره‌شده‌ها" description="مقالات ذخیره شده شما در نوبهار" ogUrl="/bookmarks" noIndex />
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center animate-fade-in">
           <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-5">
             <Bookmark size={24} className="text-muted-foreground/40" />

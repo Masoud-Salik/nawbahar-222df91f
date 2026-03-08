@@ -80,6 +80,7 @@ const VIP = () => {
 
   return (
     <AppLayout>
+      <SEOHead title="محتوای ویژه" description="سرمقاله‌ها، مسابقات و اطلاعیه‌های ویژه نوبهار" ogUrl="/vip" />
       <div className="animate-fade-in">
         {/* Header */}
         <div className="sticky top-11 z-30 bg-background border-b border-border px-5 py-3 flex items-center justify-between">
