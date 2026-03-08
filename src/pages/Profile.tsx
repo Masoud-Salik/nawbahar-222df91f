@@ -16,7 +16,7 @@ import { cn, toPersianNumber } from "@/lib/utils";
 import defaultCover from "@/assets/default-cover.jpg";
 import type { ProfileArticle } from "@/hooks/useProfile";
 import { SEOHead } from "@/components/SEOHead";
-import { SuggestedWriters } from "@/components/profile/SuggestedWriters";
+
 import { ProfileReviews } from "@/components/profile/ProfileReviews";
 import { MessageCircle as WhatsApp, Facebook, Linkedin } from "lucide-react";
 
@@ -55,8 +55,6 @@ const Profile = () => {
             </Link>
           </div>
 
-          {/* Suggested Writers even for logged-out users */}
-          <SuggestedWriters />
         </div>
       </AppLayout>
     );
@@ -285,8 +283,6 @@ const Profile = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Suggested Writers */}
-        {isOwnProfile && <SuggestedWriters />}
       </div>
 
       {/* Modals */}

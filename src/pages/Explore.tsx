@@ -9,6 +9,7 @@ import { cn, toPersianNumber } from "@/lib/utils";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SEOHead } from "@/components/SEOHead";
+import { SuggestedWriters } from "@/components/profile/SuggestedWriters";
 
 const topics = [
   { id: "politics", label: "سیاست", emoji: "🏛️" },
@@ -235,18 +236,23 @@ const Explore = () => {
             </div>
           </div>
         ) : (
-          <div className="border-t border-border/30">
-            {/* Trending section heading */}
-            <div className="flex items-center gap-1.5 px-5 pt-4 pb-2">
-              <Flame size={14} strokeWidth={1.5} className="text-muted-foreground/40" />
-              <span className="text-[12px] font-semibold text-muted-foreground/50">پرطرفدارترین‌ها</span>
+          <>
+            <div className="border-t border-border/30">
+              {/* Trending section heading */}
+              <div className="flex items-center gap-1.5 px-5 pt-4 pb-2">
+                <Flame size={14} strokeWidth={1.5} className="text-muted-foreground/40" />
+                <span className="text-[12px] font-semibold text-muted-foreground/50">پرطرفدارترین‌ها</span>
+              </div>
+              <div className="divide-y divide-border/30">
+                {trendingArticles.map((article) => (
+                  <ArticleCard key={article.id} article={article} onDelete={refetch} />
+                ))}
+              </div>
             </div>
-            <div className="divide-y divide-border/30">
-              {trendingArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} onDelete={refetch} />
-              ))}
+            <div className="mt-6 px-5">
+              <SuggestedWriters />
             </div>
-          </div>
+          </>
         )}
       </div>
     </AppLayout>

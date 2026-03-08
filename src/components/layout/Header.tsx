@@ -53,17 +53,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-background border-b border-border safe-top">
       <div className="flex items-center justify-between px-4 h-11 max-w-lg mx-auto">
-        <Link to="/" className="flex items-center gap-2 group">
-          {/* Premium logo mark */}
-           <div className="relative w-7 h-7">
-             <div
-               className="absolute inset-0 rounded-lg"
-               style={{
-                 background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8))",
-                 boxShadow: "0 2px 8px -2px hsl(var(--primary) / 0.4)",
-               }}
-             />
-           </div>
+        <Link to="/" className="flex items-center group">
           <span className="text-[15px] font-extrabold tracking-tight text-foreground leading-none">
             نوبهار
           </span>
