@@ -29,24 +29,13 @@ export function ArticleCardMetrics({
 
   const buildReactorText = () => {
     if (totalCount === 0) return null;
-
     const names = [...reactorNames];
-    if (userReaction) {
-      names.unshift("شما");
-    }
-
+    if (userReaction) names.unshift("شما");
     const displayNames = names.slice(0, 2);
     const remaining = totalCount - displayNames.length;
-
-    if (displayNames.length === 0 && remaining > 0) {
-      return `${remaining} واکنش`;
-    }
-
+    if (displayNames.length === 0 && remaining > 0) return `${remaining} واکنش`;
     let text = displayNames.join(" و ");
-    if (remaining > 0) {
-      text += ` و ${remaining} نفر دیگر`;
-    }
-
+    if (remaining > 0) text += ` و ${remaining} نفر دیگر`;
     return text;
   };
 
@@ -54,34 +43,31 @@ export function ArticleCardMetrics({
 
   return (
     <div className="mt-3 pb-4">
-      {/* Reaction count + reactor names — LinkedIn style inline */}
-      {totalCount > 0 && (
-        <div className="flex items-center gap-1.5 mb-2 pb-2 border-b border-border/40">
-          <div className="flex items-center -space-x-1.5">
-            {types.slice(0, 3).map((type) => (
-              <span
-                key={type}
-                className="w-[17px] h-[17px] flex items-center justify-center rounded-full text-[9px] leading-none ring-[1.5px] ring-background"
-                style={{
-                  background: "hsl(var(--muted))",
-                }}
-              >
-                {REACTION_EMOJIS[type]}
-              </span>
-            ))}
-          </div>
-          {reactorText && (
-            <span className="text-[11px] text-muted-foreground/55 truncate leading-none">
-              {reactorText}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Action buttons — like LinkedIn's row */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-5">
+        {/* Left: reaction picker + reaction summary + comment */}
+        <div className="flex items-center gap-4">
           <ReactionPicker userReaction={userReaction} onReact={onReact} />
+
+          {totalCount > 0 && (
+            <div className="flex items-center gap-1">
+              <div className="flex items-center -space-x-1.5">
+                {types.slice(0, 3).map((type) => (
+                  <span
+                    key={type}
+                    className="w-[15px] h-[15px] flex items-center justify-center rounded-full text-[8px] leading-none ring-[1.5px] ring-background"
+                    style={{ background: "hsl(var(--muted))" }}
+                  >
+                    {REACTION_EMOJIS[type]}
+                  </span>
+                ))}
+              </div>
+              {reactorText && (
+                <span className="text-[10.5px] text-muted-foreground/50 truncate max-w-[120px]">
+                  {reactorText}
+                </span>
+              )}
+            </div>
+          )}
 
           <button
             onClick={onCommentClick}
@@ -93,9 +79,7 @@ export function ArticleCardMetrics({
             )}
           >
             <MessageCircle size={14} strokeWidth={1.5} />
-            <span className="text-[11.5px]">
-              {commentCount > 0 ? commentCount : "نظر"}
-            </span>
+            {commentCount > 0 && <span className="text-[11.5px]">{commentCount}</span>}
           </button>
 
           {isRead && (
@@ -104,9 +88,7 @@ export function ArticleCardMetrics({
         </div>
 
         {tag && (
-          <span className="text-muted-foreground/40 text-[10px]">
-            {tag}
-          </span>
+          <span className="text-muted-foreground/40 text-[10px]">{tag}</span>
         )}
       </div>
     </div>
