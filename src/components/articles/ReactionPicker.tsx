@@ -79,7 +79,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
   };
 
   const isReacted = Boolean(userReaction);
-  const icyText = "hsl(174 30% 30%)";
+  const activeColor = userReaction ? REACTION_COLORS[userReaction]?.text : undefined;
 
   const renderSmartIcon = () => {
     if (userReaction) {

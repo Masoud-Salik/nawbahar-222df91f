@@ -21,19 +21,13 @@ export const REACTION_EMOJIS: Record<string, string> = {
   sad: "😔",
 };
 
-/** Icy teal accent color for all reactions — unified editorial tone */
-const ICY = {
-  bg: "hsl(174 30% 35% / 0.08)",
-  text: "hsl(174 30% 30%)",
-  ring: "hsl(174 30% 35% / 0.15)",
-};
-
+/** Muted distinct colors per reaction — professional but not lifeless (excitement ≈ 30) */
 export const REACTION_COLORS: Record<string, { bg: string; text: string; ring: string }> = {
-  like: ICY,
-  love: ICY,
-  insightful: ICY,
-  laugh: ICY,
-  sad: ICY,
+  like:       { bg: "hsl(210 25% 50% / 0.08)", text: "hsl(210 25% 40%)", ring: "hsl(210 25% 50% / 0.12)" },
+  love:       { bg: "hsl(350 30% 50% / 0.08)", text: "hsl(350 30% 42%)", ring: "hsl(350 30% 50% / 0.12)" },
+  insightful: { bg: "hsl(45 30% 48% / 0.08)",  text: "hsl(45 30% 38%)",  ring: "hsl(45 30% 48% / 0.12)" },
+  laugh:      { bg: "hsl(30 28% 48% / 0.08)",  text: "hsl(30 28% 40%)",  ring: "hsl(30 28% 48% / 0.12)" },
+  sad:        { bg: "hsl(200 18% 48% / 0.08)",  text: "hsl(200 18% 42%)", ring: "hsl(200 18% 48% / 0.12)" },
 };
 
 export type ReactionKey = keyof typeof REACTION_EMOJIS;
