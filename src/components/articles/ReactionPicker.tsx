@@ -72,7 +72,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
     if (userReaction) {
       return (
         <span
-          className="text-[16px] leading-none"
+          className="text-[15px] leading-none"
           style={justReacted ? { animation: "reaction-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both" } : {}}
         >
           {REACTION_EMOJIS[userReaction]}
@@ -83,12 +83,12 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
       return (
         <span className="flex items-center -space-x-0.5">
           {topTypes.slice(0, 2).map((type) => (
-            <span key={type} className="text-[14px] leading-none">{REACTION_EMOJIS[type]}</span>
+            <span key={type} className="text-[13px] leading-none">{REACTION_EMOJIS[type]}</span>
           ))}
         </span>
       );
     }
-    return <span className="text-[15px] leading-none opacity-50">👍</span>;
+    return <span className="text-[14px] leading-none opacity-45">👍</span>;
   };
 
   const handleSummaryClick = (e: React.MouseEvent) => {
@@ -109,14 +109,10 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
         {renderInlineEmoji()}
       </button>
 
-      {/* Summary text or "واکنش" label */}
+      {/* Summary text — always muted to match comment text */}
       <button
         onClick={handleSummaryClick}
-        className={cn(
-          "text-[11px] truncate max-w-[150px] transition-colors duration-200",
-          isReacted ? "font-medium" : "text-muted-foreground hover:text-foreground"
-        )}
-        style={isReacted ? { color: activeColor } : undefined}
+        className="text-[11px] truncate max-w-[150px] text-muted-foreground hover:text-foreground transition-colors duration-200"
       >
         {summaryText || "واکنش"}
       </button>
@@ -137,7 +133,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
             boxShadow: "0 -6px 30px -6px hsl(var(--foreground) / 0.12), 0 0 0 1px hsl(var(--border) / 0.4)",
           }}
         >
-          <div className="flex items-center gap-1 sm:gap-0.5">
+          <div className="flex items-center gap-0.5 sm:gap-0">
             {REACTION_KEYS.map((key, i) => {
               const isActive = userReaction === key;
               return (
@@ -146,22 +142,22 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
                   onClick={(e) => handleSelect(key as ReactionKey, e)}
                   className={cn(
                     "flex flex-col items-center justify-center rounded-2xl transition-all duration-150",
-                    "w-[56px] h-[62px] sm:w-[44px] sm:h-[44px]",
-                    "hover:scale-[1.25] hover:-translate-y-1.5 active:scale-90",
-                    isActive && "bg-primary/[0.08] scale-[1.1]"
+                    "w-[54px] h-[58px] sm:w-[42px] sm:h-[42px]",
+                    "hover:scale-[1.2] hover:-translate-y-1 active:scale-90",
+                    isActive && "bg-foreground/[0.06] scale-[1.05]"
                   )}
-                  style={{ animation: `reaction-entry 0.25s ease-out ${i * 45}ms both` }}
+                  style={{ animation: `reaction-entry 0.22s ease-out ${i * 40}ms both` }}
                 >
                   <span className={cn(
                     "transition-transform duration-150",
-                    "text-[28px] sm:text-[24px] leading-none",
-                    isActive && "scale-110"
+                    "text-[24px] sm:text-[21px] leading-none",
+                    isActive && "scale-105"
                   )}>
                     {REACTION_EMOJIS[key]}
                   </span>
                   <span className={cn(
-                    "text-[9px] sm:hidden mt-1.5 leading-none",
-                    isActive ? "text-foreground font-medium" : "text-muted-foreground"
+                    "text-[8.5px] sm:hidden mt-1 leading-none",
+                    isActive ? "text-foreground/70 font-medium" : "text-muted-foreground/60"
                   )}>
                     {REACTION_LABELS[key]}
                   </span>
