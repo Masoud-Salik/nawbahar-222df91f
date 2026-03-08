@@ -18,21 +18,23 @@ export const REACTION_LABELS: Record<string, string> = {
   insightful: "آموزنده",
   laugh: "خنده",
   sad: "غمگین",
-  fire: "عالی",
+  fire: "الهام‌بخش",
 };
 
 export type ReactionKey = keyof typeof REACTION_EMOJIS;
 
 export interface ReactionSummary {
-  types: ReactionKey[];
+  /** Top 1-2 reaction types by count (like is default if present) */
+  topTypes: ReactionKey[];
   totalCount: number;
+  /** Names of people user follows who reacted, prioritized */
   reactorNames: string[];
   userReaction: ReactionKey | null;
 }
 
 export function useCardReactions(articleId: string) {
   const [summary, setSummary] = useState<ReactionSummary>({
-    types: [],
+    topTypes: [],
     totalCount: 0,
     reactorNames: [],
     userReaction: null,
@@ -51,34 +53,73 @@ export function useCardReactions(articleId: string) {
       .eq("article_id", articleId);
 
     if (!reactions || reactions.length === 0) {
-      setSummary({ types: [], totalCount: 0, reactorNames: [], userReaction: null });
+      setSummary({ topTypes: [], totalCount: 0, reactorNames: [], userReaction: null });
       setLoading(false);
       return;
     }
 
-    const typesSet = new Set<ReactionKey>();
-    reactions.forEach((r) => typesSet.add(r.reaction_type as ReactionKey));
+    // Count each reaction type
+    const typeCounts: Record<string, number> = {};
+    reactions.forEach((r) => {
+      typeCounts[r.reaction_type] = (typeCounts[r.reaction_type] || 0) + 1;
+    });
 
+    // Sort by count, but always put "like" first if it exists
+    const sorted = Object.entries(typeCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([key]) => key as ReactionKey);
+
+    // Take top 2 unique types
+    const topTypes = sorted.slice(0, 2);
+
+    // User's own reaction
     const userReaction = currentUserId
       ? (reactions.find((r) => r.user_id === currentUserId)?.reaction_type as ReactionKey | undefined) || null
       : null;
 
+    // Get reactor IDs (exclude self)
     const otherReactorIds = reactions
       .filter((r) => r.user_id !== currentUserId)
-      .map((r) => r.user_id)
-      .slice(0, 2);
+      .map((r) => r.user_id);
 
     let reactorNames: string[] = [];
-    if (otherReactorIds.length > 0) {
+
+    if (currentUserId && otherReactorIds.length > 0) {
+      // Get IDs the user follows — prioritize these names
+      const { data: followData } = await supabase
+        .from("follows")
+        .select("following_id")
+        .eq("follower_id", currentUserId)
+        .in("following_id", otherReactorIds.slice(0, 20));
+
+      const followedIds = new Set(followData?.map((f) => f.following_id) || []);
+
+      // Sort: followed users first
+      const prioritized = [...otherReactorIds].sort((a, b) => {
+        const aFollowed = followedIds.has(a) ? 0 : 1;
+        const bFollowed = followedIds.has(b) ? 0 : 1;
+        return aFollowed - bFollowed;
+      });
+
+      const topIds = prioritized.slice(0, 2);
+      if (topIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("display_name")
+          .in("id", topIds);
+        reactorNames = profiles?.map((p) => p.display_name) || [];
+      }
+    } else if (otherReactorIds.length > 0) {
+      // Not logged in — just show first 2
       const { data: profiles } = await supabase
         .from("profiles")
         .select("display_name")
-        .in("id", otherReactorIds);
+        .in("id", otherReactorIds.slice(0, 2));
       reactorNames = profiles?.map((p) => p.display_name) || [];
     }
 
     setSummary({
-      types: Array.from(typesSet),
+      topTypes,
       totalCount: reactions.length,
       reactorNames,
       userReaction,

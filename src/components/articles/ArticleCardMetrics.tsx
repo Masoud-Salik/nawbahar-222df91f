@@ -25,7 +25,7 @@ export function ArticleCardMetrics({
   reactionSummary,
   onReact,
 }: ArticleCardMetricsProps) {
-  const { types, totalCount, reactorNames, userReaction } = reactionSummary;
+  const { topTypes, totalCount, reactorNames, userReaction } = reactionSummary;
 
   const buildReactorText = () => {
     if (totalCount === 0) return null;
@@ -44,31 +44,8 @@ export function ArticleCardMetrics({
   return (
     <div className="mt-3 pb-4">
       <div className="flex items-center justify-between">
-        {/* Left: reaction picker + reaction summary + comment */}
         <div className="flex items-center gap-4">
-          <ReactionPicker userReaction={userReaction} onReact={onReact} />
-
-          {totalCount > 0 && (
-            <div className="flex items-center gap-1">
-              <div className="flex items-center -space-x-1.5">
-                {types.slice(0, 3).map((type) => (
-                  <span
-                    key={type}
-                    className="w-[15px] h-[15px] flex items-center justify-center rounded-full text-[8px] leading-none ring-[1.5px] ring-background"
-                    style={{ background: "hsl(var(--muted))" }}
-                  >
-                    {REACTION_EMOJIS[type]}
-                  </span>
-                ))}
-              </div>
-              {reactorText && (
-                <span className="text-[10.5px] text-muted-foreground/50 truncate max-w-[120px]">
-                  {reactorText}
-                </span>
-              )}
-            </div>
-          )}
-
+          {/* Comment button first */}
           <button
             onClick={onCommentClick}
             className={cn(
@@ -81,6 +58,31 @@ export function ArticleCardMetrics({
             <MessageCircle size={14} strokeWidth={1.5} />
             {commentCount > 0 && <span className="text-[11.5px]">{commentCount}</span>}
           </button>
+
+          {/* Reaction picker */}
+          <ReactionPicker userReaction={userReaction} onReact={onReact} />
+
+          {/* Inline reaction summary: top emojis + names */}
+          {totalCount > 0 && (
+            <div className="flex items-center gap-1">
+              <div className="flex items-center -space-x-1">
+                {topTypes.slice(0, 2).map((type) => (
+                  <span
+                    key={type}
+                    className="w-[14px] h-[14px] flex items-center justify-center rounded-full text-[8px] leading-none ring-[1px] ring-background"
+                    style={{ background: "hsl(var(--muted))" }}
+                  >
+                    {REACTION_EMOJIS[type]}
+                  </span>
+                ))}
+              </div>
+              {reactorText && (
+                <span className="text-[10.5px] text-muted-foreground/45 truncate max-w-[110px]">
+                  {reactorText}
+                </span>
+              )}
+            </div>
+          )}
 
           {isRead && (
             <CheckCheck size={12} strokeWidth={2} className="text-primary/35" />

@@ -103,10 +103,10 @@ export function ReactionPicker({ userReaction, onReact }: ReactionPickerProps) {
 
       {open && (
         <div
-          className="absolute bottom-full mb-2.5 right-1/2 translate-x-1/2 flex items-center gap-0.5 rounded-full px-1.5 py-1 z-50"
+          className="absolute bottom-full mb-2 left-0 flex items-center gap-0.5 rounded-full px-2 py-1.5 z-50"
           style={{
             background: "hsl(var(--background))",
-            boxShadow: "0 2px 16px -2px hsl(var(--foreground) / 0.12), 0 0 0 1px hsl(var(--border) / 0.5)",
+            boxShadow: "0 4px 20px -4px hsl(var(--foreground) / 0.12), 0 0 0 1px hsl(var(--border) / 0.6)",
           }}
         >
           {Object.entries(REACTION_EMOJIS).map(([key, emoji], i) => (
@@ -114,12 +114,12 @@ export function ReactionPicker({ userReaction, onReact }: ReactionPickerProps) {
               key={key}
               onClick={(e) => handleSelect(key as ReactionKey, e)}
               className={cn(
-                "w-[34px] h-[34px] flex items-center justify-center rounded-full text-[19px] transition-all duration-150",
-                "hover:scale-[1.4] hover:-translate-y-1",
+                "w-[32px] h-[32px] flex items-center justify-center rounded-full text-[18px] transition-all duration-150",
+                "hover:scale-[1.35] hover:-translate-y-1",
                 userReaction === key && "bg-muted scale-110"
               )}
               style={{
-                animation: `scale-in 0.2s ease-out ${i * 25}ms both`,
+                animation: `scale-in 0.18s ease-out ${i * 20}ms both`,
               }}
               title={REACTION_LABELS[key]}
             >
