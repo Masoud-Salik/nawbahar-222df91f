@@ -22,12 +22,12 @@ export function useFollowStats(userId: string | undefined): FollowStats {
       setLoading(true);
       
       const [followersRes, followingRes] = await Promise.all([
-        supabase.from("follows").select("id", { count: "exact" }).eq("following_id", userId),
-        supabase.from("follows").select("id", { count: "exact" }).eq("follower_id", userId),
+        supabase.rpc("get_follower_count", { target_user_id: userId }),
+        supabase.rpc("get_following_count", { target_user_id: userId }),
       ]);
 
-      setFollowerCount(followersRes.count || 0);
-      setFollowingCount(followingRes.count || 0);
+      setFollowerCount(followersRes.data || 0);
+      setFollowingCount(followingRes.data || 0);
       setLoading(false);
     };
 

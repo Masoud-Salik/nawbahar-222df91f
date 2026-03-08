@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -36,42 +35,19 @@ export function FollowersList({ isOpen, onClose, userId, type }: FollowersListPr
   const fetchUsers = async () => {
     setLoading(true);
     
-    if (type === "followers") {
-      // Get users who follow this user
-      const { data: followData } = await supabase
-        .from("follows")
-        .select("follower_id")
-        .eq("following_id", userId);
+    // Use SECURITY DEFINER RPC functions to bypass follows RLS
+    const rpcName = type === "followers" ? "get_follower_ids" : "get_following_ids";
+    const { data: userIds } = await supabase.rpc(rpcName as any, { target_user_id: userId });
 
-      if (followData && followData.length > 0) {
-        const followerIds = followData.map(f => f.follower_id);
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("id, display_name, avatar_url, specialty")
-          .in("id", followerIds);
-        
-        setUsers(profiles || []);
-      } else {
-        setUsers([]);
-      }
+    if (userIds && (userIds as string[]).length > 0) {
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url, specialty")
+        .in("id", userIds as string[]);
+      
+      setUsers(profiles || []);
     } else {
-      // Get users this user follows
-      const { data: followData } = await supabase
-        .from("follows")
-        .select("following_id")
-        .eq("follower_id", userId);
-
-      if (followData && followData.length > 0) {
-        const followingIds = followData.map(f => f.following_id);
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("id, display_name, avatar_url, specialty")
-          .in("id", followingIds);
-        
-        setUsers(profiles || []);
-      } else {
-        setUsers([]);
-      }
+      setUsers([]);
     }
     
     setLoading(false);
