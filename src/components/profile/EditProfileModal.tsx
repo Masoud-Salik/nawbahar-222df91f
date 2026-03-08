@@ -119,6 +119,7 @@ export function EditProfileModal({
         .update({
           display_name: displayName.trim(),
           specialty: specialty.trim() || null,
+          bio: bio.trim() || null,
           avatar_url: avatarUrl,
           whatsapp_number: whatsapp.trim() || null,
           facebook_url: facebook.trim() || null,

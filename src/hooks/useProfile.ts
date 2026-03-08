@@ -46,7 +46,7 @@ export function useProfile(userId: string | undefined) {
     const [profileResult, articlesResult, bookmarksResult] = await Promise.all([
       supabase
         .from("profiles")
-        .select("id, display_name, avatar_url, specialty, reputation_score, trust_score, whatsapp_number, facebook_url, linkedin_url, created_at")
+        .select("id, display_name, avatar_url, specialty, bio, reputation_score, trust_score, whatsapp_number, facebook_url, linkedin_url, created_at")
         .eq("id", userId)
         .maybeSingle(),
       supabase
