@@ -7,7 +7,7 @@ import { useResponseArticles } from "@/hooks/useResponseArticles";
 import { ArticleActionsMenu } from "./ArticleActionsMenu";
 import { cn } from "@/lib/utils";
 import { SlideDownComments } from "./SlideDownComments";
-import { gregorianToSolar } from "@/lib/solarHijri";
+import { formatSolarShort } from "@/lib/solarHijri";
 import { ArticleCardMetrics } from "./ArticleCardMetrics";
 
 interface ArticleCardProps {
@@ -32,12 +32,6 @@ function isArticleRead(articleId: string): boolean {
   } catch {
     return false;
   }
-}
-
-function formatSolarNumeric(date: Date | string): string {
-  const d = typeof date === "string" ? new Date(date) : date;
-  const solar = gregorianToSolar(d);
-  return `${solar.day}/${solar.month}/${solar.year}`;
 }
 
 export function ArticleCard({ article, onDelete: _onDelete }: ArticleCardProps) {
@@ -111,7 +105,7 @@ export function ArticleCard({ article, onDelete: _onDelete }: ArticleCardProps) 
               {article.author?.display_name}
             </span>
             <span className="text-muted-foreground/20 text-[10px]">·</span>
-            <span className="text-[10.5px] text-muted-foreground/40 font-normal">{formatSolarNumeric(article.created_at)}</span>
+            <span className="text-[10.5px] text-muted-foreground/40 font-normal">{formatSolarShort(article.created_at)}</span>
           </button>
 
           <div onClick={(e) => e.preventDefault()} className="flex-shrink-0">
