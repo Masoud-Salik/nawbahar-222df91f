@@ -248,7 +248,12 @@ const Notifications = () => {
                   </div>
                 )}
                 {permission === 'denied' && (
-                  <p className="text-[10px] text-destructive/70 pb-1">اعلان‌ها در مرورگر مسدود شده‌اند.</p>
+                  <div className="text-[10px] text-muted-foreground/60 bg-muted/40 rounded-lg px-3 py-2 mb-1">
+                    <p>اعلان‌ها در مرورگر مسدود شده‌اند.</p>
+                    <p className="mt-0.5 text-muted-foreground/40 leading-relaxed">
+                      برای فعال‌سازی، روی آیکون قفل 🔒 کنار آدرس سایت کلیک کنید و اعلان‌ها را مجاز کنید.
+                    </p>
+                  </div>
                 )}
                 {[
                   { key: "comments" as const, icon: MessageCircle, label: "نظرات" },
