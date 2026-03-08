@@ -19,7 +19,6 @@ export function ArticleCardMetrics({
   isRead,
   commentsOpen,
   tag,
-  latestCommentSnippet,
   onCommentClick,
   onResponseClick,
 }: ArticleCardMetricsProps) {
