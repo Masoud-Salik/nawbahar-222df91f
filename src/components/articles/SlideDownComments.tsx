@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { compressArticleImage } from "@/lib/imageCompression";
+import { playSuccessSound, playSubmitSound, playClickSound, playErrorSound } from "@/lib/sounds";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -154,8 +155,10 @@ export function SlideDownComments({
         // Fail-open: publish anyway
         await supabase.from("articles").update({ status: "published" }).eq("id", article.id);
         toast({ title: "✅ نظر به صورت عمومی منتشر شد" });
+        playSuccessSound();
       } else if (evalData.approved) {
         toast({ title: "✅ نظر به صورت عمومی منتشر شد" });
+        playSuccessSound();
       } else {
         toast({
           title: "نظر عمومی در انتظار بررسی",
@@ -167,6 +170,7 @@ export function SlideDownComments({
       clearImage();
     } catch (error: any) {
       toast({ title: "خطا", description: "مشکلی پیش آمد", variant: "destructive" });
+      playErrorSound();
     } finally {
       setPublishingPublic(false);
     }

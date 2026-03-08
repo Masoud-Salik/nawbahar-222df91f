@@ -130,6 +130,7 @@ export function useComments(articleId: string, options?: UseCommentsOptions) {
     }
 
     toast({ title: parentId ? "پاسخ ثبت شد" : "نظر شما ثبت شد" });
+    import("@/lib/sounds").then(m => m.playSubmitSound());
     await fetchComments();
     setSubmitting(false);
     return true;

@@ -147,7 +147,10 @@ export function useNotifications() {
         schema: 'public',
         table: 'notifications',
         filter: `user_id=eq.${user.id}`,
-      }, () => { fetchNotifications(); })
+      }, () => { 
+        import("@/lib/sounds").then(m => m.playNotificationSound());
+        fetchNotifications(); 
+      })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [user, fetchNotifications]);
