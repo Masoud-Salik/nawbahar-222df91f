@@ -248,6 +248,12 @@ const Profile = () => {
           {/* About Tab */}
           <TabsContent value="about" className="mt-0 px-5 py-5">
             <div className="space-y-4">
+              {/* Bio */}
+              {profile?.bio && (
+                <p className="text-[13px] text-foreground/80 leading-[1.9] whitespace-pre-line">
+                  {profile.bio}
+                </p>
+              )}
               {profile?.specialty && (
                 <AboutItem 
                   icon={<FileText size={14} strokeWidth={1.5} />}
