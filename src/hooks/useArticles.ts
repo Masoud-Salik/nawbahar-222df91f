@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface FeedArticle {
@@ -19,44 +19,47 @@ export interface FeedArticle {
   };
 }
 
+const PAGE_SIZE = 15;
+
 export function usePublishedArticles() {
   const [articles, setArticles] = useState<FeedArticle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchArticles();
-  }, []);
+  const fetchArticles = useCallback(async (offset = 0, append = false) => {
+    if (!append) setLoading(true);
+    else setLoadingMore(true);
 
-  const fetchArticles = async () => {
-    setLoading(true);
-    
-    // First get articles
     const { data: articlesData, error: articlesError } = await supabase
       .from("articles")
       .select("id, title, content, cover_image_url, tags, created_at, save_count, view_count, author_id")
       .eq("status", "published")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .range(offset, offset + PAGE_SIZE - 1);
 
     if (articlesError) {
       setError(articlesError.message);
-      setArticles([]);
+      if (!append) setArticles([]);
       setLoading(false);
+      setLoadingMore(false);
       return;
     }
 
+    const data = articlesData || [];
+    setHasMore(data.length === PAGE_SIZE);
+
     // Get unique author IDs
-    const authorIds = [...new Set((articlesData || []).map(a => a.author_id))];
+    const authorIds = [...new Set(data.map(a => a.author_id))];
     
-    // Fetch profiles for those authors
-    const { data: profilesData } = await supabase
-      .from("profiles")
-      .select("id, display_name, avatar_url, specialty, reputation_score")
-      .in("id", authorIds);
+    const { data: profilesData } = authorIds.length > 0
+      ? await supabase.from("profiles").select("id, display_name, avatar_url, specialty, reputation_score").in("id", authorIds)
+      : { data: [] };
 
     const profilesMap = new Map((profilesData || []).map(p => [p.id, p]));
 
-    const transformed: FeedArticle[] = (articlesData || []).map((item) => {
+    const transformed: FeedArticle[] = data.map((item) => {
       const profile = profilesMap.get(item.author_id);
       return {
         id: item.id,
@@ -77,9 +80,28 @@ export function usePublishedArticles() {
       };
     });
 
-    setArticles(transformed);
+    if (append) {
+      setArticles(prev => [...prev, ...transformed]);
+    } else {
+      setArticles(transformed);
+    }
     setLoading(false);
-  };
+    setLoadingMore(false);
+  }, []);
 
-  return { articles, loading, error, refetch: fetchArticles };
+  useEffect(() => {
+    fetchArticles(0, false);
+  }, [fetchArticles]);
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    fetchArticles(articles.length, true);
+  }, [articles.length, loadingMore, hasMore, fetchArticles]);
+
+  const refetch = useCallback(() => {
+    setHasMore(true);
+    fetchArticles(0, false);
+  }, [fetchArticles]);
+
+  return { articles, loading, loadingMore, hasMore, error, refetch, loadMore };
 }

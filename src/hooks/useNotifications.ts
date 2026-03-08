@@ -19,7 +19,6 @@ export interface Notification {
   };
 }
 
-// Notification settings stored in localStorage
 const NOTIFICATION_SETTINGS_KEY = 'nawbahar_notification_settings';
 
 export interface NotificationSettings {
@@ -43,15 +42,10 @@ export function useNotifications() {
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<NotificationSettings>(defaultSettings);
 
-  // Load settings from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(NOTIFICATION_SETTINGS_KEY);
     if (saved) {
-      try {
-        setSettings(JSON.parse(saved));
-      } catch {
-        // Use defaults
-      }
+      try { setSettings(JSON.parse(saved)); } catch { /* defaults */ }
     }
   }, []);
 
@@ -71,15 +65,32 @@ export function useNotifications() {
 
     setLoading(true);
 
-    // Fetch notifications
-    const { data: notifData } = await supabase
+    // Fetch all unread notifications
+    const { data: unreadData } = await supabase
+      .from("notifications")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("is_read", false)
+      .order("created_at", { ascending: false });
+
+    // Fetch 10 most recent notifications
+    const { data: recentData } = await supabase
       .from("notifications")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(50);
+      .limit(10);
 
-    if (!notifData || notifData.length === 0) {
+    // Merge: all unread + recent 10, deduplicated
+    const allUnread = unreadData || [];
+    const recent10 = recentData || [];
+    const merged = new Map<string, typeof allUnread[0]>();
+    [...allUnread, ...recent10].forEach(n => merged.set(n.id, n));
+    const notifData = Array.from(merged.values()).sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    if (notifData.length === 0) {
       setNotifications([]);
       setUnreadCount(0);
       setLoading(false);
@@ -90,19 +101,15 @@ export function useNotifications() {
     const actorIds = [...new Set(notifData.map(n => n.actor_id))];
     const articleIds = [...new Set(notifData.filter(n => n.article_id).map(n => n.article_id!))];
 
-    // Fetch actors
-    const { data: actorsData } = await supabase
-      .from("profiles")
-      .select("id, display_name, avatar_url")
-      .in("id", actorIds);
+    const [actorsRes, articlesRes] = await Promise.all([
+      supabase.from("profiles").select("id, display_name, avatar_url").in("id", actorIds),
+      articleIds.length > 0
+        ? supabase.from("articles").select("id, title").in("id", articleIds)
+        : Promise.resolve({ data: [] }),
+    ]);
 
-    // Fetch articles
-    const { data: articlesData } = articleIds.length > 0 
-      ? await supabase.from("articles").select("id, title").in("id", articleIds)
-      : { data: [] };
-
-    const actorsMap = new Map((actorsData || []).map(a => [a.id, a]));
-    const articlesMap = new Map((articlesData || []).map(a => [a.id, a]));
+    const actorsMap = new Map((actorsRes.data || []).map(a => [a.id, a]));
+    const articlesMap = new Map((articlesRes.data || []).map(a => [a.id, a]));
 
     const transformed: Notification[] = notifData.map(n => ({
       ...n,
@@ -130,81 +137,46 @@ export function useNotifications() {
     fetchNotifications();
   }, [fetchNotifications]);
 
-  // Real-time subscription for new notifications
+  // Real-time subscription
   useEffect(() => {
     if (!user) return;
-
     const channel = supabase
       .channel('notifications-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          // Refetch notifications when new one arrives
-          fetchNotifications();
-        }
-      )
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, () => { fetchNotifications(); })
       .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, [user, fetchNotifications]);
 
   const markAsRead = async (notificationId: string) => {
-    await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("id", notificationId);
-    
-    setNotifications(prev => 
-      prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
-    );
+    await supabase.from("notifications").update({ is_read: true }).eq("id", notificationId);
+    setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n));
     setUnreadCount(prev => Math.max(0, prev - 1));
   };
 
   const markAllAsRead = async () => {
     if (!user) return;
-    
-    await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("user_id", user.id)
-      .eq("is_read", false);
-    
+    await supabase.from("notifications").update({ is_read: true }).eq("user_id", user.id).eq("is_read", false);
     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
     setUnreadCount(0);
   };
 
   const deleteNotification = async (notificationId: string) => {
-    await supabase
-      .from("notifications")
-      .delete()
-      .eq("id", notificationId);
-    
+    await supabase.from("notifications").delete().eq("id", notificationId);
     setNotifications(prev => {
       const notification = prev.find(n => n.id === notificationId);
-      if (notification && !notification.is_read) {
-        setUnreadCount(c => Math.max(0, c - 1));
-      }
+      if (notification && !notification.is_read) setUnreadCount(c => Math.max(0, c - 1));
       return prev.filter(n => n.id !== notificationId);
     });
   };
 
   return { 
-    notifications, 
-    unreadCount, 
-    loading, 
-    markAsRead, 
-    markAllAsRead,
-    deleteNotification,
-    settings,
-    updateSettings,
-    refetch: fetchNotifications 
+    notifications, unreadCount, loading, 
+    markAsRead, markAllAsRead, deleteNotification,
+    settings, updateSettings, refetch: fetchNotifications 
   };
 }

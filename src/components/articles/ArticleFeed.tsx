@@ -1,14 +1,39 @@
+import { useEffect, useRef, useCallback } from "react";
 import type { FeedArticle } from "@/hooks/useArticles";
 import { ArticleCard } from "./ArticleCard";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ArticleFeedProps {
   articles: FeedArticle[];
   onRefresh?: () => void;
+  hasMore?: boolean;
+  loadingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
-export function ArticleFeed({ articles, onRefresh }: ArticleFeedProps) {
+export function ArticleFeed({ articles, onRefresh, hasMore, loadingMore, onLoadMore }: ArticleFeedProps) {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!onLoadMore || !hasMore) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore) {
+          onLoadMore();
+        }
+      },
+      { rootMargin: "400px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [onLoadMore, hasMore, loadingMore]);
+
   if (articles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center animate-fade-in">
@@ -45,6 +70,23 @@ export function ArticleFeed({ articles, onRefresh }: ArticleFeedProps) {
           )}
         </div>
       ))}
+
+      {/* Infinite scroll sentinel */}
+      <div ref={sentinelRef} className="h-1" />
+
+      {/* Loading more indicator */}
+      {loadingMore && (
+        <div className="flex justify-center py-6">
+          <Loader2 size={20} className="animate-spin text-muted-foreground/40" />
+        </div>
+      )}
+
+      {/* End of feed */}
+      {!hasMore && articles.length > 0 && (
+        <div className="text-center py-8 text-[12px] text-muted-foreground/30">
+          پایان مقالات
+        </div>
+      )}
     </div>
   );
 }

@@ -169,6 +169,7 @@ export default defineConfig(({ mode }) => ({
         skipWaiting: true,
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api/, /^\/auth/, /^\/~oauth/],
+        importScripts: ['/sw-push.js'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

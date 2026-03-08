@@ -4,14 +4,20 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { usePublishedArticles } from "@/hooks/useArticles";
 
 const Index = () => {
-  const { articles, loading, refetch } = usePublishedArticles();
+  const { articles, loading, loadingMore, hasMore, refetch, loadMore } = usePublishedArticles();
 
   return (
     <AppLayout>
       {loading ? (
         <LoadingScreen />
       ) : (
-        <ArticleFeed articles={articles} onRefresh={refetch} />
+        <ArticleFeed 
+          articles={articles} 
+          onRefresh={refetch}
+          hasMore={hasMore}
+          loadingMore={loadingMore}
+          onLoadMore={loadMore}
+        />
       )}
     </AppLayout>
   );
