@@ -191,6 +191,7 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
                 </div>
               </div>
             </div>
+          </div>
         ) : (
           /* --- Card WITHOUT image: text-focused --- */
           <div className="px-4 pt-4">
