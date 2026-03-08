@@ -36,10 +36,13 @@ export function ArticleFeed({ articles, onRefresh }: ArticleFeedProps) {
       {articles.map((article, index) => (
         <div
           key={article.id}
-          className={`animate-fade-in ${index < articles.length - 1 ? 'border-b border-border/50' : ''}`}
-          style={{ animationDelay: `${Math.min(index * 30, 150)}ms` }}
+          className="animate-fade-in"
+          style={{ animationDelay: `${Math.min(index * 25, 120)}ms` }}
         >
           <ArticleCard article={article} onDelete={onRefresh} />
+          {index < articles.length - 1 && (
+            <div className="mx-5 border-b border-border/40" />
+          )}
         </div>
       ))}
     </div>
