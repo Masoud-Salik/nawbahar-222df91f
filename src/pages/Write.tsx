@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { PenLine } from "lucide-react";
+import { PenLine, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
 
