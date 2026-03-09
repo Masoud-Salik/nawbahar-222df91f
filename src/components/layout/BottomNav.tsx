@@ -63,8 +63,8 @@ export function BottomNav() {
             <div className={cn(
               "w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300",
               isActive("/write")
-                ? "bg-primary text-primary-foreground shadow-md scale-105"
-                : "bg-secondary text-foreground/70 group-active:scale-90 group-hover:bg-secondary/70"
+                ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md shadow-primary/20 scale-105"
+                : "bg-gradient-to-br from-secondary to-muted text-foreground/70 group-active:scale-90 group-hover:from-primary/10 group-hover:to-accent/10"
             )}>
               <Plus size={21} strokeWidth={2.2} />
             </div>

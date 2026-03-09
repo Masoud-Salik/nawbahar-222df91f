@@ -37,7 +37,7 @@ export function ArticleFeed({ articles, onRefresh, hasMore, loadingMore, onLoadM
   if (articles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-4 text-center animate-fade-in">
-        <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-5">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-5 shadow-sm">
           <span className="text-3xl">📝</span>
         </div>
         <h3 className="text-lg font-bold text-foreground mb-2">
@@ -47,7 +47,7 @@ export function ArticleFeed({ articles, onRefresh, hasMore, loadingMore, onLoadM
           اولین نفری باشید که دیدگاه خود را به اشتراک می‌گذارد.
         </p>
         {onRefresh && (
-          <Button variant="outline" onClick={onRefresh} className="gap-2 rounded-lg text-sm">
+          <Button variant="outline" onClick={onRefresh} className="gap-2 rounded-xl text-sm border-primary/20 text-primary hover:bg-primary/5">
             <RefreshCw size={14} />
             بارگذاری مجدد
           </Button>
