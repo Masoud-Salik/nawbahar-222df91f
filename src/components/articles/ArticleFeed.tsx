@@ -61,12 +61,12 @@ export function ArticleFeed({ articles, onRefresh, hasMore, loadingMore, onLoadM
       {/* Warm greeting accent */}
       <div className="h-[3px] bg-gradient-to-l from-primary/60 via-accent/50 to-primary/20 rounded-b-full mx-4 sm:mx-0" />
 
-      <div className="flex flex-col gap-0 sm:gap-4 sm:p-4">
+      <div className="flex flex-col gap-0 sm:gap-3 sm:p-4">
         {articles.map((article, index) => (
           <div
             key={article.id}
-            className="bg-card sm:rounded-2xl sm:border border-border/30 shadow-[0_1px_6px_-2px_rgba(0,0,0,0.03)] animate-fade-in overflow-hidden transition-all duration-300 hover:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)]"
-            style={{ animationDelay: `${Math.min(index * 30, 150)}ms` }}
+            className="bg-card sm:rounded-2xl sm:border border-border/25 animate-fade-in overflow-hidden transition-all duration-300 hover:bg-card/90"
+            style={{ animationDelay: `${Math.min(index * 25, 120)}ms` }}
           >
             <ArticleCard article={article} onDelete={onRefresh} />
           </div>

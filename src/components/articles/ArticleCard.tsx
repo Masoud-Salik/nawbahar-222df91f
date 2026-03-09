@@ -17,7 +17,7 @@ interface ArticleCardProps {
   onDelete?: () => void;
 }
 
-function getExcerpt(content: string, maxChars: number = 110): string {
+function getExcerpt(content: string, maxChars: number = 160): string {
   if (content.length <= maxChars) return content;
   return content.slice(0, maxChars).trim() + "…";
 }
@@ -125,14 +125,14 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
             >
               {article.title}
             </h3>
-            <p className="text-[13.5px] text-muted-foreground/70 leading-[1.7] line-clamp-2 font-medium">
-              {getExcerpt(article.content, 120)}
+            <p className="text-[13.5px] text-muted-foreground/60 leading-[1.8] line-clamp-3 font-medium">
+              {getExcerpt(article.content, 160)}
             </p>
           </div>
           <div
             className={cn(
-              "w-[100px] h-[100px] flex-shrink-0 rounded-xl overflow-hidden relative bg-muted/20 self-start shadow-sm border border-border/20 transition-all duration-300",
-              hasBeenRead && "opacity-50 saturate-[0.3] blur-[0.5px]"
+              "w-[104px] h-[104px] flex-shrink-0 rounded-xl overflow-hidden relative bg-muted/30 self-start border border-border/15 transition-all duration-300",
+              hasBeenRead && "opacity-45 saturate-[0.25] blur-[0.5px]"
             )}
           >
             {!imageLoaded && <div className="absolute inset-0 skeleton" />}
