@@ -35,8 +35,8 @@ export function BottomNav() {
         isVisible ? "translate-y-0" : "translate-y-full"
       )}
     >
-      <div className="bg-background/90 backdrop-blur-xl border-t border-border/15 safe-bottom">
-        <div className="flex items-center justify-around max-w-lg mx-auto h-14">
+      <div className="bg-background border-t border-border/20 safe-bottom">
+        <div className="h-[2px] bg-gradient-to-l from-primary/20 via-accent/30 to-primary/10 -mt-[2px]" />
           {/* Home */}
           <NavItem to="/" active={isActive("/")} label="خانه">
             <Home

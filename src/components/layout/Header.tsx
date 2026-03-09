@@ -51,7 +51,9 @@ export function Header() {
 
 
   return (
-    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/20 safe-top transition-all duration-300">
+    <header className="sticky top-0 z-40 bg-background border-b border-border/20 safe-top transition-all duration-300">
+      {/* Warm accent line */}
+      <div className="h-[2px] bg-gradient-to-l from-primary via-accent/70 to-primary/30" />
       <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
         <Link to="/" className="flex items-center group">
           <span className="text-[15px] font-extrabold tracking-tight text-foreground leading-none">

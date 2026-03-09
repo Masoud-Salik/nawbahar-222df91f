@@ -58,35 +58,51 @@ export function ArticleFeed({ articles, onRefresh, hasMore, loadingMore, onLoadM
 
   return (
     <div className="max-w-[640px] mx-auto pb-20">
-      <div className="flex flex-col gap-2 sm:gap-4 sm:p-4">
+      {/* Warm greeting accent */}
+      <div className="h-[3px] bg-gradient-to-l from-primary/60 via-accent/50 to-primary/20 rounded-b-full mx-4 sm:mx-0" />
+
+      <div className="flex flex-col gap-0 sm:gap-4 sm:p-4">
         {articles.map((article, index) => (
           <div
             key={article.id}
-            className="bg-card sm:rounded-2xl sm:border border-border/30 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] animate-fade-in overflow-hidden"
-            style={{ animationDelay: `${Math.min(index * 25, 120)}ms` }}
+            className="bg-card sm:rounded-2xl sm:border border-border/30 shadow-[0_1px_6px_-2px_rgba(0,0,0,0.03)] animate-fade-in overflow-hidden transition-all duration-300 hover:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)]"
+            style={{ animationDelay: `${Math.min(index * 30, 150)}ms` }}
           >
             <ArticleCard article={article} onDelete={onRefresh} />
-            {index < articles.length - 1 && (
-              <div className="mx-5 border-b border-border/40 sm:hidden" />
-            )}
           </div>
         ))}
       </div>
+
+      {/* Card dividers with warm accent on mobile */}
+      <style>{`
+        @media (max-width: 639px) {
+          .flex.flex-col.gap-0 > div + div {
+            border-top: 1px solid hsl(var(--border) / 0.25);
+          }
+        }
+      `}</style>
 
       {/* Infinite scroll sentinel */}
       <div ref={sentinelRef} className="h-1" />
 
       {/* Loading more indicator */}
       {loadingMore && (
-        <div className="flex justify-center py-6">
-          <Loader2 size={20} className="animate-spin text-muted-foreground/40" />
+        <div className="flex justify-center py-8">
+          <div className="flex items-center gap-2">
+            <Loader2 size={16} className="animate-spin text-primary/40" />
+            <span className="text-[11px] text-muted-foreground/40">در حال بارگذاری...</span>
+          </div>
         </div>
       )}
 
       {/* End of feed */}
       {!hasMore && articles.length > 0 && (
-        <div className="text-center py-8 text-[12px] text-muted-foreground/30">
-          پایان مقالات
+        <div className="text-center py-10">
+          <div className="inline-flex items-center gap-2 text-[12px] text-muted-foreground/30">
+            <span className="w-8 h-px bg-border/30" />
+            پایان
+            <span className="w-8 h-px bg-border/30" />
+          </div>
         </div>
       )}
     </div>
