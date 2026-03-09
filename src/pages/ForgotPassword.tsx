@@ -58,8 +58,13 @@ const ForgotPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-5" dir="rtl">
+    <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       <SEOHead title="فراموشی رمز عبور" description="بازیابی رمز عبور نوبهار" ogUrl="/forgot-password" noIndex />
+      
+      {/* Top accent line */}
+      <div className="h-1 bg-gradient-to-l from-primary via-accent to-primary/40" />
+      
+      <div className="flex-1 flex items-center justify-center p-5">
 
       <div className="w-full max-w-[380px] animate-fade-in">
         {/* Back */}
