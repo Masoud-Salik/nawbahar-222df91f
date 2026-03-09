@@ -289,8 +289,21 @@ const Auth = () => {
               </Button>
             </form>
 
+            {/* Forgot password */}
+            {isLogin && (
+              <div className="mt-4 text-center">
+                <button
+                  type="button"
+                  onClick={() => navigate("/forgot-password")}
+                  className="text-[13px] text-muted-foreground/60 hover:text-primary transition-colors focus:outline-none"
+                >
+                  رمز عبور را فراموش کردید؟
+                </button>
+              </div>
+            )}
+
             {/* Toggle */}
-            <div className="mt-8 text-center">
+            <div className="mt-4 text-center">
               <button
                 type="button"
                 onClick={() => setIsLogin(!isLogin)}
