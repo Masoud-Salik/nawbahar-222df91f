@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { REACTION_LABELS, type ReactionKey } from "@/hooks/useCardReactions";
-import { REACTION_SVG_ICONS } from "./ReactionIcons";
+import { REACTION_EMOJIS, REACTION_LABELS, type ReactionKey } from "@/hooks/useCardReactions";
 import { getRelativeTime } from "@/lib/relativeTime";
 import { toPersianNumber } from "@/lib/utils";
 import { X } from "lucide-react";
@@ -24,6 +23,7 @@ export function ReactionDetailsModal({ articleId, isOpen, onClose }: ReactionDet
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -60,12 +60,16 @@ export function ReactionDetailsModal({ articleId, isOpen, onClose }: ReactionDet
     fetchReactions();
   }, [articleId, isOpen]);
 
+  // Smart scroll: close on outside scroll if content is small; allow inside scroll
   useEffect(() => {
     if (!isOpen) return;
+
     const handleOutsideScroll = (e: Event) => {
+      // If scrolling inside the modal content, don't close
       if (contentRef.current?.contains(e.target as Node)) return;
       onClose();
     };
+
     window.addEventListener("scroll", handleOutsideScroll, { passive: true, capture: true });
     return () => window.removeEventListener("scroll", handleOutsideScroll, true);
   }, [isOpen, onClose]);
@@ -83,10 +87,10 @@ export function ReactionDetailsModal({ articleId, isOpen, onClose }: ReactionDet
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-background/15 backdrop-blur-[2px] animate-fade-in" />
+      <div ref={backdropRef} className="absolute inset-0 bg-background/60 backdrop-blur-sm animate-fade-in" />
       <div
         ref={contentRef}
-        className="relative w-full max-w-md bg-card rounded-t-2xl border border-border shadow-lg animate-slide-up max-h-[65vh] flex flex-col"
+        className="relative w-full max-w-md bg-card rounded-t-2xl border border-border shadow-lg animate-slide-up max-h-[70vh] flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -109,24 +113,21 @@ export function ReactionDetailsModal({ articleId, isOpen, onClose }: ReactionDet
           </button>
           {Object.entries(typeCounts)
             .sort((a, b) => b[1] - a[1])
-            .map(([type, count]) => {
-              const IconComponent = REACTION_SVG_ICONS[type];
-              return (
-                <button
-                  key={type}
-                  onClick={() => setActiveFilter(activeFilter === type ? null : type)}
-                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors flex-shrink-0 flex items-center gap-1 ${
-                    activeFilter === type ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  {IconComponent ? <IconComponent size={14} strokeWidth={1.5} /> : <span>{type}</span>}
-                  <span>{toPersianNumber(count)}</span>
-                </button>
-              );
-            })}
+            .map(([type, count]) => (
+              <button
+                key={type}
+                onClick={() => setActiveFilter(activeFilter === type ? null : type)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors flex-shrink-0 flex items-center gap-1 ${
+                  activeFilter === type ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <span className="text-sm">{REACTION_EMOJIS[type] || type}</span>
+                <span>{toPersianNumber(count)}</span>
+              </button>
+            ))}
         </div>
 
-        {/* Reaction list */}
+        {/* Reaction list — scrollable inside */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
           {loading ? (
             <div className="flex justify-center py-8">
@@ -136,40 +137,37 @@ export function ReactionDetailsModal({ articleId, isOpen, onClose }: ReactionDet
             <div className="text-center py-8 text-sm text-muted-foreground">واکنشی ثبت نشده</div>
           ) : (
             <div className="divide-y divide-border/50">
-              {filteredReactions.map((reaction, i) => {
-                const IconComponent = REACTION_SVG_ICONS[reaction.reaction_type];
-                return (
-                  <div
-                    key={`${reaction.user_id}-${reaction.reaction_type}`}
-                    className="flex items-center gap-3 px-4 py-3 animate-fade-in"
-                    style={{ animationDelay: `${i * 30}ms` }}
-                  >
-                    {reaction.profile?.avatar_url ? (
-                      <img src={reaction.profile.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-primary text-xs font-bold">
-                          {reaction.profile?.display_name?.charAt(0) || "?"}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <span className="text-sm font-medium text-foreground truncate block">
-                        {reaction.profile?.display_name || "کاربر"}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {getRelativeTime(reaction.created_at)}
+              {filteredReactions.map((reaction, i) => (
+                <div
+                  key={`${reaction.user_id}-${reaction.reaction_type}`}
+                  className="flex items-center gap-3 px-4 py-3 animate-fade-in"
+                  style={{ animationDelay: `${i * 30}ms` }}
+                >
+                  {reaction.profile?.avatar_url ? (
+                    <img src={reaction.profile.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-primary text-xs font-bold">
+                        {reaction.profile?.display_name?.charAt(0) || "?"}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      {IconComponent && <IconComponent size={18} strokeWidth={1.5} className="text-muted-foreground" />}
-                      <span className="text-[10px] text-muted-foreground">
-                        {REACTION_LABELS[reaction.reaction_type] || reaction.reaction_type}
-                      </span>
-                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium text-foreground truncate block">
+                      {reaction.profile?.display_name || "کاربر"}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {getRelativeTime(reaction.created_at)}
+                    </span>
                   </div>
-                );
-              })}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-lg">{REACTION_EMOJIS[reaction.reaction_type] || "👍"}</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {REACTION_LABELS[reaction.reaction_type] || reaction.reaction_type}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
