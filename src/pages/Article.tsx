@@ -44,6 +44,33 @@ interface ArticleData {
   };
 }
 
+const ARTICLE_CACHE = 'article-cache';
+
+async function cacheArticle(articleId: string, article: ArticleData) {
+  try {
+    const cache = await caches.open(ARTICLE_CACHE);
+    const response = new Response(JSON.stringify(article), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    await cache.put(`article-${articleId}`, response);
+  } catch (err) {
+    console.warn('Failed to cache article:', err);
+  }
+}
+
+async function getCachedArticle(articleId: string): Promise<ArticleData | null> {
+  try {
+    const cache = await caches.open(ARTICLE_CACHE);
+    const response = await cache.match(`article-${articleId}`);
+    if (response) {
+      return await response.json();
+    }
+  } catch (err) {
+    console.warn('Failed to get cached article:', err);
+  }
+  return null;
+}
+
 const Article = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -67,6 +94,15 @@ const Article = () => {
     if (id) fetchArticle(id);
   }, [id]);
 
+  // Refetch when coming back online
+  useEffect(() => {
+    const handleOnline = () => {
+      if (id) fetchArticle(id);
+    };
+    window.addEventListener('app-online', handleOnline);
+    return () => window.removeEventListener('app-online', handleOnline);
+  }, [id]);
+
   useEffect(() => {
     if (window.location.hash === "#comments" && !loading) {
       const el = document.getElementById("comments");
@@ -76,6 +112,17 @@ const Article = () => {
 
   const fetchArticle = async (articleId: string) => {
     setLoading(true);
+
+    // If offline, try cache first
+    if (!navigator.onLine) {
+      const cached = await getCachedArticle(articleId);
+      if (cached) {
+        setArticle(cached);
+        setLoading(false);
+        return;
+      }
+    }
+
     const { data: articleData, error } = await supabase
       .from("articles")
       .select("id, title, content, cover_image_url, tags, created_at, save_count, author_id, editorial_score_science, editorial_score_ethics, editorial_score_writing, editorial_score_timing, editorial_score_innovation")
@@ -91,7 +138,7 @@ const Article = () => {
       .eq("id", articleData.author_id)
       .maybeSingle();
 
-    setArticle({
+    const fullArticle: ArticleData = {
       ...articleData,
       tags: articleData.tags || [],
       save_count: articleData.save_count || 0,
@@ -105,8 +152,13 @@ const Article = () => {
         avatar_url: profileData.avatar_url,
         specialty: profileData.specialty,
       } : undefined,
-    });
+    };
+
+    setArticle(fullArticle);
     setLoading(false);
+
+    // Cache the article
+    cacheArticle(articleId, fullArticle);
   };
 
   const handleShare = async () => {

@@ -24,6 +24,33 @@ export interface FeedArticle {
 }
 
 const PAGE_SIZE = 15;
+const ARTICLES_CACHE = 'articles-cache';
+const ARTICLES_CACHE_KEY = 'articles-data';
+
+async function cacheArticles(articles: FeedArticle[]) {
+  try {
+    const cache = await caches.open(ARTICLES_CACHE);
+    const response = new Response(JSON.stringify(articles), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    await cache.put(ARTICLES_CACHE_KEY, response);
+  } catch (err) {
+    console.warn('Failed to cache articles:', err);
+  }
+}
+
+async function getCachedArticles(): Promise<FeedArticle[] | null> {
+  try {
+    const cache = await caches.open(ARTICLES_CACHE);
+    const response = await cache.match(ARTICLES_CACHE_KEY);
+    if (response) {
+      return await response.json();
+    }
+  } catch (err) {
+    console.warn('Failed to get cached articles:', err);
+  }
+  return null;
+}
 
 export function usePublishedArticles() {
   const [articles, setArticles] = useState<FeedArticle[]>([]);
@@ -33,6 +60,17 @@ export function usePublishedArticles() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchArticles = useCallback(async (offset = 0, append = false) => {
+    // If offline and no offset (first page), try cache first
+    if (!navigator.onLine && offset === 0) {
+      const cached = await getCachedArticles();
+      if (cached) {
+        setArticles(cached);
+        setLoading(false);
+        setHasMore(false); // Assume no more for cached
+        return;
+      }
+    }
+
     if (!append) setLoading(true);
     else setLoadingMore(true);
 
@@ -102,6 +140,10 @@ export function usePublishedArticles() {
       setArticles(prev => [...prev, ...transformed]);
     } else {
       setArticles(transformed);
+      // Cache the first page
+      if (offset === 0) {
+        cacheArticles(transformed);
+      }
     }
     setLoading(false);
     setLoadingMore(false);
@@ -109,6 +151,15 @@ export function usePublishedArticles() {
 
   useEffect(() => {
     fetchArticles(0, false);
+  }, [fetchArticles]);
+
+  // Refetch when coming back online
+  useEffect(() => {
+    const handleOnline = () => {
+      fetchArticles(0, false);
+    };
+    window.addEventListener('app-online', handleOnline);
+    return () => window.removeEventListener('app-online', handleOnline);
   }, [fetchArticles]);
 
   const loadMore = useCallback(() => {
