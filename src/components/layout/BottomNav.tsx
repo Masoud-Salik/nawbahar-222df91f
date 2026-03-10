@@ -35,8 +35,9 @@ export function BottomNav() {
         isVisible ? "translate-y-0" : "translate-y-full"
       )}
     >
-      <div className="bg-background/95 backdrop-blur-md border-t border-border/40 safe-bottom" style={{ boxShadow: '0 -1px 8px -2px rgba(0,0,0,0.06)' }}>
-        <div className="flex items-center justify-around max-w-lg mx-auto h-12">
+      <div className="bg-background border-t border-border/20 safe-bottom">
+        <div className="h-[2px] bg-gradient-to-l from-primary/20 via-accent/30 to-primary/10 -mt-[2px]" />
+        <div className="flex items-center justify-around max-w-lg mx-auto h-14">
           {/* Home */}
           <NavItem to="/" active={isActive("/")} label="خانه">
             <Home
@@ -60,12 +61,12 @@ export function BottomNav() {
             aria-label="نوشتن مقاله"
           >
             <div className={cn(
-              "w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200",
+              "w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300",
               isActive("/write")
-                ? "bg-foreground text-background scale-105"
-                : "bg-muted text-muted-foreground group-active:scale-90 group-active:bg-foreground/15"
+                ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md shadow-primary/20 scale-105"
+                : "bg-gradient-to-br from-secondary to-muted text-foreground/70 group-active:scale-90 group-hover:from-primary/10 group-hover:to-accent/10"
             )}>
-              <Plus size={20} strokeWidth={2} />
+              <Plus size={21} strokeWidth={2.2} />
             </div>
           </Link>
 
@@ -88,20 +89,20 @@ export function BottomNav() {
                 src={avatarUrl}
                 alt=""
                 className={cn(
-                  "w-[22px] h-[22px] rounded-full object-cover transition-all duration-200",
+                  "w-[21px] h-[21px] rounded-full object-cover transition-all duration-200",
                   isProfileActive
-                    ? "ring-[1.5px] ring-foreground scale-110"
-                    : "opacity-45 group-active:opacity-70 group-active:scale-90"
+                    ? "ring-[1.5px] ring-foreground ring-offset-1 ring-offset-background"
+                    : "opacity-60 grayscale-[30%] group-active:opacity-80 group-active:scale-95"
                 )}
               />
             ) : (
               <div className={cn(
-                "w-[22px] h-[22px] rounded-full bg-muted-foreground/20 flex items-center justify-center transition-all duration-200",
+                "w-[21px] h-[21px] rounded-full bg-muted flex items-center justify-center transition-all duration-200",
                 isProfileActive
-                  ? "ring-[1.5px] ring-foreground scale-110"
-                  : "group-active:scale-90 group-active:bg-muted-foreground/30"
+                  ? "ring-[1.5px] ring-foreground ring-offset-1 ring-offset-background"
+                  : "opacity-50 group-active:scale-95"
               )}>
-                <span className="text-[9px] text-muted-foreground font-bold">؟</span>
+                <span className="text-[9px] text-muted-foreground font-medium">؟</span>
               </div>
             )}
           </Link>
@@ -117,14 +118,20 @@ function NavItem({ to, active, children, label }: { to: string; active: boolean;
     <Link
       to={to}
       className={cn(
-        "flex items-center justify-center flex-1 h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-md group transition-colors duration-200",
-        active ? "text-foreground" : "text-muted-foreground/40"
+        "flex items-center justify-center flex-1 h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-md group transition-all duration-300",
+        active ? "text-foreground" : "text-muted-foreground/45"
       )}
       aria-label={label}
       aria-current={active ? "page" : undefined}
     >
-      <div className="relative flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-300 group-active:scale-90">
+      <div className={cn(
+        "relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 group-active:scale-90",
+        active && "bg-primary/8"
+      )}>
         {children}
+        {active && (
+          <span className="absolute -bottom-1.5 w-1 h-1 rounded-full bg-primary" />
+        )}
       </div>
     </Link>
   );

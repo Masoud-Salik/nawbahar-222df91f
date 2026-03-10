@@ -2,7 +2,6 @@ import { MessageCircle, CheckCheck } from "lucide-react";
 import { cn, toPersianNumber } from "@/lib/utils";
 import { ReactionPicker } from "./ReactionPicker";
 import { ReactionDetailsModal } from "./ReactionDetailsModal";
-import { REACTION_SVG_ICONS } from "./ReactionIcons";
 import { type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
 import { useState } from "react";
 
@@ -17,6 +16,7 @@ interface ArticleCardMetricsProps {
   onCommentClick: (e: React.MouseEvent) => void;
   onResponseClick: (e: React.MouseEvent) => void;
   reactionSummary: ReactionSummary;
+  reactionFetched?: boolean;
   onReact: (type: ReactionKey) => void;
   onReactionHover?: () => void;
 }
@@ -29,6 +29,7 @@ export function ArticleCardMetrics({
   commentsOpen,
   onCommentClick,
   reactionSummary,
+  reactionFetched,
   onReact,
   onReactionHover,
 }: ArticleCardMetricsProps) {
@@ -98,6 +99,7 @@ export function ArticleCardMetrics({
               topTypes={reactionSummary.topTypes}
               summaryText={reactionText || undefined}
               onSummaryClick={hasReactions ? handleSummaryClick : undefined}
+              fetched={reactionFetched}
             />
           </div>
 
