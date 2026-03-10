@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from "react";
-import { REACTION_KEYS, REACTION_LABELS, REACTION_EMOJIS, REACTION_COLORS, type ReactionKey } from "@/hooks/useCardReactions";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { REACTION_KEYS, REACTION_LABELS, REACTION_COLORS, type ReactionKey } from "@/hooks/useCardReactions";
+import { REACTION_SVG_ICONS } from "./ReactionIcons";
 import { cn } from "@/lib/utils";
 
 interface ReactionPickerProps {
@@ -16,6 +17,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
   const containerRef = useRef<HTMLDivElement>(null);
   const [justReacted, setJustReacted] = useState(false);
   const prevReaction = useRef(userReaction);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (prevReaction.current !== userReaction && prevReaction.current !== undefined) {
@@ -49,11 +51,52 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
     return () => document.removeEventListener("pointerdown", handler);
   }, [open]);
 
-  const handleToggle = (e: React.MouseEvent) => {
+  // Tap = quick like, long press = open picker
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onHover?.();
-    setOpen((prev) => !prev);
+    longPressTimer.current = setTimeout(() => {
+      longPressTimer.current = null;
+      setOpen(true);
+    }, 400);
+  }, [onHover]);
+
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+      // Quick tap = toggle like
+      if (userReaction === "like") {
+        onReact("like"); // removes it
+      } else if (!userReaction) {
+        setJustReacted(true);
+        onReact("like");
+      } else {
+        // Already has a different reaction, open picker
+        setOpen(true);
+      }
+    }
+  }, [userReaction, onReact]);
+
+  const handlePointerCancel = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
+
+  // Desktop: click opens picker
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Only use on non-touch devices
+    if (window.matchMedia("(hover: hover)").matches) {
+      onHover?.();
+      setOpen(prev => !prev);
+    }
   };
 
   const handleSelect = (type: ReactionKey, e: React.MouseEvent) => {
@@ -67,23 +110,22 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
   const isReacted = Boolean(userReaction);
   const activeColor = userReaction ? REACTION_COLORS[userReaction]?.text : undefined;
 
-  /**
-   * Stable inline emoji — NEVER changes due to async data loading.
-   * Shows 👍 by default. Only shows user's own reaction emoji if they reacted.
-   */
-  const renderInlineEmoji = () => {
-    if (userReaction) {
-      return (
-        <span
-          className="text-[15px] leading-none"
-          style={justReacted ? { animation: "reaction-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both" } : {}}
-        >
-          {REACTION_EMOJIS[userReaction]}
-        </span>
-      );
-    }
-    // Always show stable 👍 — no topTypes switching
-    return <span className="text-[14px] leading-none opacity-45">👍</span>;
+  const renderInlineIcon = () => {
+    const IconComponent = userReaction ? REACTION_SVG_ICONS[userReaction] : REACTION_SVG_ICONS.like;
+    const style = justReacted ? { animation: "reaction-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both" } : {};
+    
+    return (
+      <span style={style} className="flex items-center">
+        <IconComponent 
+          size={16} 
+          strokeWidth={userReaction ? 2 : 1.5}
+          className={cn(
+            "transition-colors duration-150",
+            userReaction ? "" : "text-muted-foreground/50"
+          )}
+        />
+      </span>
+    );
   };
 
   const handleSummaryClick = (e: React.MouseEvent) => {
@@ -99,12 +141,19 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
 
   return (
     <div ref={containerRef} className="relative flex items-center gap-1 sm:gap-1.5">
-      {/* Main emoji button */}
-      <button onClick={handleToggle} className="flex items-center">
-        {renderInlineEmoji()}
+      {/* Main icon button */}
+      <button
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
+        onClick={handleClick}
+        className="flex items-center touch-none select-none"
+        style={activeColor ? { color: activeColor } : {}}
+      >
+        {renderInlineIcon()}
       </button>
 
-      {/* Summary text — always muted to match comment text */}
+      {/* Summary text */}
       <button
         onClick={handleSummaryClick}
         className="text-[10.5px] sm:text-[11px] truncate max-w-[120px] sm:max-w-[150px] text-muted-foreground hover:text-foreground transition-colors duration-200"
@@ -112,7 +161,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
         {summaryText || "واکنش"}
       </button>
 
-      {/* LinkedIn-style emoji picker tray */}
+      {/* Reaction picker panel */}
       {open && (
         <div
           className={cn(
@@ -131,6 +180,8 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
           <div className="flex items-center gap-0.5 sm:gap-0">
             {REACTION_KEYS.map((key, i) => {
               const isActive = userReaction === key;
+              const IconComponent = REACTION_SVG_ICONS[key];
+              const color = REACTION_COLORS[key];
               return (
                 <button
                   key={key}
@@ -139,21 +190,27 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
                     "flex flex-col items-center justify-center rounded-2xl transition-all duration-150",
                     "w-[54px] h-[58px] sm:w-[42px] sm:h-[42px]",
                     "hover:scale-[1.2] hover:-translate-y-1 active:scale-90",
-                    isActive && "bg-foreground/[0.06] scale-[1.05]"
+                    isActive && "scale-[1.05]"
                   )}
-                  style={{ animation: `reaction-entry 0.22s ease-out ${i * 40}ms both` }}
+                  style={{
+                    animation: `reaction-entry 0.22s ease-out ${i * 40}ms both`,
+                    ...(isActive ? { backgroundColor: color.bg } : {}),
+                  }}
                 >
-                  <span className={cn(
-                    "transition-transform duration-150",
-                    "text-[24px] sm:text-[21px] leading-none",
-                    isActive && "scale-105"
-                  )}>
-                    {REACTION_EMOJIS[key]}
-                  </span>
+                  <IconComponent 
+                    size={22}
+                    strokeWidth={isActive ? 2.2 : 1.5}
+                    className={cn(
+                      "transition-all duration-150",
+                      isActive ? "" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  />
                   <span className={cn(
                     "text-[8.5px] sm:hidden mt-1 leading-none",
-                    isActive ? "text-foreground/70 font-medium" : "text-muted-foreground/60"
-                  )}>
+                    isActive ? "font-medium" : "text-muted-foreground/60"
+                  )}
+                    style={isActive ? { color: color.text } : {}}
+                  >
                     {REACTION_LABELS[key]}
                   </span>
                 </button>
@@ -166,7 +223,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
       {/* Backdrop for mobile */}
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-background/40 backdrop-blur-sm sm:hidden"
+          className="fixed inset-0 z-40 bg-background/15 sm:hidden"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); }}
         />
       )}

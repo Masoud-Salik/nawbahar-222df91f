@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toPersianNumber, cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
+import nawbaharLogo from "@/assets/nawbahar-logo.png";
 
 export function Header() {
   const { unreadCount } = useNotifications();
@@ -53,7 +54,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border/40 safe-top" style={{ boxShadow: '0 1px 8px -2px rgba(0,0,0,0.06)' }}>
       <div className="flex items-center justify-between px-4 h-11 max-w-lg mx-auto">
-        <Link to="/" className="flex items-center group">
+        <Link to="/" className="flex items-center gap-1.5 group">
+          <img src={nawbaharLogo} alt="نوبهار" className="w-6 h-6" />
           <span className="text-[15px] font-extrabold tracking-tight text-foreground leading-none">
             نوبهار
           </span>

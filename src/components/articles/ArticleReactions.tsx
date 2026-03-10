@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { REACTION_EMOJIS, REACTION_LABELS, type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
+import { type ReactionKey, type ReactionSummary } from "@/hooks/useCardReactions";
 import { cn, toPersianNumber } from "@/lib/utils";
-import { ThumbsUp, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { ReactionDetailsModal } from "./ReactionDetailsModal";
 import { ReactionPicker } from "./ReactionPicker";
 
