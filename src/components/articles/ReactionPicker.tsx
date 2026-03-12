@@ -111,9 +111,13 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
   const activeColor = userReaction ? REACTION_COLORS[userReaction]?.text : undefined;
 
   const renderInlineIcon = () => {
-    const IconComponent = userReaction ? REACTION_SVG_ICONS[userReaction] : REACTION_SVG_ICONS.like;
+    const IconComponent = (userReaction && REACTION_SVG_ICONS[userReaction]) ? REACTION_SVG_ICONS[userReaction] : REACTION_SVG_ICONS.like;
     const style = justReacted ? { animation: "reaction-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both" } : {};
     
+    if (!IconComponent) {
+      return <span className="w-4 h-4 text-muted-foreground/50">👍</span>;
+    }
+
     return (
       <span style={style} className="flex items-center">
         <IconComponent 
