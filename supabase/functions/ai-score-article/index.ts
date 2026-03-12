@@ -208,39 +208,26 @@ Article Content: ${content.slice(0, 4000)}`;
       ? (evaluation.rejection_reason || "کیفیت مقاله برای انتشار کافی نیست. لطفاً محتوا را بازبینی و بهبود دهید.")
       : "";
 
-    // Update article with scores and status
-    if (articleId) {
-      // Validate articleId is a valid UUID
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(articleId)) {
-        return new Response(JSON.stringify({ error: "Invalid article ID" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    // Update article with scores and status (articleId already validated above)
+    const updateBody: Record<string, unknown> = {
+      ai_score_science: scores.science,
+      ai_score_ethics: scores.ethics,
+      ai_score_writing: scores.writing,
+      ai_score_timing: scores.timing,
+      ai_score_innovation: scores.innovation,
+      status: approved ? "published" : "rejected",
+    };
 
-      const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-      const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-      const updateBody: Record<string, unknown> = {
-        ai_score_science: scores.science,
-        ai_score_ethics: scores.ethics,
-        ai_score_writing: scores.writing,
-        ai_score_timing: scores.timing,
-        ai_score_innovation: scores.innovation,
-        status: approved ? "published" : "rejected",
-      };
-
-      await fetch(`${SUPABASE_URL}/rest/v1/articles?id=eq.${articleId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: SUPABASE_SERVICE_ROLE_KEY,
-          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-          Prefer: "return=minimal",
-        },
-        body: JSON.stringify(updateBody),
-      });
-    }
+    await fetch(`${SUPABASE_URL}/rest/v1/articles?id=eq.${articleId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(updateBody),
+    });
 
     return new Response(JSON.stringify({ 
       approved, 
