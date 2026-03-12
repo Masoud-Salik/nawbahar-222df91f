@@ -184,8 +184,8 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
           <div className="flex items-center gap-0.5 sm:gap-0">
             {REACTION_KEYS.map((key, i) => {
               const isActive = userReaction === key;
-              const IconComponent = REACTION_SVG_ICONS[key];
-              const color = REACTION_COLORS[key];
+              const IconComponent = REACTION_SVG_ICONS[key] || REACTION_SVG_ICONS.like;
+              const color = REACTION_COLORS[key] || REACTION_COLORS.like;
               return (
                 <button
                   key={key}
