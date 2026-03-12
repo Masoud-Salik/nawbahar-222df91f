@@ -12,6 +12,7 @@ import { playSuccessSound } from "@/lib/sounds";
 import { toPersianNumber } from "@/lib/utils";
 import type { User } from "@supabase/supabase-js";
 import { useArticleSearch, addCitation } from "@/hooks/useCitations";
+import { usePublishingCapacity } from "@/hooks/usePublishingCapacity";
 import {
   AlertDialog,
   AlertDialogContent,
