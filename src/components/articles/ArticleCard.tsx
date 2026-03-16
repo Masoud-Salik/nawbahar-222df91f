@@ -107,7 +107,7 @@ export function ArticleCard({ article, onDelete }: ArticleCardProps) {
             <span className="text-[10.5px] text-muted-foreground/50 font-normal">{formatSolarShort(article.created_at)}</span>
           </div>
 
-          <div onClick={(e) => e.preventDefault()} className="flex-shrink-0">
+          <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="flex-shrink-0">
             <ArticleActionsMenu articleId={article.id} authorId={article.author_id} articleTitle={article.title} onDelete={onDelete} />
           </div>
         </div>

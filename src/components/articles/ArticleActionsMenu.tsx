@@ -74,16 +74,6 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle, onDelete
     if (isOpen) checkBookmark();
   }, [isOpen, checkBookmark]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const close = () => setIsOpen(false);
-    window.addEventListener("scroll", close, { passive: true, capture: true });
-    window.addEventListener("touchstart", close, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", close, true);
-      window.removeEventListener("touchstart", close);
-    };
-  }, [isOpen]);
 
   const isOwner = userId === authorId;
 
@@ -190,7 +180,12 @@ export function ArticleActionsMenu({ articleId, authorId, articleTitle, onDelete
     <>
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
         <DropdownMenuTrigger asChild>
-          <button className="p-1.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none">
+          <button
+            className="p-1.5 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onPointerDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+          >
             <MoreVertical size={16} strokeWidth={1.5} />
           </button>
         </DropdownMenuTrigger>

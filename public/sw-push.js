@@ -8,6 +8,7 @@ self.addEventListener('push', (event) => {
   try {
     const data = event.data.json();
     const title = data.title || 'نوبهار';
+    const notificationId = data.id || data.tag || `nawbahar-notification-${Date.now()}`;
     const options = {
       body: data.body || '',
       icon: data.icon || '/pwa-192x192.png',
@@ -16,8 +17,8 @@ self.addEventListener('push', (event) => {
       lang: 'fa',
       data: data.data || { url: '/' },
       vibrate: [100, 50, 100],
-      tag: 'nawbahar-notification',
-      renotify: true,
+      tag: notificationId,
+      renotify: false,
     };
 
     event.waitUntil(self.registration.showNotification(title, options));

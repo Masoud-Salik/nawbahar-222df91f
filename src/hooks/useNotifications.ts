@@ -128,8 +128,9 @@ export function useNotifications() {
         })
       : transformed;
 
-    setNotifications(filtered);
-    setUnreadCount(filtered.filter(n => !n.is_read).length);
+    const dedupedNotifications = Array.from(new Map(filtered.map((n) => [n.id, n])).values());
+    setNotifications(dedupedNotifications);
+    setUnreadCount(dedupedNotifications.filter(n => !n.is_read).length);
     setLoading(false);
   }, [user, settings]);
 
