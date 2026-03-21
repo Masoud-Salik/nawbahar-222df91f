@@ -10,6 +10,7 @@ import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Check, X } from "lucide-reac
 import { sanitizeError, validation } from "@/lib/errorHandler";
 import { SEOHead } from "@/components/SEOHead";
 import { useAuth } from "@/hooks/useAuth";
+import InteractiveOnboardingModal from "@/components/InteractiveOnboardingModal";
 import nawbaharLogo from "@/assets/nawbahar-logo.png";
 
 type AuthView = "welcome" | "login" | "register" | "forgot";
@@ -26,6 +27,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -108,7 +110,7 @@ const Auth = () => {
       if (error) throw error;
       if (data?.user) {
         toast({ title: "خوش آمدید به نوبهار! 🌱" });
-        navigate("/profile-setup");
+        setShowOnboardingModal(true);
       }
     } catch (error: any) {
       toast({ title: "خطا", description: sanitizeError(error), variant: "destructive" });
@@ -370,7 +372,8 @@ const Auth = () => {
 
   // ─── REGISTER VIEW ───
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <>
+      <div className="min-h-screen bg-background flex flex-col">
       <SEOHead title="ثبت‌نام" description="ایجاد حساب کاربری در نوبهار" ogUrl="/auth" noIndex />
       <div className="h-1 bg-gradient-to-l from-primary via-accent to-primary/40" />
       <div className="flex-1 flex items-center justify-center p-5">
@@ -564,8 +567,15 @@ const Auth = () => {
           </div>
         </div>
       </div>
-    </div>
+      
+      {/* Interactive Onboarding Modal */}
+      <InteractiveOnboardingModal 
+        isOpen={showOnboardingModal} 
+        onClose={() => {
+          setShowOnboardingModal(false);
+          navigate("/");
+        }} 
+      />
+    </>
   );
-};
-
 export default Auth;
