@@ -34,6 +34,7 @@ export function usePWAStatus(): PWAStatus {
   const [installState, setInstallState] = useState<InstallState>('unknown');
   const [updateState, setUpdateState] = useState<UpdateState>('checking');
   const [isPWA, setIsPWA] = useState(false);
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration | undefined>();
   const [updateSW, setUpdateSW] = useState<((reloadPage?: boolean) => Promise<void>) | undefined>();
   const { toast } = useToast();
   
@@ -97,6 +98,9 @@ export function usePWAStatus(): PWAStatus {
       try {
         registration = await navigator.serviceWorker.ready;
         
+        // Store registration for update functions
+        setRegistration(registration);
+        
         // Listen for updates
         registration.addEventListener('updatefound', () => {
           const newWorker = registration?.installing;
@@ -106,6 +110,41 @@ export function usePWAStatus(): PWAStatus {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                 // New version available
                 setUpdateState('update-available');
+                
+                // Store update function
+                setUpdateSW(() => async (reloadPage: boolean = true) => {
+                  setUpdateState('updating');
+                  
+                  try {
+                    // Tell service worker to skip waiting
+                    if (registration?.waiting) {
+                      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                      
+                      // Wait for controller change
+                      const controllerChange = new Promise((resolve) => {
+                        const handleControllerChange = () => {
+                          window.removeEventListener('controllerchange', handleControllerChange);
+                          resolve(undefined);
+                        };
+                        window.addEventListener('controllerchange', handleControllerChange);
+                      });
+                      
+                      await controllerChange;
+                      
+                      if (reloadPage) {
+                        window.location.reload();
+                      }
+                    }
+                  } catch (error) {
+                    console.error('Update failed:', error);
+                    setUpdateState('error');
+                    toast({
+                      title: 'خطا در بروزرسانی',
+                      description: 'لطفاً صفحه را دستی رفرش کنید',
+                      variant: 'destructive',
+                    });
+                  }
+                });
                 
                 // Show update notification
                 toast({
@@ -117,13 +156,19 @@ export function usePWAStatus(): PWAStatus {
           }
         });
 
+        // Initial check for updates
+        setTimeout(() => {
+          checkForUpdates();
+        }, 1000);
+
         // Periodic check for updates (every 30 minutes)
         updateChecker = setInterval(() => {
-          registration?.update();
+          checkForUpdates();
         }, 30 * 60 * 1000);
 
       } catch (error) {
         console.error('SW registration failed:', error);
+        setUpdateState('error');
       }
     };
 
@@ -132,7 +177,7 @@ export function usePWAStatus(): PWAStatus {
     return () => {
       clearInterval(updateChecker);
     };
-  }, [toast]);
+  }, [toast, checkForUpdates]);
 
   // Install app function
   const installApp = useCallback(async () => {
@@ -184,54 +229,48 @@ export function usePWAStatus(): PWAStatus {
     
     try {
       if (!registration) {
-        setUpdateState('up-to-date');
-        return;
-      }
-
-      await registration.update();
-      
-      // If no update found, we're up to date
-      setTimeout(() => {
-        if (updateState !== 'update-available') {
-          setUpdateState('up-to-date');
+        // Try to get registration if not available
+        const reg = await navigator.serviceWorker.ready;
+        setRegistration(reg);
+        
+        if (!reg) {
+          setUpdateState('error');
+          return;
         }
-      }, 2000);
-      
-    } catch (error) {
-      setUpdateState('error');
-    }
-  }, []);
+      }
 
-  // Handle update
-  const handleUpdate = async (reloadPage: boolean = true) => {
-    setUpdateState('updating');
-    
-    try {
-      // Tell service worker to skip waiting
-      const registration = await navigator.serviceWorker.ready;
+      // Manually check for updates
+      await registration!.update();
       
-      if (registration.waiting) {
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-      }
+      // Wait a bit to see if update is found
+      setTimeout(() => {
+        if (updateState !== 'update-available' && updateState !== 'updating') {
+          setUpdateState('up-to-date');
+          toast({
+            title: 'برنامه بروز است',
+            description: 'شما آخرین نسخه را دارید',
+          });
+        }
+      }, 3000);
       
-      if (reloadPage) {
-        window.location.reload();
-      }
     } catch (error) {
+      console.error('Update check failed:', error);
       setUpdateState('error');
       toast({
-        title: 'خطا در بروزرسانی',
+        title: 'خطا در بررسی',
+        description: 'دوباره تلاش کنید',
         variant: 'destructive',
       });
     }
-  };
+  }, [registration, updateState, toast]);
+
 
   return {
     installState,
     updateState,
     isPWA,
     currentVersion,
-    updateSW: handleUpdate,
+    updateSW,
     checkForUpdates,
     installApp,
   };

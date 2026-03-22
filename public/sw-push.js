@@ -1,6 +1,13 @@
 // Custom service worker additions for push notifications, Background Sync & Periodic Sync
 // This file is imported by vite-plugin-pwa's generated service worker
 
+// ─── Update Handler ───
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // ─── Push Notifications ───
 self.addEventListener('push', (event) => {
   if (!event.data) return;

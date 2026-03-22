@@ -67,7 +67,11 @@ export function InstallUpdateButton({
           variant="default" 
           size={size}
           className={className}
-          onClick={() => updateSW?.(true)}
+          onClick={async () => {
+            if (updateSW) {
+              await updateSW(true);
+            }
+          }}
         >
           <RefreshCw className="w-4 h-4 ml-2" />
           بروزرسانی برنامه
@@ -75,8 +79,8 @@ export function InstallUpdateButton({
       );
     }
 
-    // Checking
-    if (updateState === 'checking' || updateState === 'updating') {
+    // Updating - show loading state
+    if (updateState === 'updating') {
       return (
         <Button 
           variant={variant} 
@@ -85,7 +89,22 @@ export function InstallUpdateButton({
           disabled
         >
           <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-          {updateState === 'checking' ? 'در حال بررسی...' : 'در حال بروزرسانی...'}
+          در حال بروزرسانی...
+        </Button>
+      );
+    }
+
+    // Checking
+    if (updateState === 'checking') {
+      return (
+        <Button 
+          variant={variant} 
+          size={size}
+          className={className}
+          disabled
+        >
+          <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+          در حال بررسی...
         </Button>
       );
     }
@@ -105,7 +124,22 @@ export function InstallUpdateButton({
       );
     }
 
-    // Error or default - show Check for Updates
+    // Error state
+    if (updateState === 'error') {
+      return (
+        <Button 
+          variant="destructive" 
+          size={size}
+          className={className}
+          onClick={checkForUpdates}
+        >
+          <AlertCircle className="w-4 h-4 ml-2" />
+          تلاش مجدد
+        </Button>
+      );
+    }
+
+    // Default state - show Check for Updates
     return (
       <Button 
         variant={variant} 
