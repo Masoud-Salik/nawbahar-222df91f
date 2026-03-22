@@ -49,7 +49,7 @@ export function SuggestedWriters() {
       }
 
       const { data: profiles } = await supabase
-        .from("profiles")
+        .from("public_profiles")
         .select("id, display_name, avatar_url, specialty")
         .in("id", topAuthorIds);
 

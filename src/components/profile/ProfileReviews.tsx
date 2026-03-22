@@ -46,7 +46,7 @@ export function ProfileReviews({ profileId, isOwnProfile }: ProfileReviewsProps)
     if (data && data.length > 0) {
       const reviewerIds = [...new Set(data.map((r) => r.reviewer_id))];
       const { data: profiles } = await supabase
-        .from("profiles")
+        .from("public_profiles")
         .select("id, display_name, avatar_url")
         .in("id", reviewerIds);
 
