@@ -602,9 +602,286 @@ export type Database = {
         }
         Relationships: []
       }
+      user_devices: {
+        Row: {
+          id: string
+          user_id: string | null
+          device_id: string
+          device_type: string | null
+          device_model: string | null
+          os_name: string | null
+          os_version: string | null
+          browser_name: string | null
+          browser_version: string | null
+          screen_width: number | null
+          screen_height: number | null
+          user_type: string
+          is_pwa_installed: boolean
+          installed_at: string | null
+          app_version: string | null
+          first_visit_at: string
+          first_visit_url: string | null
+          first_visit_referrer: string | null
+          country_code: string | null
+          timezone: string | null
+          language: string | null
+          last_seen_at: string
+          last_active_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          device_id: string
+          device_type?: string | null
+          device_model?: string | null
+          os_name?: string | null
+          os_version?: string | null
+          browser_name?: string | null
+          browser_version?: string | null
+          screen_width?: number | null
+          screen_height?: number | null
+          user_type?: string
+          is_pwa_installed?: boolean
+          installed_at?: string | null
+          app_version?: string | null
+          first_visit_at?: string
+          first_visit_url?: string | null
+          first_visit_referrer?: string | null
+          country_code?: string | null
+          timezone?: string | null
+          language?: string | null
+          last_seen_at?: string
+          last_active_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          device_id?: string
+          device_type?: string | null
+          device_model?: string | null
+          os_name?: string | null
+          os_version?: string | null
+          browser_name?: string | null
+          browser_version?: string | null
+          screen_width?: number | null
+          screen_height?: number | null
+          user_type?: string
+          is_pwa_installed?: boolean
+          installed_at?: string | null
+          app_version?: string | null
+          first_visit_at?: string
+          first_visit_url?: string | null
+          first_visit_referrer?: string | null
+          country_code?: string | null
+          timezone?: string | null
+          language?: string | null
+          last_seen_at?: string
+          last_active_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_devices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      user_presence: {
+        Row: {
+          user_id: string
+          device_id: string
+          session_id: string
+          status: string
+          last_seen_at: string
+          last_activity_at: string
+          current_activity: string | null
+          current_entity_id: string | null
+          heartbeat_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          device_id: string
+          session_id: string
+          status?: string
+          last_seen_at?: string
+          last_activity_at?: string
+          current_activity?: string | null
+          current_entity_id?: string | null
+          heartbeat_at?: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          device_id?: string
+          session_id?: string
+          status?: string
+          last_seen_at?: string
+          last_activity_at?: string
+          current_activity?: string | null
+          current_entity_id?: string | null
+          heartbeat_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_presence_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      user_sessions: {
+        Row: {
+          id: string
+          user_id: string | null
+          device_id: string
+          session_token: string
+          is_active: boolean
+          started_at: string
+          ended_at: string | null
+          last_heartbeat_at: string
+          duration_seconds: number | null
+          ip_address: unknown | null
+          user_agent: string | null
+          entry_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          device_id: string
+          session_token: string
+          is_active?: boolean
+          started_at?: string
+          ended_at?: string | null
+          last_heartbeat_at?: string
+          duration_seconds?: number | null
+          ip_address?: unknown | null
+          user_agent?: string | null
+          entry_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          device_id?: string
+          session_token?: string
+          is_active?: boolean
+          started_at?: string
+          ended_at?: string | null
+          last_heartbeat_at?: string
+          duration_seconds?: number | null
+          ip_address?: unknown | null
+          user_agent?: string | null
+          entry_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      activity_logs: {
+        Row: {
+          id: string
+          user_id: string | null
+          device_id: string | null
+          session_id: string | null
+          activity_type: Database["public"]["Enums"]["activity_type"]
+          activity_category: string
+          entity_id: string | null
+          entity_type: string | null
+          metadata: Json | null
+          url: string | null
+          referrer: string | null
+          time_spent_seconds: number | null
+          created_at: string
+          created_date: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          device_id?: string | null
+          session_id?: string | null
+          activity_type: Database["public"]["Enums"]["activity_type"]
+          activity_category?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          metadata?: Json | null
+          url?: string | null
+          referrer?: string | null
+          time_spent_seconds?: number | null
+          created_at?: string
+          created_date?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          device_id?: string | null
+          session_id?: string | null
+          activity_type?: Database["public"]["Enums"]["activity_type"]
+          activity_category?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          metadata?: Json | null
+          url?: string | null
+          referrer?: string | null
+          time_spent_seconds?: number | null
+          created_at?: string
+          created_date?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      daily_active_users: {
+        Row: {
+          date: string | null
+          unique_users: number | null
+          total_sessions: number | null
+          activity_category: string | null
+          activity_type: string | null
+        }
+        Relationships: []
+      }
+      online_users: {
+        Row: {
+          user_id: string | null
+          device_id: string | null
+          session_id: string | null
+          status: string | null
+          last_seen_at: string | null
+          current_activity: string | null
+          display_name: string | null
+          avatar_url: string | null
+          user_type: string | null
+          is_pwa_installed: boolean | null
+        }
+        Relationships: []
+      }
+      user_engagement_summary: {
+        Row: {
+          user_id: string | null
+          total_activities: number | null
+          active_days: number | null
+          first_activity: string | null
+          last_activity: string | null
+          activities_last_7_days: number | null
+          activities_last_30_days: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_follower_count: { Args: { target_user_id: string }; Returns: number }
@@ -626,6 +903,16 @@ export type Database = {
     Enums: {
       app_role: "user" | "verified_writer" | "admin"
       article_status: "pending" | "published" | "rejected"
+      activity_type: 
+        | "app_open" | "app_install" | "app_update" | "login" | "logout" | "register"
+        | "article_view" | "article_read" | "article_write" | "article_publish" 
+        | "article_edit" | "article_delete" | "article_share" | "article_bookmark" 
+        | "article_unbookmark" | "article_like" | "article_unlike"
+        | "comment_add" | "comment_edit" | "comment_delete" | "comment_like"
+        | "reaction_add" | "reaction_remove" | "follow_user" | "unfollow_user"
+        | "profile_view" | "profile_edit" | "profile_setup"
+        | "search" | "explore_view" | "notification_open" | "notification_read"
+        | "vip_post_view" | "admin_action"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -755,6 +1042,17 @@ export const Constants = {
     Enums: {
       app_role: ["user", "verified_writer", "admin"],
       article_status: ["pending", "published", "rejected"],
+      activity_type: [
+        "app_open", "app_install", "app_update", "login", "logout", "register",
+        "article_view", "article_read", "article_write", "article_publish", 
+        "article_edit", "article_delete", "article_share", "article_bookmark", 
+        "article_unbookmark", "article_like", "article_unlike",
+        "comment_add", "comment_edit", "comment_delete", "comment_like",
+        "reaction_add", "reaction_remove", "follow_user", "unfollow_user",
+        "profile_view", "profile_edit", "profile_setup",
+        "search", "explore_view", "notification_open", "notification_read",
+        "vip_post_view", "admin_action"
+      ],
     },
   },
 } as const

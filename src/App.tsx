@@ -10,6 +10,7 @@ import { registerSW } from "virtual:pwa-register";
 import { useToast } from "@/hooks/use-toast";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import Index from "./pages/Index";
 
 // Lazy load non-critical pages
@@ -76,32 +77,34 @@ const App = forwardRef<HTMLDivElement>(function App(_props, _ref) {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <OfflineIndicator />
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Suspense fallback={<PageFallback />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/explore" element={<Explore />} />
-                <Route path="/bookmarks" element={<Bookmarks />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/profile/:userId" element={<Profile />} />
-                <Route path="/write" element={<Write />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/editor" element={<ArticleEditor />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/article/:id" element={<Article />} />
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/vip" element={<VIP />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/install" element={<Install />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/profile-setup" element={<ProfileSetup />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
+          <AnalyticsProvider>
+            <OfflineIndicator />
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense fallback={<PageFallback />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/explore" element={<Explore />} />
+                  <Route path="/bookmarks" element={<Bookmarks />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/profile/:userId" element={<Profile />} />
+                  <Route path="/write" element={<Write />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/editor" element={<ArticleEditor />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/article/:id" element={<Article />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/vip" element={<VIP />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/install" element={<Install />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/profile-setup" element={<ProfileSetup />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </AnalyticsProvider>
         </TooltipProvider>
       </QueryClientProvider>
     </ErrorBoundary>

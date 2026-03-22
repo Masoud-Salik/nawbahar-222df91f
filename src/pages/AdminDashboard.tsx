@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { formatSolarShort } from "@/lib/solarHijri";
 import { ReviewModal } from "@/components/admin/ReviewModal";
 import { cn } from "@/lib/utils";
+import AdminAnalyticsDashboard from "@/components/admin/AdminAnalyticsDashboard";
 
 interface AdminArticle {
   id: string;
@@ -200,9 +201,10 @@ const AdminDashboard = () => {
 
       <main className="max-w-screen-md mx-auto p-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-5 mb-4 h-auto bg-muted/30 rounded-xl p-1">
+          <TabsList className="w-full grid grid-cols-6 mb-4 h-auto bg-muted/30 rounded-xl p-1">
             {[
               { value: "stats", icon: TrendingUp, label: "آمار" },
+              { value: "analytics", icon: BarChart3, label: "تحلیل‌ها" },
               { value: "pending", icon: Clock, label: "انتظار", badge: stats?.pendingArticles },
               { value: "published", icon: CheckCircle, label: "منتشر" },
               { value: "rejected", icon: XCircle, label: "رد" },
@@ -220,6 +222,10 @@ const AdminDashboard = () => {
               </TabsTrigger>
             ))}
           </TabsList>
+
+          <TabsContent value="analytics">
+            <AdminAnalyticsDashboard />
+          </TabsContent>
 
           <TabsContent value="stats">
             {loading ? <LoadingSpinner /> : stats && (

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { analyticsService } from "@/services/analytics";
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff, Check, X } from "lucide-react";
 import { sanitizeError, validation } from "@/lib/errorHandler";
 import { SEOHead } from "@/components/SEOHead";
@@ -63,8 +64,14 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      
+      // Track login
+      if (data?.user) {
+        await analyticsService.trackLogin(data.user.id);
+      }
+      
       toast({ title: "خوش آمدید! 👋" });
       navigate("/");
     } catch (error: any) {
@@ -109,6 +116,9 @@ const Auth = () => {
       });
       if (error) throw error;
       if (data?.user) {
+        // Track registration
+        await analyticsService.trackRegistration(data.user.id);
+        
         toast({ title: "خوش آمدید به نوبهار! 🌱" });
         setShowOnboardingModal(true);
       }
@@ -567,6 +577,7 @@ const Auth = () => {
           </div>
         </div>
       </div>
+      </div>
       
       {/* Interactive Onboarding Modal */}
       <InteractiveOnboardingModal 
@@ -578,4 +589,6 @@ const Auth = () => {
       />
     </>
   );
+};
+
 export default Auth;
