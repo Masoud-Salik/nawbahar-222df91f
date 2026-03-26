@@ -1,4 +1,7 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+Type
+External commit
+Created
+Mar 23, 9:30 PMimport { useState, useRef, useEffect, useCallback } from "react";
 import { REACTION_KEYS, REACTION_LABELS, REACTION_COLORS, type ReactionKey } from "@/hooks/useCardReactions";
 import { REACTION_SVG_ICONS } from "./ReactionIcons";
 import { cn } from "@/lib/utils";
