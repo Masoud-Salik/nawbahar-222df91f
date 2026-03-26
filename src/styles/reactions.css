@@ -1,0 +1,190 @@
+/* Modern Reaction System Animations */
+
+/* Subtle pulse animation for thumbs up */
+@keyframes pulse-subtle {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.05);
+  }
+}
+
+/* Heartbeat animation for love reaction */
+@keyframes heartbeat {
+  0%, 100% { 
+    transform: scale(1);
+  }
+  25% { 
+    transform: scale(1.1);
+  }
+  45% { 
+    transform: scale(0.95);
+  }
+  65% { 
+    transform: scale(1.05);
+  }
+}
+
+/* Glow animation for insightful reaction */
+@keyframes glow {
+  0%, 100% { 
+    filter: brightness(1);
+    transform: scale(1);
+  }
+  50% { 
+    filter: brightness(1.2);
+    transform: scale(1.02);
+  }
+}
+
+/* Gentle bounce for laugh reaction */
+@keyframes bounce-gentle {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg);
+  }
+  25% { 
+    transform: translateY(-2px) rotate(-2deg);
+  }
+  75% { 
+    transform: translateY(-2px) rotate(2deg);
+  }
+}
+
+/* Sway animation for sad reaction */
+@keyframes sway {
+  0%, 100% { 
+    transform: rotate(0deg);
+  }
+  25% { 
+    transform: rotate(-3deg);
+  }
+  75% { 
+    transform: rotate(3deg);
+  }
+}
+
+/* Enhanced reaction pop animation */
+@keyframes reaction-pop-enhanced {
+  0% { 
+    transform: scale(0.3) rotate(-15deg); 
+    opacity: 0; 
+  }
+  25% { 
+    transform: scale(1.2) rotate(5deg); 
+    opacity: 0.8;
+  }
+  50% { 
+    transform: scale(0.9) rotate(-2deg); 
+  }
+  75% { 
+    transform: scale(1.05) rotate(1deg); 
+  }
+  100% { 
+    transform: scale(1) rotate(0deg); 
+    opacity: 1; 
+  }
+}
+
+/* Smooth entry animation for reaction picker */
+@keyframes reaction-entry-enhanced {
+  0% { 
+    transform: scale(0.4) translateY(12px) rotate(-10deg); 
+    opacity: 0; 
+  }
+  50% { 
+    transform: scale(1.1) translateY(-2px) rotate(2deg); 
+    opacity: 0.9;
+  }
+  100% { 
+    transform: scale(1) translateY(0) rotate(0deg); 
+    opacity: 1; 
+  }
+}
+
+/* Hover lift animation */
+@keyframes hover-lift {
+  0% { 
+    transform: translateY(0) scale(1);
+  }
+  100% { 
+    transform: translateY(-4px) scale(1.05);
+  }
+}
+
+/* Ripple effect on click */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Animation classes */
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 1.8s ease-in-out infinite;
+}
+
+.animate-sway {
+  animation: sway 2s ease-in-out infinite;
+}
+
+.animate-reaction-pop-enhanced {
+  animation: reaction-pop-enhanced 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-reaction-entry-enhanced {
+  animation: reaction-entry-enhanced 0.3s ease-out both;
+}
+
+/* Instant loading transitions */
+.reaction-instant {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reaction-instant:hover {
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-subtle,
+  .animate-heartbeat,
+  .animate-glow,
+  .animate-bounce-gentle,
+  .animate-sway {
+    animation: none;
+  }
+}
+
+/* GPU acceleration for smooth animations */
+.reaction-icon {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+  .animate-glow {
+    filter: brightness(1.3);
+  }
+}

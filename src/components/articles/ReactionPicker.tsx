@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { REACTION_KEYS, REACTION_LABELS, REACTION_COLORS, type ReactionKey } from "@/hooks/useCardReactions";
 import { REACTION_SVG_ICONS } from "./ReactionIcons";
 import { cn } from "@/lib/utils";
+import "@/styles/reactions.css";
 
 interface ReactionPickerProps {
   userReaction: ReactionKey | null;
@@ -112,19 +113,20 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
 
   const renderInlineIcon = () => {
     const IconComponent = (userReaction && REACTION_SVG_ICONS[userReaction]) ? REACTION_SVG_ICONS[userReaction] : REACTION_SVG_ICONS.like;
-    const style = justReacted ? { animation: "reaction-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both" } : {};
+    const style = justReacted ? { animation: "reaction-pop-enhanced 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both" } : {};
     
     if (!IconComponent) {
-      return <span className="w-4 h-4 text-muted-foreground/50">👍</span>;
+      return <span className="w-4 h-4 text-muted-foreground/50 reaction-icon">👍</span>;
     }
 
     return (
-      <span style={style} className="flex items-center">
+      <span style={style} className="flex items-center reaction-icon">
         <IconComponent 
           size={16} 
-          strokeWidth={userReaction ? 2 : 1.5}
+          strokeWidth={userReaction ? 2.2 : 1.8}
+          animated={justReacted}
           className={cn(
-            "transition-colors duration-150",
+            "reaction-instant",
             userReaction ? "" : "text-muted-foreground/50"
           )}
         />
@@ -151,7 +153,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
         onClick={handleClick}
-        className="flex items-center touch-none select-none"
+        className="flex items-center touch-none select-none reaction-instant hover:scale-105 active:scale-95"
         style={activeColor ? { color: activeColor } : {}}
       >
         {renderInlineIcon()}
@@ -160,7 +162,7 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
       {/* Summary text */}
       <button
         onClick={handleSummaryClick}
-        className="text-[10.5px] sm:text-[11px] truncate max-w-[120px] sm:max-w-[150px] text-muted-foreground hover:text-foreground transition-colors duration-200"
+        className="text-[10.5px] sm:text-[11px] truncate max-w-[120px] sm:max-w-[150px] text-muted-foreground hover:text-foreground reaction-instant hover:scale-105 active:scale-95"
       >
         {summaryText || "واکنش"}
       </button>
@@ -191,21 +193,22 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
                   key={key}
                   onClick={(e) => handleSelect(key as ReactionKey, e)}
                   className={cn(
-                    "flex flex-col items-center justify-center rounded-2xl transition-all duration-150",
+                    "flex flex-col items-center justify-center rounded-2xl reaction-instant reaction-icon",
                     "w-[54px] h-[58px] sm:w-[42px] sm:h-[42px]",
-                    "hover:scale-[1.2] hover:-translate-y-1 active:scale-90",
-                    isActive && "scale-[1.05]"
+                    "hover:scale-[1.15] hover:-translate-y-1.5 active:scale-90 hover:shadow-lg",
+                    isActive && "scale-[1.05] shadow-md"
                   )}
                   style={{
-                    animation: `reaction-entry 0.22s ease-out ${i * 40}ms both`,
+                    animation: `reaction-entry-enhanced 0.25s ease-out ${i * 35}ms both`,
                     ...(isActive ? { backgroundColor: color.bg } : {}),
                   }}
                 >
                   <IconComponent 
                     size={22}
-                    strokeWidth={isActive ? 2.2 : 1.5}
+                    strokeWidth={isActive ? 2.2 : 1.8}
+                    animated={isActive}
                     className={cn(
-                      "transition-all duration-150",
+                      "reaction-instant reaction-icon",
                       isActive ? "" : "text-muted-foreground hover:text-foreground"
                     )}
                   />
@@ -241,6 +244,27 @@ export function ReactionPicker({ userReaction, onReact, onHover, topTypes, summa
         @keyframes reaction-entry {
           0% { transform: scale(0) translateY(8px); opacity: 0; }
           100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        /* Enhanced hover effects */
+        .reaction-picker-item {
+          position: relative;
+          overflow: hidden;
+        }
+        .reaction-picker-item::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 0;
+          height: 0;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          transform: translate(-50%, -50%);
+          transition: width 0.3s, height 0.3s;
+        }
+        .reaction-picker-item:hover::before {
+          width: 100%;
+          height: 100%;
         }
       `}</style>
     </div>
