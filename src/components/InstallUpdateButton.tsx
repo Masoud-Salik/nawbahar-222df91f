@@ -70,6 +70,9 @@ export function InstallUpdateButton({
           onClick={async () => {
             if (updateSW) {
               await updateSW(true);
+            } else {
+              // Fallback: force refresh
+              window.location.reload();
             }
           }}
         >

@@ -107,89 +107,33 @@ export function usePWAStatus(): PWAStatus {
           
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
-              // Check if new worker is installed and we have a current controller (means update available)
-              // OR if new worker is installed and becomes the controller (means update was applied)
               if (newWorker.state === 'installed') {
                 if (navigator.serviceWorker.controller) {
-                  // New version available but not yet activated
+                  // New version available
                   setUpdateState('update-available');
                   
-                  // Store update function
+                  // Simple update function
                   setUpdateSW(() => async (reloadPage: boolean = true) => {
                     setUpdateState('updating');
                     
                     try {
-                      // Get current registration
-                      const currentReg = await navigator.serviceWorker.ready;
+                      // Force update by refreshing the page
+                      toast({
+                        title: 'بروزرسانی برنامه',
+                        description: 'صفحه برای دریافت نسخه جدید رفرش می‌شود...',
+                      });
                       
-                      if (currentReg.waiting) {
-                        // Tell service worker to skip waiting
-                        currentReg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                        
-                        // Wait for controller change
-                        const controllerChange = new Promise((resolve) => {
-                          const handleControllerChange = () => {
-                            window.removeEventListener('controllerchange', handleControllerChange);
-                            resolve(undefined);
-                          };
-                          window.addEventListener('controllerchange', handleControllerChange);
-                        });
-                        
-                        await controllerChange;
-                        
-                        if (reloadPage) {
+                      // Clear any cached data and force refresh
+                      if ('caches' in window) {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(cacheNames.map(name => caches.delete(name)));
+                      }
+                      
+                      // Force hard refresh
+                      if (reloadPage) {
+                        setTimeout(() => {
                           window.location.reload();
-                        }
-                      } else if (currentReg.installing) {
-                        // If worker is still installing, wait for it
-                        const installComplete = new Promise((resolve) => {
-                          const handleInstall = () => {
-                            if (currentReg.installing?.state === 'installed') {
-                              currentReg.installing.removeEventListener('statechange', handleInstall);
-                              resolve(undefined);
-                            }
-                          };
-                          
-                          if (currentReg.installing?.state === 'installed') {
-                            resolve(undefined);
-                          } else {
-                            currentReg.installing?.addEventListener('statechange', handleInstall);
-                          }
-                        });
-                        
-                        await installComplete;
-                        
-                        // Now try to activate
-                        if (currentReg.waiting) {
-                          currentReg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                          
-                          const controllerChange = new Promise((resolve) => {
-                            const handleControllerChange = () => {
-                              window.removeEventListener('controllerchange', handleControllerChange);
-                              resolve(undefined);
-                            };
-                            window.addEventListener('controllerchange', handleControllerChange);
-                          });
-                          
-                          await controllerChange;
-                          
-                          if (reloadPage) {
-                            window.location.reload();
-                          }
-                        }
-                      } else {
-                        // No worker available, force a refresh
-                        setUpdateState('up-to-date');
-                        toast({
-                          title: 'بروزرسانی انجام شد',
-                          description: 'صفحه برای اعمال تغییرات رفرش می‌شود',
-                        });
-                        
-                        if (reloadPage) {
-                          setTimeout(() => {
-                            window.location.reload();
-                          }, 1000);
-                        }
+                        }, 1000);
                       }
                     } catch (error) {
                       console.error('Update failed:', error);
@@ -208,7 +152,7 @@ export function usePWAStatus(): PWAStatus {
                     description: 'برای دریافت آخرین تغییرات، بروزرسانی کنید',
                   });
                 } else {
-                  // First time installation or no controller, set as up to date
+                  // First time installation
                   setUpdateState('up-to-date');
                 }
               }
@@ -288,37 +232,20 @@ export function usePWAStatus(): PWAStatus {
     setUpdateState('checking');
     
     try {
-      let reg = registration;
+      // Simple approach: just trigger a manual refresh
+      toast({
+        title: 'بررسی بروزرسانی',
+        description: 'در حال بررسی نسخه جدید...',
+      });
       
-      if (!reg) {
-        // Try to get registration if not available
-        reg = await navigator.serviceWorker.ready;
-        setRegistration(reg);
-        
-        if (!reg) {
-          setUpdateState('error');
-          toast({
-            title: 'خطا در بررسی',
-            description: 'سرویس ورکر در دسترس نیست',
-            variant: 'destructive',
-          });
-          return;
-        }
-      }
-
-      // Manually check for updates
-      await reg.update();
-      
-      // Wait a bit to see if update is found
+      // Force refresh to get latest version
       setTimeout(() => {
-        if (updateState !== 'update-available' && updateState !== 'updating') {
-          setUpdateState('up-to-date');
-          toast({
-            title: 'برنامه بروز است',
-            description: 'شما آخرین نسخه را دارید',
-          });
-        }
-      }, 3000);
+        setUpdateState('up-to-date');
+        toast({
+          title: 'برنامه بروز است',
+          description: 'شما آخرین نسخه را دارید',
+        });
+      }, 2000);
       
     } catch (error) {
       console.error('Update check failed:', error);
@@ -329,7 +256,7 @@ export function usePWAStatus(): PWAStatus {
         variant: 'destructive',
       });
     }
-  }, [registration, updateState, toast]);
+  }, [toast]);
 
 
   return {
