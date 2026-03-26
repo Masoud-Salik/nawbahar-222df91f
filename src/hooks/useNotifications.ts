@@ -17,6 +17,11 @@ export interface Notification {
   article?: {
     title: string;
   };
+  // Smart notification fields
+  context_id?: string; // Composite key for duplicate detection
+  priority?: 'low' | 'medium' | 'high';
+  batch_count?: number; // Number of similar notifications grouped
+  last_activity?: string; // Latest activity timestamp for batching
 }
 
 const NOTIFICATION_SETTINGS_KEY = 'nawbahar_notification_settings';
@@ -26,6 +31,19 @@ export interface NotificationSettings {
   likes: boolean;
   follows: boolean;
   enabled: boolean;
+  // Smart notification settings
+  batchSimilar: boolean;
+  contextAware: boolean;
+  quietHours: {
+    enabled: boolean;
+    start: string; // HH:MM format
+    end: string;   // HH:MM format
+  };
+  priorityFilter: {
+    low: boolean;
+    medium: boolean;
+    high: boolean;
+  };
 }
 
 const defaultSettings: NotificationSettings = {
@@ -33,7 +51,96 @@ const defaultSettings: NotificationSettings = {
   likes: true,
   follows: true,
   enabled: true,
+  batchSimilar: true,
+  contextAware: true,
+  quietHours: {
+    enabled: false,
+    start: '22:00',
+    end: '08:00'
+  },
+  priorityFilter: {
+    low: true,
+    medium: true,
+    high: true
+  }
 };
+
+// Smart notification utilities
+function generateContextId(notification: Partial<Notification>): string {
+  // Generate unique context key for duplicate detection
+  if (notification.type === 'follow') {
+    return `follow_${notification.actor_id}`;
+  }
+  if (notification.article_id) {
+    return `${notification.type}_${notification.article_id}_${notification.actor_id}`;
+  }
+  return `${notification.type}_${notification.actor_id}_${notification.created_at}`;
+}
+
+function calculatePriority(notification: Partial<Notification>): 'low' | 'medium' | 'high' {
+  // Context-aware priority calculation
+  if (notification.type === 'follow') return 'medium';
+  if (notification.type === 'comment') return 'high';
+  if (notification.type === 'like') return 'low';
+  return 'medium';
+}
+
+function isInQuietHours(settings: NotificationSettings): boolean {
+  if (!settings.quietHours.enabled) return false;
+  
+  const now = new Date();
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+  const [startHour, startMin] = settings.quietHours.start.split(':').map(Number);
+  const [endHour, endMin] = settings.quietHours.end.split(':').map(Number);
+  const startTime = startHour * 60 + startMin;
+  const endTime = endHour * 60 + endMin;
+  
+  if (startTime <= endTime) {
+    return currentTime >= startTime && currentTime <= endTime;
+  } else {
+    // Overnight quiet hours (e.g., 22:00 to 08:00)
+    return currentTime >= startTime || currentTime <= endTime;
+  }
+}
+
+function batchSimilarNotifications(notifications: Notification[], settings: NotificationSettings): Notification[] {
+  if (!settings.batchSimilar) return notifications;
+  
+  const batches = new Map<string, Notification[]>();
+  
+  // Group by context (same article, same type)
+  notifications.forEach(notif => {
+    const contextKey = notif.type === 'follow' 
+      ? `follow_${notif.actor_id}`
+      : `${notif.type}_${notif.article_id}`;
+    
+    if (!batches.has(contextKey)) {
+      batches.set(contextKey, []);
+    }
+    batches.get(contextKey)!.push(notif);
+  });
+  
+  const result: Notification[] = [];
+  
+  batches.forEach((batch, contextKey) => {
+    if (batch.length === 1) {
+      result.push(batch[0]);
+    } else {
+      // Create a batched notification
+      const latest = batch.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+      const batched: Notification = {
+        ...latest,
+        batch_count: batch.length,
+        context_id: contextKey,
+        last_activity: latest.created_at,
+        priority: latest.priority
+      };
+      result.push(batched);
+    }
+  });
+  
+  return result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+}
 
 export function useNotifications() {
   const { user } = useAuth();
@@ -116,21 +223,36 @@ export function useNotifications() {
       type: n.type as "like" | "comment" | "follow",
       actor: actorsMap.get(n.actor_id),
       article: n.article_id ? articlesMap.get(n.article_id) : undefined,
+      context_id: generateContextId(n),
+      priority: calculatePriority(n),
     }));
 
-    // Filter based on settings
-    const filtered = settings.enabled 
-      ? transformed.filter(n => {
-          if (n.type === 'comment' && !settings.comments) return false;
-          if (n.type === 'like' && !settings.likes) return false;
-          if (n.type === 'follow' && !settings.follows) return false;
-          return true;
-        })
-      : transformed;
-
-    const dedupedNotifications = Array.from(new Map(filtered.map((n) => [n.id, n])).values());
-    setNotifications(dedupedNotifications);
-    setUnreadCount(dedupedNotifications.filter(n => !n.is_read).length);
+    // Apply smart filters
+    let filtered = transformed;
+    
+    // Filter by settings
+    if (settings.enabled) {
+      filtered = filtered.filter(n => {
+        if (n.type === 'comment' && !settings.comments) return false;
+        if (n.type === 'like' && !settings.likes) return false;
+        if (n.type === 'follow' && !settings.follows) return false;
+        
+        // Filter by priority
+        if (!settings.priorityFilter[n.priority || 'medium']) return false;
+        
+        // Filter by quiet hours (only for non-urgent notifications)
+        if (settings.contextAware && isInQuietHours(settings) && n.priority !== 'high') {
+          return false;
+        }
+        
+        return true;
+      });
+    }
+    
+    // Apply batching for similar notifications
+    const smartNotifications = batchSimilarNotifications(filtered, settings);
+    setNotifications(smartNotifications);
+    setUnreadCount(smartNotifications.filter(n => !n.is_read).length);
     setLoading(false);
   }, [user, settings]);
 
