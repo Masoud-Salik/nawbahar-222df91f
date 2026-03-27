@@ -83,7 +83,7 @@ export function ProfileReviews({ profileId, isOwnProfile }: ProfileReviewsProps)
       toast({
         title: "خطا",
         description: error.message.includes("duplicate")
-          ? "نظر تان قبلا ثبت شده است"
+          ? "نظر تان قبلا ثبت شده است متاسفانه"
           : "خطا در ثبت نظر",
         variant: "destructive",
       });
