@@ -46,7 +46,7 @@ export function ArticleCardMetrics({
     }
 
     const names: string[] = [];
-    if (userReaction) names.push("شما");
+    if (userReaction) names.push("شمااا");
     reactorNames.forEach((n) => {
       if (!names.includes(n)) names.push(n);
     });
