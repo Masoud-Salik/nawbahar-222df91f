@@ -1,73 +1,54 @@
-# Welcome to your Lovable project
+# Nawbahar 🌱
 
-## Project info
+**A space for sharing ideas, stories, and perspectives from Afghanistan.**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Nawbahar is a social publishing platform concept focused on making it easier for people to create and share content. The name *Nawbahar* means “new spring” — a fitting idea for a platform built around fresh voices, expression, and connection.
 
-## How can I edit this code?
+This project explores how a digital publishing experience can serve Afghan communities and create more room for local perspectives.
 
-There are several ways of editing your application.
+## The idea
 
-**Use Lovable**
+People have stories, knowledge, and ideas worth sharing. Nawbahar aims to provide a simple place to publish and discover that content.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+The project is guided by three principles:
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Local relevance** — keep Afghan users and their context in mind.
+- **Accessible publishing** — make sharing content approachable.
+- **Community and discovery** — help readers find perspectives and ideas beyond their immediate circles.
 
-**Use your preferred IDE**
+## Project status
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Nawbahar is an evolving project. This repository is part of its development, and the product direction and implementation may change as the project grows.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+This README describes the project's intention; it does not claim that every idea above is already implemented.
 
-Follow these steps:
+## Technology
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+The current project setup uses:
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui
+
+## Getting started
+
+You'll need [Node.js](https://nodejs.org/) and npm.
+
+```bash
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+cd <YOUR_PROJECT_DIRECTORY>
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Replace the placeholders with this repository's Git URL and the folder created by cloning it.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Feedback
 
-**Use GitHub Codespaces**
+Ideas, constructive feedback, and bug reports are welcome. Open an issue in this repository to share them.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+**A new spring for ideas.** 🌱
